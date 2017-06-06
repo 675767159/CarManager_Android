@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="login_input_height">50dp</dimen>
+    <dimen name="horizon_margin">20dp</dimen>
+    <dimen name="login_vertical_margin">30dp</dimen>
+    <dimen name="vertical_margin">20dp</dimen>
+    <dimen name="navbar_height">44dp</dimen>
+</resources>

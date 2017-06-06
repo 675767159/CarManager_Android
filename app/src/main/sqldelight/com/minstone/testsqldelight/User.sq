@@ -1,0 +1,12 @@
+create table user(
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    age INTEGER NOT NULL
+);
+
+
+-- 其他的语句通过标识符来引用。在生成的 Java 对象中会包含
+-- 一个该标识符的常亮引用这个语句。
+
+-- 查询use表,百分号（%）代表零个、一个或多个数字或字符,||连接两个不同的字符串，得到一个新的字符串。
+select_by_name: select * from user;

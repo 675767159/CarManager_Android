@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="NavbarView" type="id">NavbarView</item>
+    <item name="listView" type="id">listView</item>
+    <item name="refreshLayout" type="id">refreshLayout</item>
+    <item name="imageView" type="id">imageView</item>
+</resources>

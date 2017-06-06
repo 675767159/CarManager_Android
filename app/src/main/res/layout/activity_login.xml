@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@mipmap/login_bg"
+        android:scaleType="centerCrop"
+        />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:src="@mipmap/login_logo"
+        android:id="@+id/logo"
+        />
+    <LinearLayout
+        android:layout_height="@dimen/login_input_height"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="@dimen/horizon_margin"
+        android:layout_marginRight="@dimen/horizon_margin"
+        android:layout_below="@+id/logo"
+        android:layout_marginTop="@dimen/login_vertical_margin"
+        android:id="@+id/user_back_view"
+        android:background="@drawable/ine_login_input"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@mipmap/login_user"
+            android:scaleType="center"
+            android:layout_marginLeft="10dp"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="请输入手机号或者用户名"
+            android:textSize="14sp"
+            android:background="@null"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/edit_text_user"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_height="@dimen/login_input_height"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="@dimen/horizon_margin"
+        android:layout_marginRight="@dimen/horizon_margin"
+        android:layout_below="@+id/user_back_view"
+        android:layout_marginTop="@dimen/login_vertical_margin"
+        android:id="@+id/password_back_view"
+        android:background="@drawable/ine_login_input"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@mipmap/login_password"
+            android:scaleType="center"
+            android:layout_marginLeft="10dp"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="请输入密码"
+            android:textSize="14sp"
+            android:background="@null"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/edit_text_password"
+            android:inputType="textPassword"
+
+            />
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_input_height"
+        android:text="登录"
+        android:layout_below="@id/password_back_view"
+        android:layout_marginLeft="@dimen/horizon_margin"
+        android:layout_marginRight="@dimen/horizon_margin"
+        android:layout_marginTop="@dimen/login_vertical_margin"
+        android:background="#23943D"
+        android:textColor="@android:color/white"
+        android:id="@+id/button_login"
+        android:onClick="onClick"
+
+
+        />
+
+    <Button android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="注册"
+        android:layout_below="@+id/button_login"
+        android:layout_marginRight="@dimen/horizon_margin"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="@dimen/vertical_margin"
+        android:background="@android:color/transparent"
+        android:onClick="onClick"
+        android:id="@+id/button_register"
+
+        />
+
+</RelativeLayout>

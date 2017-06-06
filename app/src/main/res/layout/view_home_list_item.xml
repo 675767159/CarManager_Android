@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container">
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="45dp"
+            android:src="@mipmap/main_home_car"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:id="@id/imageView"
+
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toRightOf="@id/imageView"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:id="@+id/titleBackView"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/title1"
+                android:text="所属车系："
+                android:layout_marginBottom="@dimen/vertical_margin"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/title2"
+                android:text="所属车系："
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/title3"
+                android:text="所属车系："
+                android:layout_marginTop="@dimen/vertical_margin"
+                />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toRightOf="@id/titleBackView"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/value1"
+                android:layout_marginBottom="@dimen/vertical_margin"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/value2"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/value3"
+                android:layout_marginTop="@dimen/vertical_margin"
+                />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#dcdcdc"
+            android:id="@+id/line"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            >
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

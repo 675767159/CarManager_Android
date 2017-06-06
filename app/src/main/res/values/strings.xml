@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">汽车管家</string>
+    <string name="ShareSDK_Key">e5b13e44c4d6</string>
+    <string name="ShareSDK_Secret">75072906c39bafba817435bd4fc08641</string>
+</resources>

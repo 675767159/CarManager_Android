@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.qcwp.carmanager.ui.MainActivity">
+
+  <com.qiantao.coordinatormenu.CoordinatorMenu android:layout_height="match_parent"
+      android:layout_width="match_parent">
+
+      <include layout="@layout/view_main_menu"></include>
+
+      <com.qiantao.coordinatormenu.MainView
+          android:id="@+id/main"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+          <include layout="@layout/view_main_home"></include>
+
+      </com.qiantao.coordinatormenu.MainView>
+
+  </com.qiantao.coordinatormenu.CoordinatorMenu>
+
+</android.support.constraint.ConstraintLayout>
