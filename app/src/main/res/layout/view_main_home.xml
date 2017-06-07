@@ -8,7 +8,26 @@
         style="@style/NavBarStyle"
         app:hiddenBackButton="true"
         app:title="@string/app_name"
-        />
+        >
+        <ImageButton android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/main_home_menu"
+            android:background="@null"
+            android:onClick="onClick"
+            android:id="@+id/button_menu"
+            />
+   <ImageButton android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_marginRight="8dp"
+       android:layout_centerVertical="true"
+       android:src="@mipmap/main_home_share"
+       android:background="@null"
+       android:onClick="onClick"
+       />
+    </com.qcwp.carmanager.control.NavBarView>
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/NavbarView"

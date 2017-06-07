@@ -26,4 +26,9 @@
         <attr name="image" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="MenuItemView">
+        <attr name="text" format="string"/>
+        <attr name="HomeItemView_image" format="reference" />
+    </declare-styleable>
+
 </resources>

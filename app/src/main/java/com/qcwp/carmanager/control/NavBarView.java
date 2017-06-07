@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -63,6 +64,16 @@ public class NavBarView extends RelativeLayout {
             view.setBackgroundResource(background);
         }
 
+        ImageButton button_obd_connect=(ImageButton)view.findViewById(R.id.button_obd);
+
+        button_obd_connect.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+            }
+        });
+
         LayoutParams param = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         this.addView(view,param);
 
@@ -76,6 +87,9 @@ public class NavBarView extends RelativeLayout {
         }else {
             button.setVisibility(GONE);
         }
+
+
+
 
     }
     public void setTitle(String title){

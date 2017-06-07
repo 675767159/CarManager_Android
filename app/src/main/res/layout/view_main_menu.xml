@@ -1,7 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:id="@+id/menu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#232626">
+<RelativeLayout android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
     >
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/main_home_car"
+        android:id="@+id/headImage"
+        android:layout_marginTop="@dimen/vertical_margin"
+        android:layout_centerHorizontal="true"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="13sp"
+        android:text="hello"
+        android:layout_below="@+id/headImage"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/userName"
+        android:layout_marginTop="10dp"
+        />
+
+    <LinearLayout
+        android:layout_width="100dp"
+        android:layout_height="1dp"
+        android:background="@android:color/white"
+        android:id="@+id/line"
+        android:orientation="horizontal"
+        android:layout_below="@+id/userName"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        />
+
+    <LinearLayout
+        android:layout_width="100dp"
+        android:layout_height="300dp"
+        android:orientation="vertical"
+        android:layout_below="@+id/line"
+        >
+        <com.qcwp.carmanager.control.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="主页"
+            app:HomeItemView_image="@mipmap/main_menu_home"
+            android:layout_weight="1"
+            android:id="@+id/button_home"
+            android:onClick="onClick"
+            />
+        <com.qcwp.carmanager.control.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="行驶"
+            app:HomeItemView_image="@mipmap/main_menu_driving"
+            android:layout_weight="1"
+            android:id="@+id/button_driving"
+            android:onClick="onClick"
+            />
+        <com.qcwp.carmanager.control.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="专业"
+            app:HomeItemView_image="@mipmap/mian_menu_professional_test"
+            android:layout_weight="1"
+            android:id="@+id/button_professional_test"
+            android:onClick="onClick"
+            />
+        <com.qcwp.carmanager.control.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="行程"
+            app:HomeItemView_image="@mipmap/mian_menu_travel"
+            android:layout_weight="1"
+            android:id="@+id/button_travel"
+            android:onClick="onClick"
+            />
+        <com.qcwp.carmanager.control.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="车辆"
+            app:HomeItemView_image="@mipmap/mian_menu_car"
+            android:layout_weight="1"
+            android:id="@+id/button_car_info"
+            android:onClick="onClick"
+            />
+        <com.qcwp.carmanager.control.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="设置"
+            app:HomeItemView_image="@mipmap/mian_menu_set"
+            android:layout_weight="1"
+            android:id="@+id/button_set"
+            android:onClick="onClick"
+            />
+
+
+    </LinearLayout>
+
+</RelativeLayout>
 
 </RelativeLayout>
