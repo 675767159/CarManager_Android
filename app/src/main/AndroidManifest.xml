@@ -5,6 +5,8 @@
 
     <!-- 访问网络，网络定位需要上网 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application
         android:name=".APP"
@@ -14,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon">
+        tools:replace="android:icon"
+        >
         <activity android:name=".ui.MainActivity"></activity>
         <activity android:name=".ui.LoginActivity" />
         <activity android:name=".ui.WelcomeActivity">
@@ -25,6 +28,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.RegisterActivity"></activity>
+
+        <receiver android:name=".broadcast.BlueToothReceiver">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

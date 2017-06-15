@@ -2,6 +2,7 @@ package com.qcwp.carmanager;
 
 import android.app.Activity;
 import android.app.Application;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
@@ -100,6 +101,8 @@ public class APP extends Application {
         SMSSDK.initSDK(this,this.getString(R.string.ShareSDK_Key),this.getString(R.string.ShareSDK_Secret));
 
         this.getScreenPhysicalSize();
+
+
 
     }
     public static APP getInstance() {

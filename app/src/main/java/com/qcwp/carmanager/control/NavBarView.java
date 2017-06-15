@@ -1,5 +1,7 @@
 package com.qcwp.carmanager.control;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
@@ -13,7 +15,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.obd.BluetoothService;
+import com.qcwp.carmanager.obd.SensorsService;
 import com.qcwp.carmanager.utils.MyActivityManager;
+import com.qcwp.carmanager.utils.Print;
 
 
 /**
@@ -53,7 +58,7 @@ public class NavBarView extends RelativeLayout {
         Boolean hiddenBackButton=typedArray.getBoolean(R.styleable.NavBarView_hiddenBackButton,false);
 
         LayoutInflater layoutInflater=(LayoutInflater) context
-                .getSystemService(context.LAYOUT_INFLATER_SERVICE);
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view= layoutInflater.inflate(R.layout.view_navbar,null);
 
         textView=(TextView)view.findViewById(R.id.navBar_title);
@@ -69,6 +74,23 @@ public class NavBarView extends RelativeLayout {
         button_obd_connect.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                BluetoothService bluetoothService=new BluetoothService();
+                BluetoothAdapter bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
+                BluetoothDevice device = bluetoothAdapter.getRemoteDevice("00:0D:18:00:00:01");
+                bluetoothService.connect_v2(device);
+                String str1 =  BluetoothService.getData("ATZ");
+                String str2 = BluetoothService.getData("ATE0");
+                String str3 = BluetoothService.getData("ATS0");
+                String  data = BluetoothService.getData("0100");
+                Print.d("BluetoothService",data+"----");
+                data = BluetoothService.getData("0902");
+                Print.d("BluetoothService",data+"----");
+
+                SensorsService.SensorsDataHandler(data, SensorsService.VIN_PIDS);
+                data=SensorsService.GetVinCode(data);
+                Print.d("BluetoothService",data+"----");
+
+
 
 
             }
@@ -98,5 +120,7 @@ public class NavBarView extends RelativeLayout {
     public String getTitle(){
        return (String) textView.getText();
     }
+
+
 
 }

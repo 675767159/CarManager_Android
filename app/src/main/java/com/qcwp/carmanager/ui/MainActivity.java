@@ -3,12 +3,18 @@ package com.qcwp.carmanager.ui;
 import android.os.Bundle;
 import android.view.View;
 
+import com.minstone.testsqldelight.HockeyPlayerModel;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.control.HomeItemView;
+import com.qcwp.carmanager.model.HockeyPlayer;
 import com.qcwp.carmanager.utils.Print;
 import com.qiantao.coordinatormenu.CoordinatorMenu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
+
 
 
 public class MainActivity extends BaseActivity {
@@ -34,8 +40,18 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initViewsAndEvents(Bundle savedInstanceState) {
+        Print.d(TAG,stringFromJNI());
+
+        List<HockeyPlayer> result = new ArrayList<>();
+        HockeyPlayerModel.Creator<HockeyPlayer> creator=HockeyPlayer.FACTORY.creator;
+
+
     }
 
+    public native String stringFromJNI();
+    static {
+        System.loadLibrary("native-lib");
+    }
     @Override
     public void onClick(View v) {
         super.onClick(v);
