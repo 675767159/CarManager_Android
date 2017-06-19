@@ -1,8 +1,10 @@
 package com.qcwp.carmanager.control;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -14,9 +16,15 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
+import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.obd.BluetoothService;
+import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.obd.SensorsService;
+import com.qcwp.carmanager.ui.BaseActivity;
+import com.qcwp.carmanager.ui.EditCarActivity;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
 
@@ -71,25 +79,41 @@ public class NavBarView extends RelativeLayout {
 
         ImageButton button_obd_connect=(ImageButton)view.findViewById(R.id.button_obd);
 
+        final BaseActivity currentActivity=(BaseActivity) context;
+
         button_obd_connect.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                BluetoothService bluetoothService=new BluetoothService();
-                BluetoothAdapter bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
-                BluetoothDevice device = bluetoothAdapter.getRemoteDevice("00:0D:18:00:00:01");
-                bluetoothService.connect_v2(device);
-                String str1 =  BluetoothService.getData("ATZ");
-                String str2 = BluetoothService.getData("ATE0");
-                String str3 = BluetoothService.getData("ATS0");
-                String  data = BluetoothService.getData("0100");
-                Print.d("BluetoothService",data+"----");
-                data = BluetoothService.getData("0902");
-                Print.d("BluetoothService",data+"----");
 
-                SensorsService.SensorsDataHandler(data, SensorsService.VIN_PIDS);
-                data=SensorsService.GetVinCode(data);
-                Print.d("BluetoothService",data+"----");
+                currentActivity.showLoadingDialog("正在连接...");
+                OBDClient.readVinCode(new OBDClient.ReadVinCodeCompleteListener() {
 
+                    @Override
+                    public void connectComplete(Boolean success, final String message) {
+                        currentActivity.dismissLoadingDialog();
+                        if (success) {
+                            currentActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    currentActivity.showToast(message);
+                                }
+                            });
+
+                            CarInfoModel carInfoModel = APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(message)).unique();
+                            if (carInfoModel==null){
+
+                                Intent intent=new Intent(currentActivity, EditCarActivity.class);
+                                currentActivity.startActivity(intent);
+
+                            }
+                        }else {
+
+                            currentActivity.showToast(message);
+                        }
+
+
+                    }
+                });
 
 
 

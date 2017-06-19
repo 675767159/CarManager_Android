@@ -2,15 +2,15 @@ package com.qcwp.carmanager;
 
 import android.app.Activity;
 import android.app.Application;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
-import com.blankj.utilcode.util.Utils;
 import com.qcwp.carmanager.engine.Engine;
-import com.qcwp.carmanager.engine.TokenInterceptor;
+import com.qcwp.carmanager.greendao.gen.DaoMaster;
+import com.qcwp.carmanager.greendao.gen.DaoSession;
+import com.qcwp.carmanager.implement.GreenDaoContext;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
 
@@ -39,6 +39,7 @@ public class APP extends Application {
     private int mScreenWidth = 0;
     private int mScreenHeight = 0;
     private float mScreenDensity = 0.0f;
+    private DaoSession daoSession;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -101,7 +102,7 @@ public class APP extends Application {
         SMSSDK.initSDK(this,this.getString(R.string.ShareSDK_Key),this.getString(R.string.ShareSDK_Secret));
 
         this.getScreenPhysicalSize();
-
+        this.setupDatabase();
 
 
     }
@@ -153,5 +154,28 @@ public class APP extends Application {
 
     public Double getMyScreenSize() {
         return mScreenSize ;
+    }
+    /**
+     * 配置数据库
+     */
+    private void setupDatabase() {
+        //创建数据库shop.db"
+
+        GreenDaoContext greenDaoContext=new GreenDaoContext(this);
+
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(greenDaoContext,"CarManager.db", null);
+
+        //获取可写数据库
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+
+        //获取数据库对象
+        DaoMaster daoMaster = new DaoMaster(db);
+        //获取Dao对象管理者
+        daoSession = daoMaster.newSession();
+    }
+
+    public DaoSession getDaoInstant() {
+        return daoSession;
     }
 }

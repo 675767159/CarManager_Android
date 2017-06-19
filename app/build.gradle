@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.squareup.sqldelight'
+apply plugin: 'org.greenrobot.greendao' // apply plugin
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -34,6 +34,14 @@ repositories{
     }
 }
 
+greendao {
+    schemaVersion 2 //数据库模式的当前版本。 这由* OpenHelpers类用于在模式版本之间迁移。 如果更改实体/数据库模式，则必须增加此值。 默认值为1。
+    daoPackage 'com.qcwp.carmanager.greendao.gen'//生成的DAO，DaoMaster和DaoSession的包名称。 默认为源实体的包名称。
+    targetGenDir 'src/main/java' //生成的源码应存储在的位置。 默认为生成目录（build / generated / source / greendao）中生成的源文件夹。
+//    generateTests：设置为true以自动生成单元测试。
+//    targetGenDirTests：生成的单元测试应存储在的基本目录。 默认为src / androidTest / java。
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -66,6 +74,9 @@ dependencies {
     compile 'com.github.bestTao:CoordinatorMenu:v1.0.2'
 
     compile "com.google.auto.value:auto-value:1.4.1"
+
+    compile 'org.greenrobot:greendao:3.2.2' // add library
+
 }
 
 

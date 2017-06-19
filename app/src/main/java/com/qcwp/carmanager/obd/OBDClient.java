@@ -1,12 +1,28 @@
 package com.qcwp.carmanager.obd;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+
+import com.blankj.utilcode.util.EmptyUtils;
+import com.blankj.utilcode.util.ThreadPoolUtils;
+import com.qcwp.carmanager.APP;
+import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.LoadDataTypeEnum;
-import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
+import com.qcwp.carmanager.greendao.gen.CarBrandModelDao;
+import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
+import com.qcwp.carmanager.greendao.gen.DaoSession;
+import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
+import com.qcwp.carmanager.utils.MySharedPreferences;
 import com.qcwp.carmanager.utils.Print;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+
+import static com.blankj.utilcode.util.ThreadPoolUtils.SingleThread;
+import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeConnectSuccess;
+import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeConnectingWithSP;
 
 /**
  * Created by qyh on 2017/6/6.
@@ -14,7 +30,7 @@ import java.net.Socket;
 
 public class OBDClient {
 
-    private   int connectStatus;//连接状态
+    private static   OBDConnectStateEnum  connectStatus;//连接状态
     private   LoadDataTypeEnum loadDataType;//车辆处于何种状态
     private   String vinCode;//车辆的vincode码
     private   String  spValue;//协议
@@ -57,224 +73,127 @@ public class OBDClient {
         return OBDClient.UserDataHolder.INSTANCE;
     }
 
-    public  void readVinCode(int tempOnlyFlag,SensorsService sensorsService,ReadVinCodeCompleteListener     tempSensorsService)  {
+    public  static void readVinCode(final ReadVinCodeCompleteListener  readVinCodeCompleteListener)  {
+
+        ThreadPoolUtils threadPool=new ThreadPoolUtils(SingleThread,1);
+         Future future=threadPool.submit(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+
+                BluetoothService bluetoothService=new BluetoothService();
+                BluetoothAdapter bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
+                BluetoothDevice device = bluetoothAdapter.getRemoteDevice("00:0D:18:00:00:01");
+                bluetoothService.conectOBD(device, new BluetoothService.ConectOBDListener() {
+                    @Override
+                    public void completeConect(Boolean success, String message) {
+
+                        connectStatus=connectTypeConnectingWithSP;
+                        Boolean  blockSuccess=success;
+                        String  blockMessage=message;
+                        if (success) {
+                            if (EmptyUtils.isNotEmpty(OBDClient.detectProtocol())) {
+
+                                String data = BluetoothService.getData(SensorsService.VIN_PIDS);
+                                Print.d("BluetoothService", data + "----");
+
+                                SensorsService.SensorsDataHandler(data, SensorsService.VIN_PIDS);
+                                String vinCode = SensorsService.GetVinCode(data);
+
+                                connectStatus = connectTypeConnectSuccess;
+                                blockMessage=vinCode;
+                                blockSuccess=true;
+
+
+                            } else {
+                                blockMessage="不是通用协议";
+                                blockSuccess=false;
+
+                            }
+                        }
 
 
 
-       String data = BluetoothService.getData("0100");
-        tempSensorsService.readVinCodeComplete();
+                        if (readVinCodeCompleteListener != null) {
+                            readVinCodeCompleteListener.connectComplete(blockSuccess, blockMessage);
+                        }
+
+                    }
+                });
+
+                return null;
+            }
+        });
+
+
+
+
 
 
     }
 
+    static String  detectProtocol() {
 
-    public  void getCarData(){
+        String SP=new  MySharedPreferences(APP.getInstance()).getString(KeyEnum.currentOBDrotocol,"");
 
+        if (EmptyUtils.isNotEmpty(SP)){
+            String data =  BluetoothService.getData(SP);
+           if (OBDClient.checkProtocolData(data)){
+                return SP;
+            }
+        }
+
+        //1.用协议去判断连接状态，成功返回：OK（ATDPN 例外，返回 0），失败返回的数据目前未知
+        //2.用0100去拿数据，成功返回：BUS INIT: OK和(4100或41 00)  失败返回 BUS INIT: ... ERROR、NO DATA、UNABLE TO CONNECT
+        //3.必须同时满足1和2才能正常连接
+        String  data;
+        //    NSLog(@"SP = %@",SP);
+        String str1 =  BluetoothService.getData("ATZ");//这两个必须有，不然会出现连上了却读不到数据的情况，（实测过的）
+        String str2 = BluetoothService.getData("ATE0");
+        String str3 = BluetoothService.getData("ATS0");
+
+
+        if (OBDClient.checkProtocolData("OK")){
+            return "ATZ";
+        }
+
+
+        String sp_Value;
+       String[] spArr=APP.getInstance().getResources().getStringArray(R.array.OBDProtocol);
+
+        for (int i = 0; i <spArr.length; i++) {
+            if (connectStatus == connectTypeConnectingWithSP) {
+                sp_Value = spArr [i];
+               if (OBDClient.checkProtocolData(BluetoothService.getData(sp_Value))) {
+                   MySharedPreferences mySharedPreferences = new MySharedPreferences(APP.getInstance());
+                   mySharedPreferences.setString(KeyEnum.currentOBDrotocol, sp_Value);
+                   return sp_Value;
+               }
+            }
+        }
+        return null;
     }
 
-    public  void  stop(){
+   static Boolean  checkProtocolData(String data){
+
+        if (data.toUpperCase().contains("OK")) {
+            data = BluetoothService.getData("0100");
+
+            if (data.contains("4100") ||data.contains("41 00")) {
+                //当车辆还未初始化完成时，再初始化一次
+                while (data.contains("ERROR")){
+                    data = BluetoothService.getData("0100");
+                }
 
 
+                return true;
+            }
+
+        }
+
+        return false;
     }
-
-//   public Boolean  connectSocket(int sock, String host, String port) {
-//        Print.d("");
-//        int ret;
-//
-//
-//
-//        struct addrinfo  result, hints;
-//        struct addrinfo  addr;
-//
-//
-//        int tempsock=0;
-//
-//        memset(&hints, 0, sizeof hints);
-//        hints.ai_family = AF_INET;
-//        hints.ai_socktype = SOCK_STREAM;
-//        hints.ai_flags = AI_PASSIVE;
-//
-//        ret = getaddrinfo([host cStringUsingEncoding:(NSStringEncoding)NSASCIIStringEncoding],
-//                      [port cStringUsingEncoding:(NSStringEncoding)NSASCIIStringEncoding],
-//                      &hints, &result);
-//        NSLog(@"ret====%d",ret);
-//
-//        if (ret != 0) return FALSE;
-//        for(addr = result; addr != NULL; addr = addr->ai_next) {
-//            if ((tempsock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol)) == -1) {
-//                perror("talker: socket");
-//                NSLog(@"wtf is this");
-//                continue;
-//            }
-//            break;
-//        }
-//
-//        if (tempsock == -1) {
-//            return FALSE;
-//        }
-//
-//
-//        unsigned long ul = 1;
-//        int rm = ioctl(tempsock, FIONBIO, &ul);
-//        if(rm == -1){
-//        [OBDClient stop];
-//            return NO;
-//        }
-//        NSLog(@"rm====%d",rm);
-//        ret = connect(tempsock, addr->ai_addr, addr->ai_addrlen);
-//        if (ret == 0){
-//            NSLog(@"connected");
-//        }
-//        NSLog(@"ret====%d",ret);
-//        struct timeval timeout = {10,0};
-//        fd_set r;
-//        FD_ZERO(&r);
-//        FD_SET(tempsock,&r);
-//        int retval = select(tempsock+1,NULL,&r,NULL,&timeout);
-//        if(retval == -1){
-//            NSLog(@"select");
-//        [OBDClient stop];
-//            return NO;
-//        }else if(retval == 0){
-//            NSLog(@"OBD timeout");
-//        [OBDClient stop];
-//            return NO;
-//        }
-//        NSLog(@"retval====%d",retval);
-//        unsigned long ul1=0;
-//
-//        rm = ioctl(tempsock,FIONBIO,(unsigned long*)&ul1);
-//        if(rm == -1){
-//        [OBDClient stop];
-//            return NO;
-//        }
-//        NSLog(@"rm======%d",rm);
-//
-//        NSLog(@"errno======%d",errno);
-//
-//
-//        if(errno != EINPROGRESS){
-//        *sock = tempsock;
-//            timeout = {20,0};
-//            setsockopt(tempsock, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
-//            setsockopt(tempsock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
-//            NSLog(@"connected/n");
-//            NSLog(@"tempsock====%d",tempsock);
-//            return YES;
-//        }
-//
-//        //2017-5-9所加非阻塞connect errno为EINPROGRESS,如何判断已经连接上了？
-//        int so_error;
-//        socklen_t len = sizeof(so_error);
-//        int tempsock2=tempsock;
-//        getsockopt(tempsock2, SOL_SOCKET, SO_ERROR, &so_error, &len);
-//
-//        if (so_error == 0) {
-//        /* socket is connected */
-//        *sock = tempsock;
-//            timeout = {20,0};
-//            setsockopt(tempsock, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(struct timeval));
-//            setsockopt(tempsock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval));
-//            NSLog(@"connected/n");
-//            NSLog(@"tempsock====%d",tempsock);
-//            return YES;
-//
-//        }
-//
-//        return false;
-//    }
-//
-
-
-
-
-////    连接相关方法
-//    public static void connect(SensorsService tempSensorsService, ConnectCompleteListener connectComplete){
-//
-//        static  OBDClient*OBD=nil;
-//        if(OBD==nil)  OBD=[OBDClient new];
-//        sensorsService=tempSensorsService;
-//        ConnectStatus = connectTypeConnectingWithWiFi;
-//
-//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-//        if ([OBD connectSocket:&_odbSock host:OBDKEY_HOST port:OBDKEY_PORT])
-//        {
-//            ConnectStatus = connectTypeConnectingWithOBD;
-//            BOOL isConnect = [OBD connectOBD];
-//            if (isConnect)
-//            {
-//                ConnectStatus = connectTypeConnectingWithSP;
-//                spValue = nil;
-//                spValue = [OBD detectProtocol:[OBDClient readOdbDataPid:@"ATDPN"]];
-//
-//                if (!spValue)
-//                {
-//                    ConnectStatus = connectTypeDisconnectionWithProtocol;
-//                }else
-//                {
-//                        [OBDClient shareOBDdata].spValue=spValue;
-//                    NSLog(@"协议 = %@",spValue);
-//                }
-//
-//                if (block) block(ConnectStatus,nil);
-//
-//            }
-//
-//            else
-//            {
-//                ConnectStatus = connectTypeDisconnectionWithOBD;
-//                if (block) block(ConnectStatus,nil);
-//            }
-//
-//
-//
-//
-//        }
-//            else
-//        {
-//            ConnectStatus = connectTypeDisconnectionWithWIFi;
-//                [OBDClient stop];
-//            if (block) block(ConnectStatus,nil);
-//        }
-//    });
-//
-//
-//
-//
-//    }
-//
-//
-//////
-//////    public native String stringFromJNI();
-////    static {
-////        System.loadLibrary("native-lib");
-////    }
-////
-////
-////    public static void connectBySocket() throws Exception{
-//////		Socket socket  = new Socket("192.168.0.10", 35000);
-//////		Socket socket  = new Socket("192.168.11.245", 35000);
-////
-//////		for(int i = 0;i<255;i++){
-//////			String serverIp = "192.168.0."+i;
-////        String serverIp = "192.168.0.10";
-////        try {
-////
-////            Socket socket  = new Socket(serverIp, 35000);
-////
-////             InputStream mmInStream= socket.getInputStream();
-////             OutputStream mmOutStream= socket.getOutputStream();
-////
-//////				myThread.start();
-////        } catch (Exception e) {
-////            e.printStackTrace();
-////        }
-//////		}
-
     public interface ReadVinCodeCompleteListener{
-        void readVinCodeComplete();
+        void connectComplete(Boolean success,String message);
     }
-    public interface ConnectCompleteListener{
-        void connectComplete();
-    }
+
 }

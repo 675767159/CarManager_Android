@@ -2,31 +2,21 @@ package com.qcwp.carmanager.ui;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Trace;
-import android.util.ArrayMap;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
-import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.R;
-import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.model.LoginModel;
-import com.qcwp.carmanager.model.User;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.utils.CommonUtils;
-import com.qcwp.carmanager.utils.ObjectWriter;
 import com.qcwp.carmanager.utils.Print;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import butterknife.BindView;
 import retrofit2.Call;
@@ -53,6 +43,7 @@ public class LoginActivity extends BaseActivity {
     protected void initViewsAndEvents(Bundle savedInstanceState) {
         CommonUtils.setViewCorner(buttonLogin, 20, 20, Color.parseColor("#23943D"));
         KeyboardUtils.clickBlankArea2HideSoftInput();
+
 
 
 

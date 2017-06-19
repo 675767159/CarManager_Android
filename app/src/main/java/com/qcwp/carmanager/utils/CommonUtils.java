@@ -1,9 +1,13 @@
 package com.qcwp.carmanager.utils;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.os.Environment;
 import android.view.View;
 
 import com.qcwp.carmanager.implement.StateRoundRectDrawable;
+
+import java.io.File;
 
 
 /**
@@ -22,5 +26,14 @@ public class CommonUtils {
         view.setBackground(mRoundRectDradable);
 
     }
+    public static String getMyFileFolder(Context context) {
+        String mFileFolder;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            mFileFolder = context.getExternalCacheDir().getPath() + File.separator;
+        } else {
+            mFileFolder = context.getCacheDir().getPath() + File.separator;
+        }
 
+        return mFileFolder;
+    }
 }

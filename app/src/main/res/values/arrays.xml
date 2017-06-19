@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="OBDProtocol">
+        <item>ATSP7</item>
+        <item>ATSP1</item>
+        <item>ATSP2</item>
+        <item>ATSP3</item>
+        <item>ATSP4</item>
+        <item>ATSP5</item>
+        <item>ATSP6</item>
+        <item>ATSP8</item>
+        <item>ATSP9</item>
+        <item>ATSPA</item>
+        <item>ATSPB</item>
+        <item>ATSPC</item>
+        <item>ATSPD</item>
+    </string-array>
+
+
+
+
+</resources>

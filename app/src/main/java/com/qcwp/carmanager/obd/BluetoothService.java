@@ -423,9 +423,92 @@ public class BluetoothService {
 		}
         return STATE_FAILED;
 	}
-	
-	
-	
+
+
+
+
+	public Boolean conectOBD(BluetoothDevice mmDevice, ConectOBDListener conectOBDListener){
+		Print.d("RfcommSocket","------");
+		BluetoothSocket mmSocket =null;
+		try {
+			BluetoothSocket tmp = null;
+			boolean isConnectSuccess = false;
+			thirdConnectHadDone = false;
+
+			for (int i = 0; i <= 4; i++) {
+				Print.d("RfcommSocket，第"+i+"次，状态："+mState);
+				try {
+					if(i == 0) {
+						Method m = mmDevice.getClass().getMethod("createRfcommSocket", int.class);
+						tmp = (BluetoothSocket)m.invoke(mmDevice, 1);
+						log("RfcommSocket，第"+i+"次，tmp"+tmp.toString());
+						tmp.connect();
+						isConnectSuccess = true;
+						break;
+					}
+
+				} catch(Exception eee) {
+					//TODO 蓝牙连接失败返回的代码有：
+					//【Connection refused】 （不包含中括号）再用第二种方法连接是可以连接上的
+					//【Device or resource busy】当另一个软件退出的时候，才可以连接上，可以多试几次第二种方法，可以提示用户退出其它线程
+					//【Permission denied】这是主要问题，有时可以多次进行连接而连上，有时不行（还有个大问题就是当连不上时，有一直弹出输入框），解决办法：如果已经配对过重启蓝牙，取消配对再连即可连上
+					//【Connection timed out】
+					//No route to host 当车易连接上时，我们再连接会出现这情况
+					//还有一种情况，obd已经连接上，但蓝牙却没有检测到，解决方法，重插下obd
+					//当蓝牙已经给其它
+					returnConnectBluetoothExceptionStr = eee.getMessage().toString();
+					Print.d("连接情况","错误信息："+returnConnectBluetoothExceptionStr);
+					System.out.println(eee.getMessage());
+					Thread.sleep(300);
+					continue;
+				}
+			}
+
+			Print.d("连接情况","isConnectSuccess.状态："+getState());
+			if(isConnectSuccess == false) {
+				if (conectOBDListener!=null){
+					conectOBDListener.completeConect(false,returnConnectBluetoothExceptionStr);
+				}
+				return false;
+			}
+
+			mmSocket = tmp;
+			Print.d("连接情况","isConnectSuccess.状态："+getState());
+
+		} catch (Exception e) {
+			connectionFailed();
+			Print.d("连接情况","connect device fail.状态："+getState());
+			try {
+				if(null != mmSocket) mmSocket.close();
+			} catch (Exception e2) {
+			}
+			if (conectOBDListener!=null){
+				conectOBDListener.completeConect(false,e.getLocalizedMessage());
+			}
+			return false;
+		}
+
+
+		log("connect device success.状态："+getState());
+
+		try {
+			mmInStream = mmSocket.getInputStream();
+			mmOutStream = mmSocket.getOutputStream();
+			Print.d("连接情况",serverIp+"连接成功------mmInStream："+mmInStream);
+
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		if (conectOBDListener!=null){
+			conectOBDListener.completeConect(true,"连接成功!");
+		}
+		return true;
+	}
+
+	public interface ConectOBDListener{
+		void completeConect(Boolean success,String message);
+	}
 	
 	/**
 	 * 1,是蓝牙，2,是wifi
@@ -486,6 +569,6 @@ public class BluetoothService {
 	
 	
 	private void log(String str){
-		Log.i("override BluetoothService", ":"+str);
+
 	}
 }
