@@ -17,6 +17,20 @@
     </string-array>
 
 
+    <string-array name="CarColors">
+        <item>白</item>
+        <item>黄</item>
+        <item>红</item>
+        <item>褐</item>
+        <item>绿</item>
+        <item>蓝</item>
+        <item>灰</item>
+        <item>黑</item>
+        <item>青</item>
+        <item>银白</item>
+        <item>紫</item>
+        <item>其他</item>
+   </string-array>
 
 
 </resources>

@@ -3,21 +3,17 @@
     android:layout_width="match_parent" android:layout_height="@dimen/navbar_height"
     android:background="@color/navbarBackGroundColor"
     >
-    <Button
+    <ImageButton
         android:id="@+id/navBar_back"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:background="@null"
-        android:drawableLeft="@null"
-        android:drawablePadding="10dp"
         android:gravity="center"
-        android:paddingLeft="15dp"
-        android:text="返回"
-        android:textColor="@android:color/white"
-        android:textSize="25sp"
         android:onClick="onClick"
-
-
+        android:src="@mipmap/back"
+        android:paddingTop="@dimen/padding"
+        android:paddingBottom="@dimen/padding"
+        android:paddingLeft="10dp"
         />
     <TextView
         android:id="@+id/navBar_title"
@@ -27,16 +23,9 @@
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="25sp"
+        android:drawableLeft="@mipmap/obd_connect_failed"
 
         />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/obd_connect_failed"
-        android:layout_toLeftOf="@+id/navBar_title"
-        android:layout_centerInParent="true"
-        android:background="@null"
-        android:id="@+id/button_obd"
-        />
+
 
 </RelativeLayout>

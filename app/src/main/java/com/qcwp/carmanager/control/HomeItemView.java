@@ -4,11 +4,9 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -73,7 +71,7 @@ public class HomeItemView extends RelativeLayout {
         Boolean hiddenTitle2=typedArray.getBoolean(R.styleable.HomeItemView_hiddenTitle2,false);
 
         LayoutInflater layoutInflater=(LayoutInflater) context
-                .getSystemService(context.LAYOUT_INFLATER_SERVICE);
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view= layoutInflater.inflate(R.layout.view_home_list_item,null);
 
         TextView textView1=(TextView)view.findViewById(R.id.title1);

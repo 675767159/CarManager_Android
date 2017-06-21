@@ -17,6 +17,9 @@ public class UserData implements Serializable {
     private double userLocaLatitude;
     private double userLocaLongitude;
 
+    public String getPassword() {
+        return password;
+    }
 
     private static class UserDataHolder{
 

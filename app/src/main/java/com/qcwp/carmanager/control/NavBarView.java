@@ -1,8 +1,5 @@
 package com.qcwp.carmanager.control;
 
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -11,22 +8,19 @@ import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
-import com.qcwp.carmanager.obd.BluetoothService;
 import com.qcwp.carmanager.obd.OBDClient;
-import com.qcwp.carmanager.obd.SensorsService;
 import com.qcwp.carmanager.ui.BaseActivity;
-import com.qcwp.carmanager.ui.EditCarActivity;
+import com.qcwp.carmanager.ui.CarEditActivity;
 import com.qcwp.carmanager.utils.MyActivityManager;
-import com.qcwp.carmanager.utils.Print;
 
 
 /**
@@ -72,16 +66,15 @@ public class NavBarView extends RelativeLayout {
         textView=(TextView)view.findViewById(R.id.navBar_title);
         textView.setText(text);
 
-        Button button=(Button)view.findViewById(R.id.navBar_back);
+        ImageButton button=(ImageButton)view.findViewById(R.id.navBar_back);
         if (background!=0){
             view.setBackgroundResource(background);
         }
 
-        ImageButton button_obd_connect=(ImageButton)view.findViewById(R.id.button_obd);
 
         final BaseActivity currentActivity=(BaseActivity) context;
 
-        button_obd_connect.setOnClickListener(new OnClickListener() {
+        textView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -92,24 +85,19 @@ public class NavBarView extends RelativeLayout {
                     public void connectComplete(Boolean success, final String message) {
                         currentActivity.dismissLoadingDialog();
                         if (success) {
-                            currentActivity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    currentActivity.showToast(message);
-                                }
-                            });
 
                             CarInfoModel carInfoModel = APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(message)).unique();
                             if (carInfoModel==null){
 
-                                Intent intent=new Intent(currentActivity, EditCarActivity.class);
+                                Intent intent=new Intent(currentActivity, CarEditActivity.class);
+                                intent.putExtra(KeyEnum.vinCode,message);
+                                intent.putExtra(KeyEnum.typeKey, CarEditActivity.Type.Bind);
                                 currentActivity.startActivity(intent);
 
                             }
-                        }else {
-
-                            currentActivity.showToast(message);
                         }
+
+                        currentActivity.showToast(message);
 
 
                     }

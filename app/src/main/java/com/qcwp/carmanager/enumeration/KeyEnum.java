@@ -21,7 +21,7 @@ public class KeyEnum {
             cleanTimeKey="cleanTimeKey",
             wifiName="wifiName",
             wifiPassword="wifiPassword",
-            wifiType="wiPfiType",
+            vinCode="vinCode",
             currentOBDrotocol="currentOBDrotocol";
 
 }

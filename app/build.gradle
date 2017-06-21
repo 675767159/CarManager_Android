@@ -57,7 +57,7 @@ dependencies {
     //json转换搭配retrofit
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 
-    //Android开发人员不得不收集的代码(持续更新中)https://
+    //Android开发人员不得不收集的代码(持续更新中)https://github.com/Blankj/AndroidUtilCode/blob/master/README-CN.md
     compile 'com.blankj:utilcode:1.6.4'
 
     //黄油刀https://github.com/JakeWharton/butterknife
@@ -74,8 +74,14 @@ dependencies {
     compile 'com.github.bestTao:CoordinatorMenu:v1.0.2'
 
     compile "com.google.auto.value:auto-value:1.4.1"
-
+    //数据库
     compile 'org.greenrobot:greendao:3.2.2' // add library
+
+
+
+    compile 'com.contrarywind:Android-PickerView:3.2.5'
+
+    compile 'com.luffykou:android-common-utils:1.1.3'
 
 }
 

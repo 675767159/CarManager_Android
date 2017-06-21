@@ -296,5 +296,41 @@ public class CarInfoModel {
     }
 
 
+    public String getIsoBuyDate() {
+        return isoBuyDate;
+    }
 
+    public void setIsoBuyDate(String isoBuyDate) {
+        this.isoBuyDate = isoBuyDate;
+    }
+
+    @Override
+    public String toString() {
+        return "CarInfoModel{" +
+                "vinCode='" + vinCode + '\'' +
+                ", carNumber='" + carNumber + '\'' +
+                ", spValue='" + spValue + '\'' +
+                ", totalMileage=" + totalMileage +
+                ", isTestSteer=" + isTestSteer +
+                ", ownerName='" + ownerName + '\'' +
+                ", buyDate='" + buyDate + '\'' +
+                ", productiveYear='" + productiveYear + '\'' +
+                ", maintenanceInterval='" + maintenanceInterval + '\'' +
+                ", carColor='" + carColor + '\'' +
+                ", fuelOilType='" + fuelOilType + '\'' +
+                ", mid=" + mid +
+                ", brandId=" + brandId +
+                ", carTypeId=" + carTypeId +
+                ", carSeriesId=" + carSeriesId +
+                ", carType='" + carType + '\'' +
+                ", carSeries='" + carSeries + '\'' +
+                ", brand='" + brand + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", officialConsume='" + officialConsume + '\'' +
+                ", actualConsume='" + actualConsume + '\'' +
+                ", memberId=" + memberId +
+                ", isoBuyDate='" + isoBuyDate + '\'' +
+                ", needUpload=" + needUpload +
+                '}';
+    }
 }

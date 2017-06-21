@@ -2,13 +2,38 @@ package com.qcwp.carmanager.engine;
 
 
 
+import com.blankj.utilcode.util.FileIOUtils;
+import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.StringUtils;
+import com.google.gson.Gson;
+import com.litesuits.common.io.IOUtils;
+import com.qcwp.carmanager.APP;
+import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
+import com.qcwp.carmanager.utils.Print;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.Iterator;
 
 import okhttp3.FormBody;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.Buffer;
+import okio.BufferedSource;
+import retrofit2.http.HTTP;
 
 
 /**
@@ -47,20 +72,69 @@ public class TokenInterceptor implements Interceptor {
         Request original = chain.request();
         //请求定制：添加请求头
         Request.Builder requestBuilder = original.newBuilder() /*.header("APIKEY", Constant.API_KEY)*/;
-
-
-        //请求体定制：统一添加token参数
-        if(original.body() instanceof FormBody)/*带参数*/{
-            FormBody.Builder newFormBody = new FormBody.Builder();
-            FormBody oidFormBody = (FormBody) original.body();
-            for (int i = 0;i<oidFormBody.size();i++){
-                newFormBody.addEncoded(oidFormBody.encodedName(i),oidFormBody.encodedValue(i));
+        String url=original.url().toString();
+        String token = null;
+        if (url.contains("doVin_bindVin")){
+            token=this.getNewToken(url.replace(Engine.QiCheWangPing,""));
+            //请求体定制：统一添加token参数
+            if(original.body() instanceof FormBody)/*带参数*/{
+                FormBody.Builder newFormBody = new FormBody.Builder();
+                FormBody oldFormBody = (FormBody) original.body();
+                for (int i = 0;i<oldFormBody.size();i++){
+                    Print.d("getNewToken",oldFormBody.encodedName(i)+"---"+oldFormBody.encodedValue(i));
+                    newFormBody.addEncoded(oldFormBody.encodedName(i),oldFormBody.encodedValue(i));
+                }
+                Print.d("getNewToken","token---"+token);
+                if (token!=null) {
+                    newFormBody.add("token", token);
+                }
+                requestBuilder.method(original.method(),newFormBody.build());
             }
-            requestBuilder.method(original.method(),newFormBody.build());
-        }
-        else if (original.body() instanceof RequestBody)/*不带参数*/{
-            FormBody.Builder newFormBody = new FormBody.Builder();
-            requestBuilder.method(original.method(),newFormBody.build());
+            else if (original.body() instanceof RequestBody)/*不带参数*/{
+
+
+                FormBody.Builder newFormBody = new FormBody.Builder();
+                RequestBody oldFormBody = original.body();
+
+
+                Buffer buffer = new Buffer();
+                oldFormBody.writeTo(buffer);
+                Charset charset =  Charset.forName("UTF-8");
+                MediaType contentType = oldFormBody.contentType();
+                if (contentType != null) {
+                    charset = contentType.charset(charset);
+                }
+
+                String bodyString = buffer.clone().readString(charset);
+                Print.d("getNewToken","bodyString---"+bodyString);
+                try {
+                    JSONObject josn=new JSONObject(bodyString);
+                    Print.d("getNewToken","josn---"+josn);
+
+                    Iterator<String> iterator=josn.keys();
+                    for (Iterator iter = iterator; iter.hasNext();) {
+                        String str = (String)iter.next();
+                        String value = josn.optString(str);
+                        newFormBody.add(str, value);
+
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                Print.d("getNewToken","token---"+token);
+
+
+                if (token!=null) {
+                    newFormBody.add("token", token);
+                }
+                requestBuilder.method(original.method(),newFormBody.build());
+
+            }
+
         }
 
         Request request = requestBuilder.build();
@@ -77,10 +151,7 @@ public class TokenInterceptor implements Interceptor {
      * @return
      */
     private boolean isTokenExpired(Response response) {
-        if (response.code() == 404) {
-            return true;
-        }
-        return false;
+        return response.code() == 404;
     }
 
     /**
@@ -88,10 +159,37 @@ public class TokenInterceptor implements Interceptor {
      *
      * @return
      */
-    private String getNewToken() throws IOException {
-        // 通过一个特定的接口获取新的token，此处要用到同步的retrofit请求
-
-        return null;
+    private String getNewToken(String method) throws IOException {
+        Print.d("getNewToken",method+"------");
+        String path =Engine.QiCheWangPing+"doAppToken_getToken";
+        try {
+            URL url = new URL(path);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setReadTimeout(5000);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            String data = "username=" +UserData.getInstance().getUserName() + "&password=" + UserData.getInstance().getPassword()+"&url="+method;
+            conn.setRequestProperty("Content-Length", data.length() + "");
+            //允许向外面写数据
+            conn.setDoOutput(true);
+            //获取输出流
+            OutputStream os = conn.getOutputStream();
+            os.write(data.getBytes());
+            int code = conn.getResponseCode();
+            if (code == 200) {
+                InputStream is = conn.getInputStream();
+                String result =  IOUtils.toString(is, "UTF-8");
+                JSONObject jSONObject=new JSONObject(result);
+                Print.d("getNewToken",method+"------"+result);
+                return jSONObject.optString("token");
+            } else {
+                Print.d("getNewToken",code+"------");
+                return null;
+            }
+        } catch (Exception e) {
+            Print.d("getNewToken","错误"+"------");
+            return null;
+        }
     }
 
 }

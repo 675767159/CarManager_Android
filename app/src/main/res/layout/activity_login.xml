@@ -24,7 +24,7 @@
         android:layout_below="@+id/logo"
         android:layout_marginTop="@dimen/login_vertical_margin"
         android:id="@+id/user_back_view"
-        android:background="@drawable/ine_login_input"
+        android:background="@drawable/line_login_input"
         >
         <ImageView
             android:layout_width="wrap_content"
@@ -53,7 +53,7 @@
         android:layout_below="@+id/user_back_view"
         android:layout_marginTop="@dimen/login_vertical_margin"
         android:id="@+id/password_back_view"
-        android:background="@drawable/ine_login_input"
+        android:background="@drawable/line_login_input"
         >
         <ImageView
             android:layout_width="wrap_content"

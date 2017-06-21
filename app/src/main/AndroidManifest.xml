@@ -27,7 +27,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.RegisterActivity"></activity>
+        <activity android:name=".ui.RegisterActivity" android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".ui.CarEditActivity"></activity>
 
         <receiver android:name=".broadcast.BlueToothReceiver">
             <intent-filter>

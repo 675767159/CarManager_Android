@@ -14,9 +14,12 @@ import com.qcwp.carmanager.greendao.gen.CarBrandModelDao;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
+import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.MySharedPreferences;
 import com.qcwp.carmanager.utils.Print;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -76,7 +79,8 @@ public class OBDClient {
     public  static void readVinCode(final ReadVinCodeCompleteListener  readVinCodeCompleteListener)  {
 
         ThreadPoolUtils threadPool=new ThreadPoolUtils(SingleThread,1);
-         Future future=threadPool.submit(new Callable<Object>() {
+
+       threadPool.submit(new Callable<Object>() {
             @Override
             public Object call() throws Exception {
 
@@ -111,11 +115,18 @@ public class OBDClient {
                             }
                         }
 
+                        final Boolean finalBlockSuccess = blockSuccess;
+                        final String finalBlockMessage = blockMessage;
+                        MyActivityManager.getInstance().getCurrentActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (readVinCodeCompleteListener != null) {
+                                    readVinCodeCompleteListener.connectComplete(finalBlockSuccess, finalBlockMessage);
+                                }
+                            }
+                        });
 
 
-                        if (readVinCodeCompleteListener != null) {
-                            readVinCodeCompleteListener.connectComplete(blockSuccess, blockMessage);
-                        }
 
                     }
                 });

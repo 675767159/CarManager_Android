@@ -42,7 +42,6 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void initViewsAndEvents(Bundle savedInstanceState) {
         CommonUtils.setViewCorner(buttonLogin, 20, 20, Color.parseColor("#23943D"));
-        KeyboardUtils.clickBlankArea2HideSoftInput();
 
 
 

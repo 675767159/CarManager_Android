@@ -31,4 +31,14 @@
         <attr name="HomeItemView_image" format="reference" />
     </declare-styleable>
 
+
+    <declare-styleable name="EditCarInputView">
+        <attr name="EditCar_title" format="string" />
+        <attr name="EditCar_title_description" format="string" />
+        <attr name="EditCar_hint" format="string"/>
+        <attr name="EditCar_canEdit" format="boolean"/>
+        <attr name="EditCar_isButton" format="boolean"/>
+
+    </declare-styleable>
+
 </resources>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:paddingTop="@dimen/padding"
+    android:paddingLeft="@dimen/padding"
+    android:paddingRight="@dimen/padding"
+    >
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/title"
+       android:textSize="18sp"
+       />
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/title"
+        android:id="@+id/title_description"
+        android:textColor="@color/gray_btn_bg_color"
+        android:textSize="16sp"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_input_height"
+        android:layout_below="@+id/title"
+        android:id="@+id/editText"
+        android:background="@drawable/line_edit_car_input"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_input_height"
+        android:layout_below="@+id/title"
+        android:id="@+id/selectText"
+        android:background="@drawable/line_edit_car_input"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:gravity="center_vertical|left"
+        android:visibility="gone"
+        android:textSize="18sp"
+        android:drawableRight="@mipmap/edit_car_down"
+        />
+
+</RelativeLayout>

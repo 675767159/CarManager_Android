@@ -5,11 +5,11 @@ import android.view.View;
 
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.control.HomeItemView;
+import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.utils.Print;
 import com.qiantao.coordinatormenu.CoordinatorMenu;
 
 import butterknife.BindView;
-
 
 
 public class MainActivity extends BaseActivity {
@@ -35,16 +35,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initViewsAndEvents(Bundle savedInstanceState) {
-        Print.d(TAG,stringFromJNI());
 
 
 
     }
 
-    public native String stringFromJNI();
-    static {
-        System.loadLibrary("native-lib");
-    }
+
     @Override
     public void onClick(View v) {
         super.onClick(v);
@@ -70,6 +66,9 @@ public class MainActivity extends BaseActivity {
             case R.id.button_travel:
                 break;
             case R.id.button_car_info:
+            {
+                readyGo(CarEditActivity.class);
+            }
                 break;
             case R.id.button_set:
                 break;

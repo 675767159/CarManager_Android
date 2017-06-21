@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.util.DisplayMetrics;
 
 import com.qcwp.carmanager.engine.Engine;
+import com.qcwp.carmanager.engine.TokenInterceptor;
 import com.qcwp.carmanager.greendao.gen.DaoMaster;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.implement.GreenDaoContext;
@@ -35,10 +36,7 @@ public class APP extends Application {
     // 通过改变isDebug，实现Debug、Release版
     public final static boolean isDebug = BuildConfig.DEBUG;
 
-    private double mScreenSize;
-    private int mScreenWidth = 0;
-    private int mScreenHeight = 0;
-    private float mScreenDensity = 0.0f;
+
     private DaoSession daoSession;
     @Override
     public void onCreate() {
@@ -48,11 +46,11 @@ public class APP extends Application {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).addInterceptor(new TokenInterceptor())
                 .build();
 
         mEngine = new Retrofit.Builder()
-                .baseUrl(Engine.HuaYIKangDaoBaseUrl)
+                .baseUrl(Engine.QiCheWangPing)
                 .addConverterFactory(GsonConverterFactory.create()).client(client)
                 .build().create(Engine.class);
 
@@ -101,7 +99,6 @@ public class APP extends Application {
 
         SMSSDK.initSDK(this,this.getString(R.string.ShareSDK_Key),this.getString(R.string.ShareSDK_Secret));
 
-        this.getScreenPhysicalSize();
         this.setupDatabase();
 
 
@@ -126,6 +123,11 @@ public class APP extends Application {
 
     private void getScreenPhysicalSize() {
 
+         double mScreenSize;
+         int mScreenWidth = 0;
+         int mScreenHeight = 0;
+         float mScreenDensity = 0.0f;
+
         DisplayMetrics dm=getResources().getDisplayMetrics();
         double diagonalPixels = Math.sqrt(Math.pow(dm.widthPixels, 2) + Math.pow(dm.heightPixels, 2));
         mScreenSize=diagonalPixels / (160 * dm.density);
@@ -140,21 +142,7 @@ public class APP extends Application {
         Print.d("getScreenPhysicalSize",mScreenHeight+"");
         Print.d("getScreenPhysicalSize", dm.densityDpi+"");
     }
-    public float getMyScreenDensity() {
-        return mScreenDensity;
-    }
 
-    public int getMyScreenWidth() {
-        return mScreenWidth;
-    }
-
-    public int getMyScreenHeight() {
-        return mScreenHeight;
-    }
-
-    public Double getMyScreenSize() {
-        return mScreenSize ;
-    }
     /**
      * 配置数据库
      */

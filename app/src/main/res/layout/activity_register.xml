@@ -1,143 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+<com.qcwp.carmanager.control.InputMethodLayout
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/backgroundColor">
-  <com.qcwp.carmanager.control.NavBarView
-      style="@style/NavBarStyle"
-      app:title="注册"
-      />
+    android:background="@color/backgroundColor"
+    android:id="@+id/inputMethodLayout"
+    >
 
- <ScrollView
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:layout_below="@id/NavbarView"
-     tools:ignore="UnknownId"
-     android:background="@color/backgroundColor">
-     <RelativeLayout
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:background="@color/backgroundColor"
-         >
-         <LinearLayout
-             style="@style/RegisterSubviewStyle"
+        <com.qcwp.carmanager.control.NavBarView
+            style="@style/NavBarStyle"
+            app:title="注册"
+            />
 
-             android:background="@drawable/ine_login_input"
-             android:orientation="vertical"
-             android:id="@+id/inputBackView"
-             >
-             <com.qcwp.carmanager.control.RegisterInputView
-                 app:name="用户名："
-                 android:id="@+id/userName"
-                 app:description="请输入您的用户名"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/NavbarView"
+            tools:ignore="UnknownId"
+            android:background="@color/backgroundColor"
+            android:id="@+id/scrollView"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/backgroundColor"
+                android:layout_marginTop="@dimen/vertical_margin"
+                >
+                <LinearLayout
+                    style="@style/RegisterSubviewStyle"
 
-                 android:layout_height="@dimen/login_input_height"
-                 android:layout_width="match_parent" />
-             <com.qcwp.carmanager.control.RegisterInputView
-                 app:name="昵称："
-                 android:id="@+id/nickName"
-                 app:description="请输入您的昵称"
+                    android:background="@drawable/line_login_input"
+                    android:orientation="vertical"
+                    android:id="@+id/inputBackView"
+                    >
+                    <com.qcwp.carmanager.control.RegisterInputView
+                        app:name="用户名："
+                        android:id="@+id/userName"
+                        app:description="请输入您的用户名"
 
-                 android:layout_height="@dimen/login_input_height"
-                 android:layout_width="match_parent" />
+                        android:layout_height="@dimen/login_input_height"
+                        android:layout_width="match_parent" />
+                    <com.qcwp.carmanager.control.RegisterInputView
+                        app:name="昵称："
+                        android:id="@+id/nickName"
+                        app:description="请输入您的昵称"
 
-             <com.qcwp.carmanager.control.RegisterInputView
-                 app:name="手机号："
-                 android:id="@+id/mobilePhone"
-                 app:description="请输入您的手机号"
+                        android:layout_height="@dimen/login_input_height"
+                        android:layout_width="match_parent" />
 
-                 android:layout_height="@dimen/login_input_height"
-                 android:layout_width="match_parent" />
+                    <com.qcwp.carmanager.control.RegisterInputView
+                        app:name="手机号："
+                        android:id="@+id/mobilePhone"
+                        app:description="请输入您的手机号"
 
-             <com.qcwp.carmanager.control.RegisterInputView
-                 app:name="密码："
-                 android:id="@+id/password1"
-                 app:description="请输入您的密码"
-                 app:isPassword="true"
-                 android:layout_height="@dimen/login_input_height"
-                 android:layout_width="match_parent" />
+                        android:layout_height="@dimen/login_input_height"
+                        android:layout_width="match_parent" />
 
-             <com.qcwp.carmanager.control.RegisterInputView
-                 app:name="重复密码："
-                 android:id="@+id/password2"
-                 app:description="请重复您的密码"
-                 app:hiddenLine="true"
-                 app:isPassword="true"
-                 android:layout_height="@dimen/login_input_height"
-                 android:layout_width="match_parent"
+                    <com.qcwp.carmanager.control.RegisterInputView
+                        app:name="密码："
+                        android:id="@+id/password1"
+                        app:description="请输入您的密码"
+                        app:isPassword="true"
+                        android:layout_height="@dimen/login_input_height"
+                        android:layout_width="match_parent" />
 
-                 />
+                    <com.qcwp.carmanager.control.RegisterInputView
+                        app:name="重复密码："
+                        android:id="@+id/password2"
+                        app:description="请重复您的密码"
+                        app:hiddenLine="true"
+                        app:isPassword="true"
+                        android:layout_height="@dimen/login_input_height"
+                        android:layout_width="match_parent"
 
-         </LinearLayout>
+                        />
 
-
-         <LinearLayout
-             style="@style/RegisterSubviewStyle"
-             android:orientation="horizontal"
-             android:layout_below="@+id/inputBackView"
-             android:id="@+id/verifaCodeView"
-             android:background="@android:color/white"
-             >
-             <EditText
-                 android:layout_width="match_parent"
-                 android:layout_height="@dimen/login_input_height"
-                 android:hint="请输入验证码"
-                 android:background="@android:color/white"
-                 android:layout_weight="3"
-                 android:layout_marginStart="8dp"
-                 android:id="@+id/verifCode"
-                 />
-             <Button
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 android:text="获取验证码"
-                 android:background="@color/gray_btn_bg_color"
-                 android:layout_weight="6"
-                 android:onClick="onClick"
-                 android:id="@+id/button_getVerify"
-                 />
-
-         </LinearLayout>
+                </LinearLayout>
 
 
+                <LinearLayout
+                    style="@style/RegisterSubviewStyle"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/inputBackView"
+                    android:id="@+id/verifaCodeView"
+                    android:background="@android:color/white"
+                    >
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/login_input_height"
+                        android:hint="请输入验证码"
+                        android:background="@android:color/white"
+                        android:layout_weight="3"
+                        android:layout_marginStart="8dp"
+                        android:id="@+id/verifCode"
+                        />
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="获取验证码"
+                        android:background="@color/gray_btn_bg_color"
+                        android:layout_weight="6"
+                        android:onClick="onClick"
+                        android:id="@+id/button_getVerify"
+                        />
 
-         <LinearLayout style="@style/RegisterSubviewStyle"
-            android:layout_below="@+id/verifaCodeView"
-             android:id="@+id/agreement"
-
-             android:orientation="horizontal">
-             <ImageView
-                 android:layout_width="wrap_content"
-                 android:layout_height="match_parent"
-                 android:scaleType="center"
-                 android:src="@mipmap/register_agreement_agree"
-                 />
-             <TextView
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_marginStart="3dp"
-                 android:text="我已经阅读并同意《汽车网评会员服务条款》"/>
-
-         </LinearLayout>
-
-         <Button
-             style="@style/RegisterSubviewStyle"
-             android:text="注册"
-             android:textColor="@android:color/white"
-             android:layout_below="@+id/agreement"
-             android:background="#196ED8"
-             android:onClick="onClick"
-             android:id="@+id/button_register"
-             android:layout_marginBottom="@dimen/vertical_margin"
-             />
-
-     </RelativeLayout>
+                </LinearLayout>
 
 
 
- </ScrollView>
+                <LinearLayout style="@style/RegisterSubviewStyle"
+                    android:layout_below="@+id/verifaCodeView"
+                    android:id="@+id/agreement"
+
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:scaleType="center"
+                        android:src="@mipmap/register_agreement_agree"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="我已经阅读并同意《汽车网评会员服务条款》"/>
+
+                </LinearLayout>
+
+                <Button
+                    style="@style/RegisterSubviewStyle"
+                    android:text="注册"
+                    android:textColor="@android:color/white"
+                    android:layout_below="@+id/agreement"
+                    android:background="#196ED8"
+                    android:onClick="onClick"
+                    android:id="@+id/button_register"
+                    android:layout_marginBottom="@dimen/vertical_margin"
+                    />
+
+            </RelativeLayout>
 
 
-</RelativeLayout>
+
+        </ScrollView>
+
+
+</com.qcwp.carmanager.control.InputMethodLayout>
