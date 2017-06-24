@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
@@ -46,6 +47,11 @@ public class LoginActivity extends BaseActivity {
 
 
 
+
+    }
+
+    @Override
+    protected void onReceiveMessageEvent(MessageEvent messageEvent) {
 
     }
 

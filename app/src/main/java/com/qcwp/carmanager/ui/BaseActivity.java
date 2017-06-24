@@ -11,9 +11,15 @@ import android.view.View;
 import com.blankj.utilcode.util.BarUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.engine.Engine;
+import com.qcwp.carmanager.utils.Print;
 import com.qcwp.carmanager.utils.ToastUtil;
 
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -48,6 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         mEngine = mApp.getEngine();
 
         initViewsAndEvents(savedInstanceState);
+        EventBus.getDefault().register(this);
 
 
     }
@@ -99,6 +106,11 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      */
 //    protected abstract View getLoadingTargetView();
 
+
+    /**
+     * 初始化布局以及事件
+     */
+    protected abstract void onReceiveMessageEvent(MessageEvent messageEvent);
 
 
     /**
@@ -208,5 +220,16 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+
+        Print.d(TAG,"------"+event.getMessage());
+        onReceiveMessageEvent(event);
+    }
 }

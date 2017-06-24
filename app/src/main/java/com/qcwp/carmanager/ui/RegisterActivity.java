@@ -13,6 +13,7 @@ import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.RegexUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.InputMethodLayout;
 import com.qcwp.carmanager.control.RegisterInputView;
 import com.qcwp.carmanager.model.LoginModel;
@@ -100,6 +101,11 @@ public class RegisterActivity extends BaseActivity {
         };
         SMSSDK.registerEventHandler(eh); //注册短信回调
         this.addLayoutListener(inputMethodLayout,buttonRegister);
+
+    }
+
+    @Override
+    protected void onReceiveMessageEvent(MessageEvent messageEvent) {
 
     }
 

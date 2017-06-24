@@ -2,22 +2,30 @@ package com.qcwp.carmanager.ui;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
 import com.bigkoo.pickerview.TimePickerView;
 import com.blankj.utilcode.util.EmptyUtils;
+import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.adapter.CarEditSelectAdapter;
+import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.EditCarInputView;
 import com.qcwp.carmanager.engine.RequestModel;
 import com.qcwp.carmanager.enumeration.KeyEnum;
+import com.qcwp.carmanager.enumeration.PathEnum;
+import com.qcwp.carmanager.enumeration.TimeEnum;
+import com.qcwp.carmanager.enumeration.UploadStatusEnum;
+import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.CarSeriesModelDao;
 import com.qcwp.carmanager.greendao.gen.CarTypeModelDao;
 import com.qcwp.carmanager.greendao.gen.CommonBrandModelDao;
+import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.sqLiteModel.CarBrandModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
@@ -25,6 +33,8 @@ import com.qcwp.carmanager.model.sqLiteModel.CarSeriesModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarTypeModel;
 import com.qcwp.carmanager.model.sqLiteModel.CommonBrandModel;
 import com.qcwp.carmanager.utils.Print;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -64,9 +74,11 @@ public class CarEditActivity extends BaseActivity {
     @BindView(R.id.button_confirm)
     Button buttonConfirm;
 
-
+    private CarInfoModel  carInfoModel;
     private long carBrandId,carCommonBrandId,carSerisId,carTypeId;
-    private String buyDateStr,initMileageStr,ownerNameStr,carColorStr,carNumberStr;
+    private String initMileageStr,ownerNameStr,carNumberStr,
+            buyDateStr,carColorStr;
+    private Type type;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_edit_car;
@@ -79,8 +91,38 @@ public class CarEditActivity extends BaseActivity {
         String vinCode=getIntent().getStringExtra(KeyEnum.vinCode);
         if (EmptyUtils.isNotEmpty(vinCode)){
             vincode.setText(vinCode);
+            carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(vincode.getText())).build().unique();
         }
-        Type type=(Type) getIntent().getSerializableExtra(KeyEnum.typeKey);
+        type=(Type) getIntent().getSerializableExtra(KeyEnum.typeKey);
+
+        updateUI();
+
+    }
+
+    private void updateUI(){
+        if (carInfoModel!=null){
+            carNumber.setText(carInfoModel.getCarNumber());
+            carBrand.setText(carInfoModel.getBrand());
+            carBrandId=carInfoModel.getBrandId();
+            carSeries.setText(carInfoModel.getCarSeries());
+            carSerisId=carInfoModel.getCarSeriesId();
+            carType.setText(carInfoModel.getCarType());
+            carTypeId=carInfoModel.getCarTypeId();
+            buyDateStr=carInfoModel.getIsoBuyDate().replace(" 00:00:00","");
+            buyDate.setText(buyDateStr);
+            carColorStr=carInfoModel.getCarColor();
+            carColor.setText(carColorStr);
+            initMileage.setText(String.valueOf(carInfoModel.getTotalMileage()));
+            ownerName.setText(carInfoModel.getOwnerName());
+
+
+        }
+
+    }
+
+
+    @Override
+    protected void onReceiveMessageEvent(MessageEvent messageEvent) {
 
     }
 
@@ -237,40 +279,48 @@ public class CarEditActivity extends BaseActivity {
 
         if (carBrandId!=0&&carSerisId!=0&&carTypeId!=0&&EmptyUtils.isNotEmpty(carNumberStr)&&EmptyUtils.isNotEmpty(buyDateStr)&&EmptyUtils.isNotEmpty(initMileageStr)&&EmptyUtils.isNotEmpty(ownerNameStr)&&EmptyUtils.isNotEmpty(carColorStr)){
 
-            CarInfoModel carInfoModel=new CarInfoModel();
+
+
+            if (carInfoModel==null) {
+                 carInfoModel = new CarInfoModel();
+            }
             carInfoModel.setVinCode(vincode.getText());
             carInfoModel.setCarNumber(carNumberStr);
             carInfoModel.setBrand(carBrand.getText());
             carInfoModel.setBrandId(carBrandId);
             carInfoModel.setCarSeries(carSeries.getText());
             carInfoModel.setCarSeriesId(carSerisId);
-            carInfoModel.setCarType(carType.getText());
             carInfoModel.setCarTypeId(carTypeId);
             carInfoModel.setTotalMileage(Double.parseDouble(initMileageStr));
             carInfoModel.setOwnerName(ownerNameStr);
             carInfoModel.setCarColor(carColorStr);
             carInfoModel.setIsoBuyDate(buyDateStr+" 00:00:00");
             carInfoModel.setMemberId(UserData.getInstance().getUserId());
+            carInfoModel.setNeedUpload(UploadStatusEnum.NotUpload);
 
-//            carInfoModel.setBuyDate(buyDateStr);
-//            mApp.getDaoInstant().insertOrReplace(carInfoModel);
-            carInfoModel.setCarType(null);
             showLoadingDialog();
+
             mEngine.uploadCarInfo(carInfoModel).enqueue(new Callback<RequestModel>() {
                 @Override
                 public void onResponse(Call<RequestModel> call, Response<RequestModel> response) {
                     RequestModel requestModel=RequestModel.HandlerData(response);
                     dismissLoadingDialog();
-                    if (requestModel!=null) {
-                        Print.d(TAG, "----"+requestModel.status+requestModel.msg);
+
+                    if (requestModel.isSuccess) {
+                        carInfoModel.setNeedUpload(UploadStatusEnum.HadUpload);
+
                     }else {
-                        Print.d(TAG, "----" + "model为空");
                     }
+                    CarEditActivity.this.updateSuccess();
+
+
                 }
 
                 @Override
                 public void onFailure(Call<RequestModel> call, Throwable throwable) {
+
                     dismissLoadingDialog();
+                   CarEditActivity.this.updateSuccess();
                 }
             });
 
@@ -281,6 +331,32 @@ public class CarEditActivity extends BaseActivity {
         }
     }
 
+
+    private void updateSuccess(){
+
+        carInfoModel.setCarType(carType.getText());//后台有一个carType对象，不是字符串，所以传字符串会出错
+        carInfoModel.setTimestamp(TimeUtils.getNowMills());
+
+        mApp.getDaoInstant().insertOrReplace(carInfoModel);
+        showLoadingDialog("绑定成功，请稍等...");
+
+        MessageEvent messageEvent=new MessageEvent();
+        if (type==Type.Bind) {
+            messageEvent.setType(MessageEvent.MessageEventType.CarBlindSuccess);
+        }
+        messageEvent.setMessage(vincode.getText());
+        EventBus.getDefault().post(messageEvent);
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+
+                dismissLoadingDialog();
+                finish();
+            }
+        }, TimeEnum.Launch_Time);
+
+
+    }
 
     public  enum Type{
         Bind,

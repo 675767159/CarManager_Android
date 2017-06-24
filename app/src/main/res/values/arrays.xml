@@ -33,4 +33,113 @@
    </string-array>
 
 
+
+    <string-array name="NeedTokenAPI">
+        <item>doVin_bindVin</item>
+    </string-array>
+
+    <string-array name="AcceleratorPids">
+        <item>0111</item>
+        <item>015A</item>
+        <item>0145</item>
+        <item>0147</item>
+        <item>0148</item>
+        <item>0149</item>
+        <item>014A</item>
+        <item>014B</item>
+        <item>0142</item>
+    </string-array>
+
+    <string-array name="ALL_PID_DRIVE">
+        <item>0100</item>
+        <item>0101</item>
+        <item>0102</item>
+        <item>0103</item>
+        <item>0104</item>
+        <item>0106</item>
+        <item>0107</item>
+        <item>0108</item>
+        <item>0109</item>
+        <item>010A</item>
+        <item>010E</item>
+        <item>0112</item>
+        <item>0113</item>
+        <item>0114</item>
+        <item>0115</item>
+        <item>0116</item>
+        <item>0117</item>
+        <item>0118</item>
+        <item>0119</item>
+        <item>011A</item>
+        <item>011B</item>
+        <item>011C</item>
+        <item>011D</item>
+        <item>011E</item>
+        <item>011F</item>
+        <item>0120</item>
+        <item>0121</item>
+        <item>0122</item>
+        <item>0123</item>
+        <item>0124</item>
+        <item>0125</item>
+        <item>0126</item>
+        <item>0127</item>
+        <item>0128</item>
+        <item>0129</item>
+        <item>012A</item>
+        <item>012B</item>
+        <item>012C</item>
+        <item>012D</item>
+        <item>012E</item>
+        <item>012F</item>
+        <item>0130</item>
+        <item>0131</item>
+        <item>0132</item>
+        <item>0133</item>
+        <item>0134</item>
+        <item>0135</item>
+        <item>0136</item>
+        <item>0137</item>
+        <item>0138</item>
+        <item>0139</item>
+        <item>013A</item>
+        <item>013B</item>
+        <item>013C</item>
+        <item>013D</item>
+        <item>013E</item>
+        <item>013F</item>
+        <item>0140</item>
+        <item>0141</item>
+        <item>0142</item>
+        <item>0143</item>
+        <item>0144</item>
+        <item>0146</item>
+        <item>014C</item>
+        <item>014D</item>
+        <item>014E</item>
+        <item>014F</item>
+        <item>0150</item>
+        <item>0151</item>
+        <item>0152</item>
+        <item>0153</item>
+        <item>0154</item>
+        <item>0155</item>
+        <item>0156</item>
+        <item>0157</item>
+        <item>0158</item>
+        <item>0159</item>
+        <item>015B</item>
+        <item>015C</item>
+        <item>015D</item>
+        <item>015E</item>
+        <item>015F</item>
+        <item>0160</item>
+        <item>0161</item>
+        <item>0162</item>
+        <item>0163</item>
+        <item>0164</item>
+        <item>0165</item>
+        <item>03</item>
+    </string-array>
+
 </resources>

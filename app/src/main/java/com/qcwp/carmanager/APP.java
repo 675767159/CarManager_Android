@@ -9,14 +9,22 @@ import android.util.DisplayMetrics;
 
 import com.qcwp.carmanager.engine.Engine;
 import com.qcwp.carmanager.engine.TokenInterceptor;
+import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.DaoMaster;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.implement.GreenDaoContext;
+import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
+import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
+import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import cn.smssdk.SMSSDK;
@@ -35,18 +43,18 @@ public class APP extends Application {
     private static APP sInstance;
     // 通过改变isDebug，实现Debug、Release版
     public final static boolean isDebug = BuildConfig.DEBUG;
-
-
     private DaoSession daoSession;
+    public static byte[] DESKey={27,19,23,67,90,56,78,55};
     @Override
     public void onCreate() {
         super.onCreate();
         sInstance=this;
 
+        List neddTokeApis= Arrays.asList(getResources().getStringArray(R.array.NeedTokenAPI));
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).addInterceptor(new TokenInterceptor())
+                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).addInterceptor(new TokenInterceptor(neddTokeApis))
                 .build();
 
         mEngine = new Retrofit.Builder()
@@ -100,6 +108,8 @@ public class APP extends Application {
         SMSSDK.initSDK(this,this.getString(R.string.ShareSDK_Key),this.getString(R.string.ShareSDK_Secret));
 
         this.setupDatabase();
+
+
 
 
     }

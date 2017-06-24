@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.enumeration.TimeEnum;
 import com.qcwp.carmanager.model.LoginModel;
@@ -47,6 +48,11 @@ public class WelcomeActivity extends BaseActivity {
 
             }
         }, TimeEnum.Launch_Time);
+
+    }
+
+    @Override
+    protected void onReceiveMessageEvent(MessageEvent messageEvent) {
 
     }
 }

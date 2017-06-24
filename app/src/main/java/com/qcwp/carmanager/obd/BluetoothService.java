@@ -435,7 +435,7 @@ public class BluetoothService {
 			boolean isConnectSuccess = false;
 			thirdConnectHadDone = false;
 
-			for (int i = 0; i <= 4; i++) {
+			for (int i = 0; i <= 20; i++) {
 				Print.d("RfcommSocket，第"+i+"次，状态："+mState);
 				try {
 					if(i == 0) {

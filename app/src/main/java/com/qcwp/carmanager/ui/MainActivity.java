@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.HomeItemView;
-import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.enumeration.KeyEnum;
+import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
+import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.utils.Print;
 import com.qiantao.coordinatormenu.CoordinatorMenu;
+
 
 import butterknife.BindView;
 
@@ -28,6 +32,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.menu)
     CoordinatorMenu mCoordinatorMenu;
 
+    private CarInfoModel    carInfoModel;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_main;
@@ -35,10 +40,11 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initViewsAndEvents(Bundle savedInstanceState) {
-
-
+        carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
+        updateUI();
 
     }
+
 
 
     @Override
@@ -67,7 +73,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.button_car_info:
             {
-                readyGo(CarEditActivity.class);
+                Bundle bundle=new Bundle();
+                bundle.putString(KeyEnum.vinCode,"12345678901234567");
+                readyGo(CarEditActivity.class,bundle);
             }
                 break;
             case R.id.button_set:
@@ -77,4 +85,25 @@ public class MainActivity extends BaseActivity {
 
 
 
+    @Override
+    protected void onReceiveMessageEvent(MessageEvent messageEvent) {
+
+        Print.d(TAG,"onReceiveMessageEvent");
+        if (messageEvent.getType()== MessageEvent.MessageEventType.CarBlindSuccess){
+            carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(messageEvent.getMessage())).build().unique();
+            updateUI();
+        }
+    }
+
+
+    private void updateUI(){
+        if (carInfoModel!=null){
+            carInfo.setValue1(carInfoModel.getCarSeries());
+            carInfo.setValue3(carInfoModel.getCarNumber());
+
+            totalTravel.setValue1(String.valueOf(carInfoModel.getTotalMileage()));
+
+        }
+
+    }
 }

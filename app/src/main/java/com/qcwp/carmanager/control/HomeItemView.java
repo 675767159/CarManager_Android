@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.qcwp.carmanager.R;
 
+import org.w3c.dom.Text;
+
 
 /**
  * Created by qyh on 2016/11/30.
@@ -25,16 +27,29 @@ public class HomeItemView extends RelativeLayout {
    private TextView value2;
    private TextView value3;
 
-    public TextView getValue1() {
-        return value1;
+    public String getValue1() {
+        return value1.getText().toString();
     }
 
-    public TextView getValue2() {
-        return value2;
+    public String getValue2() {
+        return value2.getText().toString();
     }
 
-    public TextView getValue3() {
-        return value3;
+    public String getValue3() {
+        return value3.getText().toString();
+    }
+
+
+    public void setValue1(String value1) {
+        this.value1.setText(value1);
+    }
+
+    public void setValue2(String value2) {
+        this.value2.setText(value2);
+    }
+
+    public void setValue3(String value3) {
+        this.value3.setText(value3);
     }
 
     public HomeItemView(Context context) {

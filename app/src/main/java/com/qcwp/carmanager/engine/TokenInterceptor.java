@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.List;
 
 import okhttp3.FormBody;
 import okhttp3.Interceptor;
@@ -42,9 +43,9 @@ import retrofit2.http.HTTP;
 
 public class TokenInterceptor implements Interceptor {
 
-    public TokenInterceptor(){
-
-
+    private List<String>needTokenAPIs;
+    public TokenInterceptor(List<String> needTokenAPIs){
+                this.needTokenAPIs=needTokenAPIs;
     }
 
     @Override
@@ -74,8 +75,10 @@ public class TokenInterceptor implements Interceptor {
         Request.Builder requestBuilder = original.newBuilder() /*.header("APIKEY", Constant.API_KEY)*/;
         String url=original.url().toString();
         String token = null;
-        if (url.contains("doVin_bindVin")){
-            token=this.getNewToken(url.replace(Engine.QiCheWangPing,""));
+
+       String method=url.replace(Engine.QiCheWangPing,"");
+        if (needTokenAPIs.contains(method)){
+            token=this.getNewToken(method);
             //请求体定制：统一添加token参数
             if(original.body() instanceof FormBody)/*带参数*/{
                 FormBody.Builder newFormBody = new FormBody.Builder();

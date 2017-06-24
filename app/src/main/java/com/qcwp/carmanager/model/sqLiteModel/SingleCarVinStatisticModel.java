@@ -1,17 +1,15 @@
 package com.qcwp.carmanager.model.sqLiteModel;
 
-import com.qcwp.carmanager.enumeration.TableEnum;
-
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by qyh on 2017/6/19.
  */
-@Entity(nameInDb = "CarVinStatistic")
-public class CarVinStatisticModel {
+@Entity(nameInDb = "SingleCarVinStatistic")
+public class SingleCarVinStatisticModel {
 
     @Property(nameInDb = "vinCode")
     private String vinCode;
@@ -71,22 +69,23 @@ public class CarVinStatisticModel {
     private double zdtestBestBeat;//刹车制动最好成绩排名％
     @Property(nameInDb = "carStataccelerCount")
     private int carStataccelerCount;//平均速度（额外增加）
-
-    @Property(nameInDb = "id")
+    @Property(nameInDb = "avgVehicleSpeed")
+    private double avgVehicleSpeed;//平均速度（额外增加）
     @Id(autoincrement = true)
-    Long  id;//平均速度（额外增加）
+    @Property(nameInDb = "onlyFlag")
+    private Long onlyFlag;
 
-    @Generated(hash = 988155929)
-    public CarVinStatisticModel(String vinCode, double distCount, double maxDist,
-            int timeCount, int maxTime, double fuelCount, double avgFuel,
-            int accelerCount, int decelerCount, int overspeedCount, int wzcxCount,
-            int carCheckCount, double carCheckAvg, int faultCodeCount,
-            int clearCodeCount, int lastCarCheck, int bmtestCount,
-            double bmSeriesBestScore, double bmtestBestScore, double bmtestBestBeat,
-            int bltestCount, double blSeriesBestScore, double bltestBestScore,
-            double bltestBestBeat, int zdtestCount, double zdSeriesBestScore,
-            double zdtestBestScore, double zdtestBestBeat, int carStataccelerCount,
-            Long id) {
+    @Generated(hash = 1056699906)
+    public SingleCarVinStatisticModel(String vinCode, double distCount,
+            double maxDist, int timeCount, int maxTime, double fuelCount,
+            double avgFuel, int accelerCount, int decelerCount, int overspeedCount,
+            int wzcxCount, int carCheckCount, double carCheckAvg,
+            int faultCodeCount, int clearCodeCount, int lastCarCheck,
+            int bmtestCount, double bmSeriesBestScore, double bmtestBestScore,
+            double bmtestBestBeat, int bltestCount, double blSeriesBestScore,
+            double bltestBestScore, double bltestBestBeat, int zdtestCount,
+            double zdSeriesBestScore, double zdtestBestScore, double zdtestBestBeat,
+            int carStataccelerCount, double avgVehicleSpeed, Long onlyFlag) {
         this.vinCode = vinCode;
         this.distCount = distCount;
         this.maxDist = maxDist;
@@ -116,254 +115,198 @@ public class CarVinStatisticModel {
         this.zdtestBestScore = zdtestBestScore;
         this.zdtestBestBeat = zdtestBestBeat;
         this.carStataccelerCount = carStataccelerCount;
-        this.id = id;
+        this.avgVehicleSpeed = avgVehicleSpeed;
+        this.onlyFlag = onlyFlag;
     }
-
-    @Generated(hash = 619412153)
-    public CarVinStatisticModel() {
+    @Generated(hash = 40543826)
+    public SingleCarVinStatisticModel() {
     }
-
     public String getVinCode() {
         return this.vinCode;
     }
-
     public void setVinCode(String vinCode) {
         this.vinCode = vinCode;
     }
-
     public double getDistCount() {
         return this.distCount;
     }
-
     public void setDistCount(double distCount) {
         this.distCount = distCount;
     }
-
     public double getMaxDist() {
         return this.maxDist;
     }
-
     public void setMaxDist(double maxDist) {
         this.maxDist = maxDist;
     }
-
     public int getTimeCount() {
         return this.timeCount;
     }
-
     public void setTimeCount(int timeCount) {
         this.timeCount = timeCount;
     }
-
     public int getMaxTime() {
         return this.maxTime;
     }
-
     public void setMaxTime(int maxTime) {
         this.maxTime = maxTime;
     }
-
     public double getFuelCount() {
         return this.fuelCount;
     }
-
     public void setFuelCount(double fuelCount) {
         this.fuelCount = fuelCount;
     }
-
     public double getAvgFuel() {
         return this.avgFuel;
     }
-
     public void setAvgFuel(double avgFuel) {
         this.avgFuel = avgFuel;
     }
-
     public int getAccelerCount() {
         return this.accelerCount;
     }
-
     public void setAccelerCount(int accelerCount) {
         this.accelerCount = accelerCount;
     }
-
     public int getDecelerCount() {
         return this.decelerCount;
     }
-
     public void setDecelerCount(int decelerCount) {
         this.decelerCount = decelerCount;
     }
-
     public int getOverspeedCount() {
         return this.overspeedCount;
     }
-
     public void setOverspeedCount(int overspeedCount) {
         this.overspeedCount = overspeedCount;
     }
-
     public int getWzcxCount() {
         return this.wzcxCount;
     }
-
     public void setWzcxCount(int wzcxCount) {
         this.wzcxCount = wzcxCount;
     }
-
     public int getCarCheckCount() {
         return this.carCheckCount;
     }
-
     public void setCarCheckCount(int carCheckCount) {
         this.carCheckCount = carCheckCount;
     }
-
     public double getCarCheckAvg() {
         return this.carCheckAvg;
     }
-
     public void setCarCheckAvg(double carCheckAvg) {
         this.carCheckAvg = carCheckAvg;
     }
-
     public int getFaultCodeCount() {
         return this.faultCodeCount;
     }
-
     public void setFaultCodeCount(int faultCodeCount) {
         this.faultCodeCount = faultCodeCount;
     }
-
     public int getClearCodeCount() {
         return this.clearCodeCount;
     }
-
     public void setClearCodeCount(int clearCodeCount) {
         this.clearCodeCount = clearCodeCount;
     }
-
     public int getLastCarCheck() {
         return this.lastCarCheck;
     }
-
     public void setLastCarCheck(int lastCarCheck) {
         this.lastCarCheck = lastCarCheck;
     }
-
     public int getBmtestCount() {
         return this.bmtestCount;
     }
-
     public void setBmtestCount(int bmtestCount) {
         this.bmtestCount = bmtestCount;
     }
-
     public double getBmSeriesBestScore() {
         return this.bmSeriesBestScore;
     }
-
     public void setBmSeriesBestScore(double bmSeriesBestScore) {
         this.bmSeriesBestScore = bmSeriesBestScore;
     }
-
     public double getBmtestBestScore() {
         return this.bmtestBestScore;
     }
-
     public void setBmtestBestScore(double bmtestBestScore) {
         this.bmtestBestScore = bmtestBestScore;
     }
-
     public double getBmtestBestBeat() {
         return this.bmtestBestBeat;
     }
-
     public void setBmtestBestBeat(double bmtestBestBeat) {
         this.bmtestBestBeat = bmtestBestBeat;
     }
-
     public int getBltestCount() {
         return this.bltestCount;
     }
-
     public void setBltestCount(int bltestCount) {
         this.bltestCount = bltestCount;
     }
-
     public double getBlSeriesBestScore() {
         return this.blSeriesBestScore;
     }
-
     public void setBlSeriesBestScore(double blSeriesBestScore) {
         this.blSeriesBestScore = blSeriesBestScore;
     }
-
     public double getBltestBestScore() {
         return this.bltestBestScore;
     }
-
     public void setBltestBestScore(double bltestBestScore) {
         this.bltestBestScore = bltestBestScore;
     }
-
     public double getBltestBestBeat() {
         return this.bltestBestBeat;
     }
-
     public void setBltestBestBeat(double bltestBestBeat) {
         this.bltestBestBeat = bltestBestBeat;
     }
-
     public int getZdtestCount() {
         return this.zdtestCount;
     }
-
     public void setZdtestCount(int zdtestCount) {
         this.zdtestCount = zdtestCount;
     }
-
     public double getZdSeriesBestScore() {
         return this.zdSeriesBestScore;
     }
-
     public void setZdSeriesBestScore(double zdSeriesBestScore) {
         this.zdSeriesBestScore = zdSeriesBestScore;
     }
-
     public double getZdtestBestScore() {
         return this.zdtestBestScore;
     }
-
     public void setZdtestBestScore(double zdtestBestScore) {
         this.zdtestBestScore = zdtestBestScore;
     }
-
     public double getZdtestBestBeat() {
         return this.zdtestBestBeat;
     }
-
     public void setZdtestBestBeat(double zdtestBestBeat) {
         this.zdtestBestBeat = zdtestBestBeat;
     }
-
     public int getCarStataccelerCount() {
         return this.carStataccelerCount;
     }
-
     public void setCarStataccelerCount(int carStataccelerCount) {
         this.carStataccelerCount = carStataccelerCount;
     }
-
-    public Long getId() {
-        return this.id;
+    public double getAvgVehicleSpeed() {
+        return this.avgVehicleSpeed;
     }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setAvgVehicleSpeed(double avgVehicleSpeed) {
+        this.avgVehicleSpeed = avgVehicleSpeed;
     }
-
-
+    public Long getOnlyFlag() {
+        return this.onlyFlag;
+    }
+    public void setOnlyFlag(Long onlyFlag) {
+        this.onlyFlag = onlyFlag;
+    }
 
 
 }
