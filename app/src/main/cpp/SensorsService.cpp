@@ -912,14 +912,14 @@ void SensorsService::testing(double intervalTime) {
 
 
 void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
-	//string tmpData = BluetoothService.getData("015A");
+	//string tmpData = BlueteethService.getData("015A");
 	if( pid.find("015A")!=string::npos &&tmpData.find("415A")!= string::npos){
 		//if(tmpData.contains("415A")) {
 		//MAIN_ACTIVITY_PIDS = new String[] { "0105", "010B", "010C", "010D", "010F", "0110", "015A" };
 		pids ="0105,010B,010C,010D,010F,0110,0142,0146,015A";
 		return;
 	}
-	//tmpData = BluetoothService.getData("0145");
+	//tmpData = BlueteethService.getData("0145");
 	else if( pid.find("0145")!=string::npos ){
 		SensorsDataHandler(tmpData,pid);
 		//if(tmpData.contains("4145") && Double.parseDouble(SensorsService.acceleratorPedalPosition) > 0) {
@@ -936,13 +936,13 @@ void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
 			return;
 		}
 	}
-	/*tmpData = BluetoothService.getData("0147");
+	/*tmpData = BlueteethService.getData("0147");
 	if(tmpData.contains("4147")) {
 	MAIN_ACTIVITY_PIDS = new String[] { "0105", "010B", "010C", "010D", "010F", "0110", "0147" };
 	return;
 	}*/
 	else if( pid.find ("0148")!=string::npos){
-		//tmpData = BluetoothService.getData("0148");
+		//tmpData = BlueteethService.getData("0148");
 		SensorsDataHandler(tmpData,pid);
 		//	if(tmpData.contains("4148") && Double.parseDouble(SensorsService.acceleratorPedalPosition) > 0) {
 		if(tmpData.find("4148")!=string::npos &&acceleratorPedalPosition> 0) {
@@ -952,7 +952,7 @@ void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
 		}
 	}
 	else if( pid.find ("0149")!=string::npos){
-		//tmpData = BluetoothService.getData("0149");
+		//tmpData = BlueteethService.getData("0149");
 		SensorsDataHandler(tmpData,pid);
 		//if(tmpData.contains("4149") && Double.parseDouble(SensorsService.acceleratorPedalPosition) > 0) {
 		if(tmpData.find("4149")!=string::npos && acceleratorPedalPosition > 0) {
@@ -962,7 +962,7 @@ void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
 		}
 	}
 	else if( pid.find ("014A")!=string::npos){
-		//tmpData = BluetoothService.getData("014A");
+		//tmpData = BlueteethService.getData("014A");
 		SensorsDataHandler(tmpData,pid);
 		//if(tmpData.contains("414A") && Double.parseDouble(SensorsService.acceleratorPedalPosition) > 0) {
 		if(tmpData.find("414A")!=string::npos && acceleratorPedalPosition > 0) {
@@ -972,7 +972,7 @@ void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
 		}
 	}
 	else if( pid.find ("014B")!=string::npos){
-		//tmpData = BluetoothService.getData("014B");
+		//tmpData = BlueteethService.getData("014B");
 		SensorsDataHandler(tmpData,pid);
 		//if(tmpData.contains("414B") && Double.parseDouble(SensorsService.acceleratorPedalPosition) > 0) {
 		if(tmpData.find("414B")!=string::npos && acceleratorPedalPosition > 0) {
@@ -988,7 +988,7 @@ void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
 			return;
 		}
 	}
-	/*tmpData = BluetoothService.getData("0111");
+	/*tmpData = BlueteethService.getData("0111");
 	if(tmpData.contains("4111")) {
 	MAIN_ACTIVITY_PIDS = new String[] { "0105", "010B", "010C", "010D", "010F", "0110", "0111" };
 	return;
@@ -1090,7 +1090,7 @@ string SensorsService::analysisDTC(string data)
 
 // Android getDtcData  
 vector<string> SensorsService::dtcs(string data ) {
-	//String data = BluetoothService.getData("03");
+	//String data = BlueteethService.getData("03");
 	//if(null == data || "".equals(data)) return null;
 	vector<string> valueList;
 	if(data.empty()) return valueList;

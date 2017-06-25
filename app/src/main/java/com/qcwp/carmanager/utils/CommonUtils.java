@@ -1,5 +1,6 @@
 package com.qcwp.carmanager.utils;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Environment;
@@ -8,6 +9,7 @@ import android.view.View;
 import com.qcwp.carmanager.implement.StateRoundRectDrawable;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 
 /**
@@ -35,5 +37,62 @@ public class CommonUtils {
         }
 
         return mFileFolder;
+    }
+
+    public static  String longTimeToStr(int sec){
+        String timeStr = new String();
+        int day = sec / (60 * 60 * 24);
+        sec -= day * 60 * 60 * 24;
+        int ousr = sec / (60 * 60);
+        sec -= ousr * 60 * 60;
+        int minutes = sec / 60;
+        sec -= minutes * 60;
+
+        if (day > 0) {
+            timeStr= timeStr+String.format("%d天",day);
+        }
+        if (ousr > 0) {
+            timeStr= timeStr+String.format("%d小时",ousr);
+        }
+        if (day > 0) {
+            timeStr= timeStr+String.format("%d分",minutes);
+            return  timeStr;
+        }
+        if (sec < 10) {
+            timeStr= timeStr+String.format("%d分0%d秒",minutes,sec);
+        }else{
+            timeStr= timeStr+String.format("%d分%d秒",minutes,sec);
+        }
+        return  timeStr;
+    }
+
+    static public boolean setPin(Class btClass, BluetoothDevice btDevice,
+                                 String str) throws Exception
+    {
+        try
+        {
+            Method removeBondMethod = btClass.getDeclaredMethod("setPin",
+                    byte[].class);
+            Boolean returnValue = (Boolean) removeBondMethod.invoke(btDevice,
+                    new Object[]
+                            {str.getBytes()});
+        }
+        catch (SecurityException e)
+        {
+            // throw new RuntimeException(e.getMessage());
+            e.printStackTrace();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // throw new RuntimeException(e.getMessage());
+            e.printStackTrace();
+        }
+        catch (Exception e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return true;
+
     }
 }

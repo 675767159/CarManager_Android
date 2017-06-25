@@ -48,8 +48,12 @@ public class MessageEvent {
 
    public enum MessageEventType{
        OBDConnectSuccess,
-        CarBlindSuccess,
+       CarBlindSuccess,
        CarCrash,
-       CarDataUpdate
+       CarDataUpdate,
+       BlueToothScaned,
+       OBDLostDisconnection,
+       BlueRequestResult
+
    }
 }

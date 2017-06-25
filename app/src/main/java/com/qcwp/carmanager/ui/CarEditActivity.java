@@ -16,6 +16,7 @@ import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.adapter.CarEditSelectAdapter;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.EditCarInputView;
+import com.qcwp.carmanager.control.NavBarView;
 import com.qcwp.carmanager.engine.RequestModel;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.PathEnum;
@@ -73,6 +74,8 @@ public class CarEditActivity extends BaseActivity {
     EditCarInputView carColor;
     @BindView(R.id.button_confirm)
     Button buttonConfirm;
+    @BindView(R.id.NavbarView)
+    NavBarView navbarView;
 
     private CarInfoModel  carInfoModel;
     private long carBrandId,carCommonBrandId,carSerisId,carTypeId;
@@ -94,7 +97,11 @@ public class CarEditActivity extends BaseActivity {
             carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(vincode.getText())).build().unique();
         }
         type=(Type) getIntent().getSerializableExtra(KeyEnum.typeKey);
-
+        switch (type){
+            case Bind:
+                navbarView.setBackButtonHidden(true);
+                break;
+        }
         updateUI();
 
     }

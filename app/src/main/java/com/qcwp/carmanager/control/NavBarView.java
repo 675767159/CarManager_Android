@@ -46,6 +46,7 @@ public class NavBarView extends RelativeLayout {
 
     private  TextView textView;
     private Context context;
+    private ImageButton button;
     public NavBarView(Context context) {
         super(context);
     }
@@ -83,11 +84,11 @@ public class NavBarView extends RelativeLayout {
         textView.setText(text);
 
 
-        if (OBDClient.getInstance().getConnectStatus()== OBDConnectStateEnum.connectTypeConnectSuccess||OBDClient.getInstance().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded){
-            NavBarView.this.setTitleConnectedStatus();
+        if (OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeConnectSuccess||OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded){
+            NavBarView.this.setTitleConnectedStatus(true);
         }
 
-        ImageButton button=(ImageButton)view.findViewById(R.id.navBar_back);
+        button=(ImageButton)view.findViewById(R.id.navBar_back);
         if (background!=0){
             view.setBackgroundResource(background);
         }
@@ -129,15 +130,27 @@ public class NavBarView extends RelativeLayout {
     public String getTitle(){
        return (String) textView.getText();
     }
-
+    public void setBackButtonHidden(Boolean hidden){
+        if (hidden){
+            button.setVisibility(GONE);
+        }else {
+            button.setVisibility(VISIBLE);
+        }
+    }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        if (event.getType() == MessageEvent.MessageEventType.OBDConnectSuccess) {
 
-           NavBarView.this.setTitleConnectedStatus();
+        switch (event.getType()){
+            case OBDConnectSuccess:
+                NavBarView.this.setTitleConnectedStatus(true);
+                break;
+            case OBDLostDisconnection:
+                NavBarView.this.setTitleConnectedStatus(false);
+                break;
         }
+
     }
 
     @Override
@@ -150,7 +163,7 @@ public class NavBarView extends RelativeLayout {
    private void onClick(Context context){
        final BaseActivity currentActivity=(BaseActivity)context ;
        currentActivity.showLoadingDialog("正在连接...");
-       OBDClient obdClient=OBDClient.getInstance();
+       OBDClient obdClient=OBDClient.getDefaultClien();
        TravelSummaryModel travelSummaryModel=APP.getInstance().getDaoInstant().queryBuilder(TravelSummaryModel.class).orderDesc(TravelSummaryModelDao.Properties.OnlyFlag).limit(1).unique();
        if (travelSummaryModel==null){
            obdClient.setOnlyFlag(0);
@@ -159,10 +172,9 @@ public class NavBarView extends RelativeLayout {
        }
         obdClient.setStartTime(TimeUtils.getNowString());
        SensorsService.initData();
-       obdClient.readVinCode(new OBDClient.ReadVinCodeCompleteListener() {
-
+       obdClient.setReadVinCodeCompleteListener(new OBDClient.ReadVinCodeCompleteListener() {
            @Override
-           public void connectComplete(Boolean success, final String message) {
+           public void connectComplete(Boolean success, String message) {
                currentActivity.dismissLoadingDialog();
                if (success) {
 
@@ -186,15 +198,26 @@ public class NavBarView extends RelativeLayout {
 
 
            }
+
        });
+       obdClient.startOBDClient();
 
    }
 
-   private void setTitleConnectedStatus(){
-       Drawable leftDrawableOne = ContextCompat.getDrawable(context,R.mipmap.obd_connect_succes);
+   private void setTitleConnectedStatus(Boolean success){
+
+       Drawable leftDrawableOne = null;
+       if (success) {
+           leftDrawableOne = ContextCompat.getDrawable(context, R.mipmap.obd_connect_succes);
+           textView.setEnabled(false);
+       }else {
+           leftDrawableOne = ContextCompat.getDrawable(context, R.mipmap.obd_connect_failed);
+           textView.setEnabled(true);
+       }
        leftDrawableOne.setBounds(0, 0, leftDrawableOne.getIntrinsicWidth(), leftDrawableOne.getIntrinsicHeight());//非常重要，必须设置，否则图片不会显示
-       textView.setCompoundDrawables(leftDrawableOne,null,null,null);
-       textView.setEnabled(false);
+
+       textView.setCompoundDrawables(leftDrawableOne, null, null, null);
+
 
    }
 

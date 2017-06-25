@@ -24,7 +24,7 @@
         android:textColor="@android:color/white"
         android:textSize="25sp"
         android:drawableLeft="@mipmap/obd_connect_failed"
-        android:padding="10dp"
+        android:padding="@dimen/navbar_title_padding"
         />
 
 

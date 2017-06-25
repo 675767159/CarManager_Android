@@ -63,20 +63,20 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/value1"
                 android:layout_marginBottom="@dimen/vertical_margin"
-                android:text="0"
+                android:text="-"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/value2"
-                android:text="0"
+                android:text="-"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/value3"
                 android:layout_marginTop="@dimen/vertical_margin"
-                android:text="0"
+                android:text="-"
                 />
 
         </LinearLayout>

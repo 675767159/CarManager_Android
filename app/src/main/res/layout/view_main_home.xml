@@ -51,9 +51,9 @@
             android:layout_height="match_parent"
             android:id="@+id/totalTravel"
             app:image="@mipmap/main_home_local"
-            app:title1="行驶里程："
-            app:title2="行驶时间："
-            app:title3="行驶用油："
+            app:title1="总行驶里程："
+            app:title2="总行驶时间："
+            app:title3="总行驶用油："
             android:layout_weight="1"
             >
 
@@ -61,7 +61,7 @@
         <com.qcwp.carmanager.control.HomeItemView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/lastTravel"
+            android:id="@+id/singleTravel"
             app:image="@mipmap/main_home_peccancy"
             app:title1="上次行驶里程："
             app:title2="上次行驶时间："

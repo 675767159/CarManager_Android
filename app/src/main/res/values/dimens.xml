@@ -7,4 +7,5 @@
     <dimen name="navbar_height">44dp</dimen>
     <dimen name="padding">20dp</dimen>
     <dimen name="marginLeft">8dp</dimen>
+    <dimen name="navbar_title_padding">0dp</dimen>
 </resources>

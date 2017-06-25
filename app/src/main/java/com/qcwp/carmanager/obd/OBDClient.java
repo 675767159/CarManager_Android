@@ -1,11 +1,7 @@
 package com.qcwp.carmanager.obd;
 
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.icu.util.TimeUnit;
 
-import com.android.internal.util.Predicate;
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.ThreadPoolUtils;
 import com.blankj.utilcode.util.TimeUtils;
@@ -35,18 +31,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.regex.Pattern;
 
 import static com.blankj.utilcode.util.ThreadPoolUtils.CachedThread;
 import static com.blankj.utilcode.util.ThreadPoolUtils.FixedThread;
-import static com.blankj.utilcode.util.ThreadPoolUtils.SingleThread;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypeTijian;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypedrive;
 import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeConnectSuccess;
@@ -123,7 +114,7 @@ public class OBDClient {
         this.onlyFlag = onlyFlag;
     }
 
-    private static class UserDataHolder {
+    private static class OBDClientHolder {
 
         static final OBDClient INSTANCE = new OBDClient();
     }
@@ -132,39 +123,37 @@ public class OBDClient {
      * * private的构造函数用于避免外界直接使用new来实例化对象
      */
     private OBDClient() {
-        threadPool = new ThreadPoolUtils(FixedThread, 2);
+
         daoSession = APP.getInstance().getDaoInstant();
         EventBus.getDefault().register(OBDClient.this);
 
     }
 
-    public static OBDClient getInstance() {
+    public static OBDClient getDefaultClien() {
 
-        return OBDClient.UserDataHolder.INSTANCE;
+        return OBDClient.OBDClientHolder.INSTANCE;
     }
 
-    public void readVinCode(final ReadVinCodeCompleteListener readVinCodeCompleteListener) {
+    public void startOBDClient() {
 
 
+        threadPool = new ThreadPoolUtils(FixedThread, 2);
         threadPool.submit(new Callable<Object>() {
             @Override
             public Object call() throws Exception {
 
-                BluetoothService bluetoothService = new BluetoothService();
-                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                BluetoothDevice device = bluetoothAdapter.getRemoteDevice("00:0D:18:00:00:01");
-                bluetoothService.conectOBD(device, new BluetoothService.ConectOBDListener() {
+                BlueteethService blueteethService =  BlueteethService.getDefaultBluetoothService();
+                blueteethService.setConectOBDListener(new BlueteethService.ConectOBDListener() {
                     @Override
                     public void completeConect(Boolean success, String message) {
-
                         connectStatus = connectTypeConnectingWithSP;
                         Boolean blockSuccess = success;
                         String blockMessage = message;
                         if (success) {
                             if (EmptyUtils.isNotEmpty(OBDClient.this.detectProtocol())) {
 
-                                String data = BluetoothService.getData(SensorsService.VIN_PIDS);
-                                Print.d("BluetoothService", data + "----");
+                                String data = BlueteethService.getData(SensorsService.VIN_PIDS);
+                                Print.d("BlueteethService", data + "----");
 
                                 SensorsService.SensorsDataHandler(data, SensorsService.VIN_PIDS);
                                 vinCode = SensorsService.GetVinCode(data);
@@ -196,9 +185,15 @@ public class OBDClient {
                             }
                         });
 
+                        if (!blockSuccess){
+                            threadPool.shutDownNow();
+                        }
 
                     }
                 });
+                blueteethService.startBluetoothService();
+
+
 
                 return null;
             }
@@ -212,7 +207,7 @@ public class OBDClient {
         String SP = new MySharedPreferences(APP.getInstance()).getString(KeyEnum.currentOBDrotocol, "");
 
         if (EmptyUtils.isNotEmpty(SP)) {
-            String data = BluetoothService.getData(SP);
+            String data = BlueteethService.getData(SP);
             if (this.checkProtocolData(data)) {
                 return SP;
             }
@@ -223,9 +218,9 @@ public class OBDClient {
         //3.必须同时满足1和2才能正常连接
         String data;
         //    NSLog(@"SP = %@",SP);
-        String str1 = BluetoothService.getData("ATZ");//这两个必须有，不然会出现连上了却读不到数据的情况，（实测过的）
-        String str2 = BluetoothService.getData("ATE0");
-        String str3 = BluetoothService.getData("ATS0");
+        String str1 = BlueteethService.getData("ATZ");//这两个必须有，不然会出现连上了却读不到数据的情况，（实测过的）
+        String str2 = BlueteethService.getData("ATE0");
+        String str3 = BlueteethService.getData("ATS0");
 
 
         if (this.checkProtocolData("OK")) {
@@ -239,7 +234,7 @@ public class OBDClient {
         for (int i = 0; i < spArr.length; i++) {
             if (connectStatus == connectTypeConnectingWithSP) {
                 sp_Value = spArr[i];
-                if (this.checkProtocolData(BluetoothService.getData(sp_Value))) {
+                if (this.checkProtocolData(BlueteethService.getData(sp_Value))) {
                     MySharedPreferences mySharedPreferences = new MySharedPreferences(APP.getInstance());
                     mySharedPreferences.setString(KeyEnum.currentOBDrotocol, sp_Value);
                     return sp_Value;
@@ -252,12 +247,12 @@ public class OBDClient {
     private Boolean checkProtocolData(String data) {
 
         if (data.toUpperCase().contains("OK")) {
-            data = BluetoothService.getData("0100");
+            data = BlueteethService.getData("0100");
 
             if (data.contains("4100") || data.contains("41 00")) {
                 //当车辆还未初始化完成时，再初始化一次
                 while (data.contains("ERROR")) {
-                    data = BluetoothService.getData("0100");
+                    data = BlueteethService.getData("0100");
                 }
 
 
@@ -269,15 +264,31 @@ public class OBDClient {
         return false;
     }
 
+    private ReadVinCodeCompleteListener readVinCodeCompleteListener;
     public interface ReadVinCodeCompleteListener {
         void connectComplete(Boolean success, String message);
     }
+    public void setReadVinCodeCompleteListener(ReadVinCodeCompleteListener readVinCodeCompleteListener){
+        this.readVinCodeCompleteListener=readVinCodeCompleteListener;
+    }
 
+    /**
+     * @param event
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        if (event.getType() == MessageEvent.MessageEventType.CarBlindSuccess) {
-            OBDClient.this.initData();
+        switch (event.getType()){
+            case CarBlindSuccess:
+                OBDClient.this.initData();
+                break;
+            case OBDLostDisconnection:
+                //重连
+                connectStatus=OBDConnectStateEnum.connectTypeDisconnectionWithOBD;
+                threadPool.shutDownNow();
+                OBDClient.this.startOBDClient();
+                break;
         }
+
     }
 
 
@@ -337,7 +348,7 @@ public class OBDClient {
         double maxAcceleratorPedalPosition=SensorsService.maxAcceleratorPedalPosition();
         double avgAcceleratorPedalPosition=SensorsService.acceleratorPedalPositionAvg();
         double cureentDist=SensorsService.dist();
-        double carDist=originalCarMileage+dist;
+        double carDist=originalCarMileage+cureentDist;
         int travelTime=SensorsService.travelTime();
         int stopTime=SensorsService.stopTime();
         String startDate=startTime;
@@ -461,7 +472,7 @@ public class OBDClient {
                 Print.d("Runnable", "getCarData=========");
                 String[] acceleratorPids = APP.getInstance().getResources().getStringArray(R.array.AcceleratorPids);
                 for (String pid : acceleratorPids) {
-                    String tmpData = BluetoothService.getData(pid);
+                    String tmpData = BlueteethService.getData(pid);
                     SensorsService.setAccelerator(tmpData, pid);
                 }
 
@@ -474,7 +485,7 @@ public class OBDClient {
 
 
                 for (String pid : mainPIDList) {
-                    String tmpData = BluetoothService.getData(pid);
+                    String tmpData = BlueteethService.getData(pid);
                     SensorsService.SensorsDataHandler(tmpData, pid);
                 }
                 loadDataType = dataTypedrive;
@@ -515,7 +526,7 @@ public class OBDClient {
                         switch (loadDataType) {
                             case dataTypeTest:
 
-                                String tmpData = BluetoothService.getData("010D");
+                                String tmpData = BlueteethService.getData("010D");
                                 SensorsService.SensorsDataHandler(tmpData, "010D");
 
                                 break;
@@ -537,7 +548,7 @@ public class OBDClient {
                                 for (int i = 0; i < pids.size(); i++) {
                                     if (connectStatus == connectTypeHaveBinded) {
                                         String pid = pids.get(i);
-                                        String data = BluetoothService.getData(pid);
+                                        String data = BlueteethService.getData(pid);
                                         if (data.length() > 0) {
                                             if (i >= mainPIDList.size()) {
                                                 travelArray.add(OBDClient.this.readTravelDataWith(pid, data));
@@ -556,7 +567,7 @@ public class OBDClient {
                             break;
                             case dataTypeClearErr: {
 
-                                BluetoothService.getData("04");
+                                BlueteethService.getData("04");
                                 loadDataType = dataTypeTijian;
                             }
                             break;

@@ -27,6 +27,23 @@ public class HomeItemView extends RelativeLayout {
    private TextView value2;
    private TextView value3;
 
+
+    private TextView textView1;
+    private TextView textView2;
+    private TextView textView3;
+
+    public void setTitle1(String title) {
+        this.textView1.setText(title);
+    }
+
+    public void setTitle2(String title) {
+        this.textView2.setText(title);
+    }
+
+    public void setTitle3(String title) {
+        this.textView3.setText(title);
+    }
+
     public String getValue1() {
         return value1.getText().toString();
     }
@@ -89,13 +106,13 @@ public class HomeItemView extends RelativeLayout {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view= layoutInflater.inflate(R.layout.view_home_list_item,null);
 
-        TextView textView1=(TextView)view.findViewById(R.id.title1);
+         textView1=(TextView)view.findViewById(R.id.title1);
         textView1.setText(title1);
 
-        TextView textView2=(TextView)view.findViewById(R.id.title2);
+         textView2=(TextView)view.findViewById(R.id.title2);
         textView2.setText(title2);
 
-        TextView textView3=(TextView)view.findViewById(R.id.title3);
+         textView3=(TextView)view.findViewById(R.id.title3);
         textView3.setText(title3);
 
         ImageView imageView=(ImageView)view.findViewById(R.id.imageView);

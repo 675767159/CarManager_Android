@@ -5,7 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
+
+import org.greenrobot.eventbus.EventBus;
+
+import static com.qcwp.carmanager.broadcast.MessageEvent.MessageEventType.BlueToothScaned;
 
 
 /**
@@ -13,17 +18,34 @@ import com.qcwp.carmanager.utils.Print;
  */
 
 public class BlueToothReceiver extends BroadcastReceiver {
-
-
-
+    public static Boolean gotOBD=false;
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Print.d("BlueToothReceiver",intent.getAction());
+        Print.d("BlueToothReceiver", intent.getAction());
 
-        if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())) {// 搜索到蓝牙
-            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            Print.d("BlueToothReceiver",device.getName());
+        switch (intent.getAction()){
+            case BluetoothDevice.ACTION_FOUND :
+            case BluetoothDevice.ACTION_NAME_CHANGED:
+                {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                this.isOBDBluetoothDevice(device);
+            }
+                break;
+        }
+
+
+    }
+
+    private synchronized void  isOBDBluetoothDevice(BluetoothDevice device){
+        String name=device.getName();
+        Print.d("BlueToothReceiver",name+"---");
+        if (name!=null&&name.contains("OBD")) {
+            if (!gotOBD) {
+                gotOBD=true;
+                EventBus.getDefault().post(new MessageEvent(BlueToothScaned, device.getAddress()));
+            }
+
         }
     }
 }
