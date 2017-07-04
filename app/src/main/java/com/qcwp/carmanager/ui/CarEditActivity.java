@@ -9,9 +9,7 @@ import android.widget.Button;
 
 import com.bigkoo.pickerview.TimePickerView;
 import com.blankj.utilcode.util.EmptyUtils;
-import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.TimeUtils;
-import com.google.gson.Gson;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.adapter.CarEditSelectAdapter;
 import com.qcwp.carmanager.broadcast.MessageEvent;
@@ -19,15 +17,15 @@ import com.qcwp.carmanager.control.EditCarInputView;
 import com.qcwp.carmanager.control.NavBarView;
 import com.qcwp.carmanager.engine.RequestModel;
 import com.qcwp.carmanager.enumeration.KeyEnum;
-import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.enumeration.TimeEnum;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
+import com.qcwp.carmanager.greendao.gen.CarBrandModelDao;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.CarSeriesModelDao;
 import com.qcwp.carmanager.greendao.gen.CarTypeModelDao;
 import com.qcwp.carmanager.greendao.gen.CommonBrandModelDao;
-import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarBrandModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarSeriesModel;
@@ -43,7 +41,6 @@ import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -113,9 +110,11 @@ public class CarEditActivity extends BaseActivity {
             carBrandId=carInfoModel.getBrandId();
             carSeries.setText(carInfoModel.getCarSeries());
             carSerisId=carInfoModel.getCarSeriesId();
-            carType.setText(carInfoModel.getCarType());
+            carType.setText(carInfoModel.getCarType().getCarTypeName());
             carTypeId=carInfoModel.getCarTypeId();
-            buyDateStr=carInfoModel.getIsoBuyDate().replace(" 00:00:00","");
+            if (EmptyUtils.isNotEmpty(carInfoModel.getIsoBuyDate())) {
+                buyDateStr = carInfoModel.getIsoBuyDate().replace(" 00:00:00", "");
+            }
             buyDate.setText(buyDateStr);
             carColorStr=carInfoModel.getCarColor();
             carColor.setText(carColorStr);
@@ -139,22 +138,22 @@ public class CarEditActivity extends BaseActivity {
         switch (v.getId()) {
             case R.id.carBrand:
             {
-                this.chooseCarInfo(CarListType.CarBrand);
+                this.getAllCarBrand();
             }
                 break;
             case R.id.carSeries:
             {
-                this.chooseCarInfo(CarListType.CarCommonBrand);
+                this.getAllCommonCarBrand();
             }
             break;
             case R.id.carType:
             {
-                this.chooseCarInfo(CarListType.CarType);
+                this.getAllCarType();
             }
             break;
             case R.id.buyDate:
             {
-                this.chooseBuydaye();
+                this.chooseBuydate();
             }
             break;
             case R.id.carColor:
@@ -184,6 +183,8 @@ public class CarEditActivity extends BaseActivity {
 
                 list= mApp.getDaoInstant().loadAll(CarBrandModel.class);
                 builder.setTitle("请选择车品牌");
+
+
                 break;
             case CarType:
                 list= mApp.getDaoInstant().queryBuilder(CarTypeModel.class).where(CarTypeModelDao.Properties.Sid.eq(carSerisId)).orderDesc(CarTypeModelDao.Properties.Id).list();
@@ -217,16 +218,36 @@ public class CarEditActivity extends BaseActivity {
                         carBrand.setText(carBrandModel.getBrandName());
                         carBrandId=carBrandModel.getId();
 
+                        carCommonBrandId=0;
+                        carSerisId=0;
+                        carSeries.setText("");
+                        carTypeId=0;
+                        carType.setText("");
+
+                       CarEditActivity.this.getAllCommonCarBrand();
                         break;
                     case Carseries:
                         CarSeriesModel carSeriesModel=(CarSeriesModel) finalList.get(which);
                         carSeries.setText(carSeriesModel.getSeriesName());
                         carSerisId=carSeriesModel.getId();
+
+
+                        carTypeId=0;
+                        carType.setText("");
+
+                        CarEditActivity.this.getAllCarType();
+
                         break;
                     case CarCommonBrand:
                         CommonBrandModel commonBrandModel=(CommonBrandModel) finalList.get(which);
                         carCommonBrandId=commonBrandModel.getId();
-                        CarEditActivity.this.chooseCarInfo(CarListType.Carseries);
+                        CarEditActivity.this.getAllCarSeries();
+
+                        carSerisId=0;
+                        carSeries.setText("");
+                        carTypeId=0;
+                        carType.setText("");
+
                         break;
                 }
 
@@ -236,7 +257,7 @@ public class CarEditActivity extends BaseActivity {
     }
 
 
-    private void chooseBuydaye(){
+    private void chooseBuydate(){
         Calendar startDate = Calendar.getInstance();
         startDate.set(1970,1,1);
         Calendar endDate = Calendar.getInstance();
@@ -304,7 +325,7 @@ public class CarEditActivity extends BaseActivity {
             carInfoModel.setIsoBuyDate(buyDateStr+" 00:00:00");
             carInfoModel.setMemberId(UserData.getInstance().getUserId());
             carInfoModel.setNeedUpload(UploadStatusEnum.NotUpload);
-
+            carInfoModel.setCarType(null);
             showLoadingDialog();
 
             mEngine.uploadCarInfo(carInfoModel).enqueue(new Callback<RequestModel>() {
@@ -312,7 +333,7 @@ public class CarEditActivity extends BaseActivity {
                 public void onResponse(Call<RequestModel> call, Response<RequestModel> response) {
                     RequestModel requestModel=RequestModel.HandlerData(response);
                     dismissLoadingDialog();
-
+                    Print.d(TAG,requestModel.status+"-----"+requestModel.msg);
                     if (requestModel.isSuccess) {
                         carInfoModel.setNeedUpload(UploadStatusEnum.HadUpload);
 
@@ -341,15 +362,18 @@ public class CarEditActivity extends BaseActivity {
 
     private void updateSuccess(){
 
-        carInfoModel.setCarType(carType.getText());//后台有一个carType对象，不是字符串，所以传字符串会出错
         carInfoModel.setTimestamp(TimeUtils.getNowMills());
-
+        CarTypeModel carTypeModel=new CarTypeModel();
+        carTypeModel.setCarTypeName(carType.getText());
+        carInfoModel.setCarType(carTypeModel);//后台有一个carType对象，不是字符串，所以传字符串会出错
         mApp.getDaoInstant().insertOrReplace(carInfoModel);
         showLoadingDialog("绑定成功，请稍等...");
 
         MessageEvent messageEvent=new MessageEvent();
         if (type==Type.Bind) {
             messageEvent.setType(MessageEvent.MessageEventType.CarBlindSuccess);
+        }else {
+            messageEvent.setType(MessageEvent.MessageEventType.CarSelected);
         }
         messageEvent.setMessage(vincode.getText());
         EventBus.getDefault().post(messageEvent);
@@ -376,4 +400,135 @@ public class CarEditActivity extends BaseActivity {
         CarType
     }
 
+    private void getAllCarBrand(){
+        long ID=0;
+        CarBrandModel carBrandModel=mDaoSession.queryBuilder(CarBrandModel.class).orderDesc(CarBrandModelDao.Properties.Id).limit(1).unique();
+        if (carBrandModel!=null){
+            ID=carBrandModel.getId();
+        }
+        showLoadingDialog();
+        mEngine.getAllCarBrand(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel=response.body();
+                if (allCarModel.getStatus()==1){
+                   List<CarBrandModel>carBrandModels=allCarModel.getBrands();
+                    for (CarBrandModel carBrandModel:carBrandModels){
+                        mDaoSession.insertOrReplace(carBrandModel);
+                        Print.d(TAG,carBrandModel.getBrandName());
+                    }
+
+                }
+                dismissLoadingDialog();
+               CarEditActivity.this.chooseCarInfo(CarListType.CarBrand);
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+                dismissLoadingDialog();
+                CarEditActivity.this.chooseCarInfo(CarListType.CarBrand);
+            }
+        });
+    }
+
+    private void getAllCommonCarBrand(){
+
+        long ID=0;
+        CommonBrandModel commonBrandModel=mDaoSession.queryBuilder(CommonBrandModel.class).orderDesc(CommonBrandModelDao.Properties.Id).limit(1).unique();
+        if (commonBrandModel!=null){
+            ID=commonBrandModel.getId();
+        }
+        showLoadingDialog();
+        mEngine.getAllCommonCarBrand(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel=response.body();
+                if (allCarModel.getStatus()==1){
+                    List<CommonBrandModel>commonBrands=allCarModel.getCommonBrands();
+                    for (CommonBrandModel  commonBrandModel:commonBrands){
+                        mDaoSession.insertOrReplace(commonBrandModel);
+                        Print.d(TAG,commonBrandModel.getCommonBrandName());
+                    }
+
+                }
+                dismissLoadingDialog();
+                CarEditActivity.this.chooseCarInfo(CarListType.CarCommonBrand);
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+                dismissLoadingDialog();
+                CarEditActivity.this.chooseCarInfo(CarListType.CarCommonBrand);
+            }
+        });
+    }
+
+    private void getAllCarSeries(){
+
+        long ID=0;
+        CarSeriesModel carSeriesModel=mDaoSession.queryBuilder(CarSeriesModel.class).orderDesc(CarSeriesModelDao.Properties.Id).limit(1).unique();
+        if (carSeriesModel!=null){
+            ID=carSeriesModel.getId();
+        }
+
+        showLoadingDialog();
+        mEngine.getAllCarSeries(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel=response.body();
+                if (allCarModel.getStatus()==1){
+                    List<CarSeriesModel>carSerieses=allCarModel.getCarSerieses();
+                    for (CarSeriesModel  carSeriesModel:carSerieses){
+                        mDaoSession.insertOrReplace(carSeriesModel);
+                        Print.d(TAG,carSeriesModel.getSeriesName());
+                    }
+
+                }
+                dismissLoadingDialog();
+                CarEditActivity.this.chooseCarInfo(CarListType.Carseries);
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+                dismissLoadingDialog();
+                CarEditActivity.this.chooseCarInfo(CarListType.Carseries);
+            }
+        });
+    }
+
+    private void getAllCarType(){
+
+        long ID=0;
+        CarTypeModel carTypeModel=mDaoSession.queryBuilder(CarTypeModel.class).orderDesc(CarTypeModelDao.Properties.Id).limit(1).unique();
+        if (carTypeModel!=null){
+            ID=carTypeModel.getId();
+        }
+        showLoadingDialog();
+        mEngine.getAllCarType(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel=response.body();
+                if (allCarModel.getStatus()==1){
+                    List<CarTypeModel>carTypes=allCarModel.getCarTypes();
+                    for (CarTypeModel  carTypeModel:carTypes){
+                        mDaoSession.insertOrReplace(carTypeModel);
+                        Print.d(TAG,carTypeModel.getCarTypeName());
+                    }
+
+                }
+                dismissLoadingDialog();
+                CarEditActivity.this.chooseCarInfo(CarListType.CarType);
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+                dismissLoadingDialog();
+                CarEditActivity.this.chooseCarInfo(CarListType.CarType);
+            }
+        });
+    }
 }

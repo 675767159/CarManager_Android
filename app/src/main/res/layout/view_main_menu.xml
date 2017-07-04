@@ -51,7 +51,7 @@
             app:text="主页"
             app:HomeItemView_image="@mipmap/main_menu_home"
             android:layout_weight="1"
-            android:id="@+id/button_home"
+            android:id="@+id/menu_home"
             android:onClick="onClick"
             />
         <com.qcwp.carmanager.control.MenuItemView
@@ -60,7 +60,7 @@
             app:text="行驶"
             app:HomeItemView_image="@mipmap/main_menu_driving"
             android:layout_weight="1"
-            android:id="@+id/button_driving"
+            android:id="@+id/menu_driving"
             android:onClick="onClick"
             />
         <com.qcwp.carmanager.control.MenuItemView
@@ -69,7 +69,7 @@
             app:text="专业"
             app:HomeItemView_image="@mipmap/mian_menu_professional_test"
             android:layout_weight="1"
-            android:id="@+id/button_professional_test"
+            android:id="@+id/menu_professional_test"
             android:onClick="onClick"
             />
         <com.qcwp.carmanager.control.MenuItemView
@@ -78,7 +78,7 @@
             app:text="行程"
             app:HomeItemView_image="@mipmap/mian_menu_travel"
             android:layout_weight="1"
-            android:id="@+id/button_travel"
+            android:id="@+id/menu_travel"
             android:onClick="onClick"
             />
         <com.qcwp.carmanager.control.MenuItemView
@@ -87,7 +87,7 @@
             app:text="车辆"
             app:HomeItemView_image="@mipmap/mian_menu_car"
             android:layout_weight="1"
-            android:id="@+id/button_car_info"
+            android:id="@+id/menu_car_info"
             android:onClick="onClick"
             />
         <com.qcwp.carmanager.control.MenuItemView
@@ -96,7 +96,7 @@
             app:text="设置"
             app:HomeItemView_image="@mipmap/mian_menu_set"
             android:layout_weight="1"
-            android:id="@+id/button_set"
+            android:id="@+id/menu_set"
             android:onClick="onClick"
             />
 

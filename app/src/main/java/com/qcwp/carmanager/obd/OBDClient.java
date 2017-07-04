@@ -97,13 +97,13 @@ public class OBDClient {
     }
 
     public String startTime;
-    public long getOnlyFlag() {
-        return onlyFlag;
+
+
+    public String getVinCode() {
+        return vinCode;
     }
 
-    public String getStartTime() {
-        return startTime;
-    }
+
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
@@ -285,6 +285,7 @@ public class OBDClient {
                 //重连
                 connectStatus=OBDConnectStateEnum.connectTypeDisconnectionWithOBD;
                 threadPool.shutDownNow();
+                vinCode=null;
                 OBDClient.this.startOBDClient();
                 break;
         }
@@ -318,6 +319,9 @@ public class OBDClient {
             singleCarVinStatisticModel = new SingleCarVinStatisticModel();
         }
         singleCarVinStatisticModel.setVinCode(vinCode);
+        singleCarVinStatisticModel.setTimeCount(0);
+        singleCarVinStatisticModel.setDistCount(0);
+        singleCarVinStatisticModel.setFuelCount(0);
         daoSession.insertOrReplace(singleCarVinStatisticModel);
 
 
@@ -355,7 +359,7 @@ public class OBDClient {
         String endDate=TimeUtils.getNowString();
 
 
-        return  "OnlyFlag="+onlyFlag+"&VinId="+0+"&UserId="+UserData.getInstance().getUserId()+"&LiterAvg="+showUsaLiter+"&MaxVehicleSpeed="+maxVehicleSpeed+"&VehicleSpeedAve="+avgVehicleSpeed+"&MaxEngineRpm="+maxEngineRpm+"&EngineRpmAve="+avgEngineRpm+"&MaxAcceleratorPedalPosition="+maxAcceleratorPedalPosition+"&AcceleratorPedalPositionAve="+avgAcceleratorPedalPosition+"&StartDate="+startDate+"&EndDate="+endDate+"&CarDist="+carDist+"&Dist="+cureentDist+"&CountSecond="+travelTime+"&StopSecond="+stopTime+"\n";
+        return  "@OnlyFlag="+onlyFlag+"&VinId="+0+"&UserId="+UserData.getInstance().getUserId()+"&LiterAvg="+showUsaLiter+"&MaxVehicleSpeed="+maxVehicleSpeed+"&VehicleSpeedAve="+avgVehicleSpeed+"&MaxEngineRpm="+maxEngineRpm+"&EngineRpmAve="+avgEngineRpm+"&MaxAcceleratorPedalPosition="+maxAcceleratorPedalPosition+"&AcceleratorPedalPositionAve="+avgAcceleratorPedalPosition+"&StartDate="+startDate+"&EndDate="+endDate+"&CarDist="+carDist+"&Dist="+cureentDist+"&CountSecond="+travelTime+"&StopSecond="+stopTime+"\n";
 
     }
 
@@ -705,7 +709,7 @@ public class OBDClient {
             Print.d("saveOBDData","777777");
 
 
-            EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarDataUpdate,null));
+            EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarDataUpdate,vinCode));
             Print.d("saveOBDData","============"+travelArray.size());
 
         }

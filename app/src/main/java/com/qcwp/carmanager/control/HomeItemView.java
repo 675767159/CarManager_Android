@@ -2,8 +2,10 @@ package com.qcwp.carmanager.control;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +33,7 @@ public class HomeItemView extends RelativeLayout {
     private TextView textView1;
     private TextView textView2;
     private TextView textView3;
-
+   private Context context;
     public void setTitle1(String title) {
         this.textView1.setText(title);
     }
@@ -69,6 +71,12 @@ public class HomeItemView extends RelativeLayout {
         this.value3.setText(value3);
     }
 
+    public void setValue3Color(int colorId) {
+        int color=ContextCompat.getColor(context, colorId);
+        this.value3.setTextColor(color);
+    }
+
+
     public HomeItemView(Context context) {
         super(context);
     }
@@ -92,7 +100,7 @@ public class HomeItemView extends RelativeLayout {
 
 
     private void init(Context context, AttributeSet attrs) {
-
+        this.context=context;
         TypedArray typedArray=context.obtainStyledAttributes(attrs, R.styleable.HomeItemView);
         String  title1=typedArray.getString(R.styleable.HomeItemView_title1);
         String  title2=typedArray.getString(R.styleable.HomeItemView_title2);

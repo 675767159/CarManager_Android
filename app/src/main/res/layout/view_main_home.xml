@@ -37,60 +37,65 @@
         <com.qcwp.carmanager.control.HomeItemView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/carInfo"
+            android:id="@+id/home_carInfo"
             app:image="@mipmap/main_home_car"
             app:title1="所属车系："
-            app:title3="车牌号："
-            app:hiddenTitle2="true"
+            app:title2="车牌号："
+            app:title3="当前状态："
             android:layout_weight="1"
+            android:onClick="onClick"
             >
 
         </com.qcwp.carmanager.control.HomeItemView>
         <com.qcwp.carmanager.control.HomeItemView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/totalTravel"
+            android:id="@+id/home_totalTravel"
             app:image="@mipmap/main_home_local"
             app:title1="总行驶里程："
             app:title2="总行驶时间："
             app:title3="总行驶用油："
             android:layout_weight="1"
+            android:onClick="onClick"
             >
 
         </com.qcwp.carmanager.control.HomeItemView>
         <com.qcwp.carmanager.control.HomeItemView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/singleTravel"
+            android:id="@+id/home_singleTravel"
             app:image="@mipmap/main_home_peccancy"
             app:title1="上次行驶里程："
             app:title2="上次行驶时间："
             app:title3="上次行驶用油："
             android:layout_weight="1"
+            android:onClick="onClick"
             >
 
         </com.qcwp.carmanager.control.HomeItemView>
         <com.qcwp.carmanager.control.HomeItemView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/professionalTest"
+            android:id="@+id/home_professionalTest"
             app:image="@mipmap/main_home_hectometre"
             app:title1="百米加速："
             app:title2="制动测试："
             app:title3="百公里加速："
             android:layout_weight="1"
+            android:onClick="onClick"
             >
 
         </com.qcwp.carmanager.control.HomeItemView>
         <com.qcwp.carmanager.control.HomeItemView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/driveHabit"
+            android:id="@+id/home_driveHabit"
             app:image="@mipmap/main_home_accelerate"
             app:title1="急加速："
             app:title2="超速："
             app:title3="急刹车："
             android:layout_weight="1"
+            android:onClick="onClick"
             >
 
         </com.qcwp.carmanager.control.HomeItemView>

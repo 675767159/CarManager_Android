@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.qcwp.carmanager.ui.CarListActivity">
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="设置"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_input_height"
+        android:text="登录"
+        android:layout_below="@id/password_back_view"
+        android:layout_marginLeft="@dimen/horizon_margin"
+        android:layout_marginRight="@dimen/horizon_margin"
+        android:layout_marginTop="@dimen/login_vertical_margin"
+        android:background="#23943D"
+        android:textColor="@android:color/white"
+        android:id="@+id/button_login"
+        android:onClick="onClick"
+        android:layout_centerInParent="true"
+        />
+</RelativeLayout>

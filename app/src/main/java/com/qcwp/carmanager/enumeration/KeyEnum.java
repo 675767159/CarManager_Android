@@ -22,6 +22,7 @@ public class KeyEnum {
             wifiName="wifiName",
             wifiPassword="wifiPassword",
             vinCode="vinCode",
-            currentOBDrotocol="currentOBDrotocol";
+            currentOBDrotocol="currentOBDrotocol",
+            carNumber="carNumber";
 
 }

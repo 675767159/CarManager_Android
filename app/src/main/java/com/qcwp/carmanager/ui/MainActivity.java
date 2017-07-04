@@ -1,9 +1,6 @@
 package com.qcwp.carmanager.ui;
 
-import android.content.pm.PackageManager;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.blankj.utilcode.util.TimeUtils;
@@ -12,9 +9,12 @@ import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.HomeItemView;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
+import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.CarVinStatisticModelDao;
 import com.qcwp.carmanager.greendao.gen.SingleCarVinStatisticModelDao;
+import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.SingleCarVinStatisticModel;
@@ -24,21 +24,26 @@ import com.qcwp.carmanager.utils.Print;
 import com.qiantao.coordinatormenu.CoordinatorMenu;
 
 
+import java.util.List;
+
 import butterknife.BindView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MainActivity extends BaseActivity {
 
 
-    @BindView(R.id.carInfo)
+    @BindView(R.id.home_carInfo)
     HomeItemView carInfo;
-    @BindView(R.id.totalTravel)
+    @BindView(R.id.home_totalTravel)
     HomeItemView totalTravel;
-    @BindView(R.id.singleTravel)
+    @BindView(R.id.home_singleTravel)
     HomeItemView singleTravel;
-    @BindView(R.id.professionalTest)
+    @BindView(R.id.home_professionalTest)
     HomeItemView professionalTest;
-    @BindView(R.id.driveHabit)
+    @BindView(R.id.home_driveHabit)
     HomeItemView driveHabit;
     @BindView(R.id.menu)
     CoordinatorMenu mCoordinatorMenu;
@@ -58,11 +63,52 @@ public class MainActivity extends BaseActivity {
             carVinStatisticModel = mApp.getDaoInstant().queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).build().unique();
             singleCarVinStatisticModel = mApp.getDaoInstant().queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).build().unique();
         }
-        updateUI();
-
+        this.updateUI();
+        this.getMyAllCarInfo();
+        Print.d(TAG,"UserId="+UserData.getInstance().getUserId());
+        Print.d(TAG,"UserName="+UserData.getInstance().getUserName());
     }
 
 
+
+    private void getMyAllCarInfo(){
+
+        mEngine.getMyAllCarInfo(UserData.getInstance().getUserId()).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+                AllCarModel allCarInfoModel=response.body();
+                if (allCarInfoModel.getStatus()==1){
+                    List<CarInfoModel> allCarInfoModels=allCarInfoModel.getVins();
+                    for (CarInfoModel carInfoModel:allCarInfoModels){
+                        Print.d(TAG,carInfoModel.getVinCode()+"-----");
+                        CarInfoModel sqCarInfoModel=mDaoSession.queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).unique();
+                        if (sqCarInfoModel!=null){
+                            carInfoModel.setId(sqCarInfoModel.getId());
+                            carInfoModel.setTimestamp(sqCarInfoModel.getTimestamp());
+                        }else {
+                            carInfoModel.setTimestamp(TimeUtils.getNowMills());
+                        }
+                        carInfoModel.setNeedUpload(UploadStatusEnum.HadUpload);
+                        carInfoModel.setCarSeries(carInfoModel.getCarType().getCarSeriesModel().getSeriesName());
+                        carInfoModel.setBrand(carInfoModel.getCarType().getCarSeriesModel().getCommonBrandModel().getCarBrand().getBrandName());
+                        carInfoModel.setCommonBrandName(carInfoModel.getCarType().getCarSeriesModel().getCommonBrandModel().getCommonBrandName());
+
+                        mDaoSession.insertOrReplace(carInfoModel);
+                    }
+                    Print.d(TAG,allCarInfoModels.size()+"-----");
+                    carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
+
+                    MainActivity.this.updateUI();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+            }
+        });
+
+    }
 
     @Override
     public void onClick(View v) {
@@ -78,25 +124,29 @@ public class MainActivity extends BaseActivity {
             }
                 break;
 
-            case R.id.button_home:{
+            case R.id.menu_home:{
                 mCoordinatorMenu.closeMenu();
             }
             break;
-            case R.id.button_driving:
+            case R.id.menu_driving:
                 break;
-            case R.id.button_professional_test:
+            case R.id.menu_professional_test:
                 break;
-            case R.id.button_travel:
+            case R.id.menu_travel:
                 break;
-            case R.id.button_car_info:
+            case R.id.menu_car_info:
             {
                 Bundle bundle=new Bundle();
-                bundle.putString(KeyEnum.vinCode,"12345678901234567");
+                bundle.putString(KeyEnum.vinCode,carInfoModel.getVinCode());
                 bundle.putSerializable(KeyEnum.typeKey,CarEditActivity.Type.Edit);
                 readyGo(CarEditActivity.class,bundle);
             }
                 break;
-            case R.id.button_set:
+            case R.id.menu_set:
+                readyGo(SetActivity.class);
+                break;
+            case R.id.home_carInfo:
+               readyGo(CarListActivity.class);
                 break;
         }
     }
@@ -109,6 +159,7 @@ public class MainActivity extends BaseActivity {
         switch (messageEvent.getType()){
             case CarDataUpdate:
             case  CarBlindSuccess:
+            case  CarSelected:
                 carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(messageEvent.getMessage())).build().unique();
                 carVinStatisticModel=mApp.getDaoInstant().queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(messageEvent.getMessage())).build().unique();
 singleCarVinStatisticModel=mApp.getDaoInstant().queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(messageEvent.getMessage())).build().unique();
@@ -123,7 +174,8 @@ singleCarVinStatisticModel=mApp.getDaoInstant().queryBuilder(SingleCarVinStatist
     private void updateUI(){
         if (carInfoModel!=null){
             carInfo.setValue1(carInfoModel.getCarSeries());
-            carInfo.setValue3(carInfoModel.getCarNumber());
+            carInfo.setValue2(carInfoModel.getCarNumber());
+
 
         }
 
@@ -149,31 +201,21 @@ singleCarVinStatisticModel=mApp.getDaoInstant().queryBuilder(SingleCarVinStatist
             singleTravel.setValue3(String.format("%.1f升",singleCarVinStatisticModel.getFuelCount()));
 
         }
-        if (OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded){
+        if ((OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded||OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeConnectSuccess)&&carInfoModel.getVinCode().equals(OBDClient.getDefaultClien().getVinCode())){
             singleTravel.setTitle1("本次行驶里程");
             singleTravel.setTitle2("本次行驶时间");
             singleTravel.setTitle3("本次行驶用油");
+            carInfo.setValue3("在线");
+            carInfo.setValue3Color(R.color.greenColor);
         }else {
 
             singleTravel.setTitle1("上次行驶里程");
             singleTravel.setTitle2("上次行驶时间");
             singleTravel.setTitle3("上次行驶用油");
+            carInfo.setValue3("离线");
+            carInfo.setValue3Color(R.color.blackColor);
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Print.d("onRequestPermissionsResult","--------"+requestCode);
-        switch (requestCode) {
-            case 2: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                  Print.d("onRequestPermissionsResult","--------");
-                }
-                return;
-            }
-        }
-    }
 }

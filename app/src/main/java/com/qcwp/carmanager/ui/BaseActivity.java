@@ -13,6 +13,7 @@ import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.engine.Engine;
+import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.obd.BlueteethService;
 import com.qcwp.carmanager.utils.Print;
 import com.qcwp.carmanager.utils.ToastUtil;
@@ -36,7 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected APP mApp;
     protected Engine mEngine;
     protected String TAG;
-
+    protected DaoSession mDaoSession;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         TAG = this.getClass().getSimpleName();
         mApp = APP.getInstance();
         mEngine = mApp.getEngine();
-
+        mDaoSession=mApp.getDaoInstant();
         initViewsAndEvents(savedInstanceState);
         EventBus.getDefault().register(this);
 
@@ -237,6 +238,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //请求蓝牙打开结果
         if (requestCode== BlueteethService.REQUEST_OPEN_BT_CODE){
           EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.BlueRequestResult,String.valueOf(resultCode)));
         }

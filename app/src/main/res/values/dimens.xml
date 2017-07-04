@@ -8,4 +8,5 @@
     <dimen name="padding">20dp</dimen>
     <dimen name="marginLeft">8dp</dimen>
     <dimen name="navbar_title_padding">0dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

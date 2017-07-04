@@ -30,17 +30,8 @@ public class WelcomeActivity extends BaseActivity {
             public void run() {
 
 
-                String userInfoStr= FileIOUtils.readFile2String(mApp.getMyFileFolder(PathEnum.UserInfo));
-                if (EmptyUtils.isNotEmpty(userInfoStr)){
-
-                    LoginModel userInfo=new Gson().fromJson(userInfoStr,LoginModel.class);
-                    Print.d(TAG,userInfo.toString());
-                    if (EmptyUtils.isNotEmpty(userInfo)){
-                        UserData.setInstance(userInfo);
+                if (EmptyUtils.isNotEmpty(UserData.getInstance().getUserName())&&EmptyUtils.isNotEmpty(UserData.getInstance().getPassword())){
                         readyGoThenKill(MainActivity.class);
-                    }else {
-                        readyGoThenKill(LoginActivity.class);
-                    }
 
                 } else {
                     readyGoThenKill(LoginActivity.class);

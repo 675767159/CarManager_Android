@@ -7,4 +7,6 @@
     <color name="navbarBackGroundColor">#4B95DB</color>//navbar背景色
 
     <color name="backgroundColor">#E5E5E5</color>
+    <color name="blackColor">#000000</color>
+    <color name="greenColor">#3DFF05</color>
 </resources>

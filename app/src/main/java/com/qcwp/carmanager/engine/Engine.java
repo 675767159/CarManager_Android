@@ -4,19 +4,25 @@ package com.qcwp.carmanager.engine;
 
 import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.PhoneAuthModel;
-import com.qcwp.carmanager.model.retrofitModel.Token;
+import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
+import com.qcwp.carmanager.model.retrofitModel.TokenModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 
 import java.util.Map;
 
-import okhttp3.ResponseBody;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
-import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Part;
+import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Url;
 
 /**
  * Created by qyh on 2016/11/17.
@@ -45,6 +51,39 @@ public  interface Engine {
     @POST("doVin_bindVin")
     Call<RequestModel> uploadCarInfo(@Body CarInfoModel carInfoModel);
 
+    @FormUrlEncoded
+    @POST("doMember_getVinsByMemberId")
+    Call<AllCarModel> getMyAllCarInfo(@Field("id") int userId);
+
+    @FormUrlEncoded
+    @POST("doBrand_getBrandByIdgt")
+    Call<AllCarModel> getAllCarBrand(@Field("id") long ID);
+
+
+    @FormUrlEncoded
+    @POST("doCommonBrand_getCommonBrandByIdgt")
+    Call<AllCarModel> getAllCommonCarBrand(@Field("id") long ID);
+
+
+    @FormUrlEncoded
+    @POST("doCarSeries_getCarSeriesByIdgt")
+    Call<AllCarModel> getAllCarSeries(@Field("id") long ID);
+
+    @FormUrlEncoded
+    @POST("doCarType_getCarTypeByIdgt")
+    Call<AllCarModel> getAllCarType(@Field("id") long ID);
+
+
+
+
+    @Multipart
+    @POST("doTravelDataUploadFile_appUpload")
+    Call<AllCarModel> uploadDriveData( @Part MultipartBody.Part file ,@Query("token") String token);
+
+
+    @FormUrlEncoded
+    @POST("doAppToken_getToken")
+    Call<TokenModel> getToken(@Field("username") String username,@Field("password") String password,@Field("url") String url);
 
 
 }

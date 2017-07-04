@@ -2,6 +2,7 @@
 #include <string>
 
 #include "SensorsService.cpp"
+#include "SensorsService.hpp"
 //#include "SensorsService.cpp"
 /* Header for class com_auto_service_SensorsService */
 
@@ -991,10 +992,10 @@ JNIEXPORT jdouble JNICALL Java_com_qcwp_carmanager_obd_SensorsService_analysisAc
  * Method:    initCoefficient
  * Signature: (DDDDDDDDDD)V
  */
-JNIEXPORT void JNICALL Java_com_qcwp_carmanager_obd_SensorsService_initCoefficient
-        (JNIEnv *, jclass, jdouble val1, jdouble val2, jdouble val3, jdouble val4, jdouble val5, jdouble val6, jdouble val7, jdouble val8, jdouble val9, jdouble val10){
-    SensorsService::initCoefficient(val1,val2,val3,val4,val5,val6,val7,val8,val9,val10);
-}
+//JNIEXPORT void JNICALL Java_com_qcwp_carmanager_obd_SensorsService_initCoefficient
+//        (JNIEnv *, jclass, jdouble val1, jdouble val2, jdouble val3, jdouble val4, jdouble val5, jdouble val6, jdouble val7, jdouble val8, jdouble val9, jdouble val10){
+//    SensorsService::initCoefficient(val1,val2,val3,val4,val5,val6,val7,val8,val9,val10);
+//}
 
 
 /*
@@ -1002,30 +1003,30 @@ JNIEXPORT void JNICALL Java_com_qcwp_carmanager_obd_SensorsService_initCoefficie
  * Method:    setMaxLiter
  * Signature: (D)V
  */
-JNIEXPORT void JNICALL Java_com_qcwp_carmanager_obd_SensorsService_setMaxLiter
-        (JNIEnv *, jclass, jdouble val){
-    SensorsService::setMaxLiter(val);
-}
+//JNIEXPORT void JNICALL Java_com_qcwp_carmanager_obd_SensorsService_setMaxLiter
+//        (JNIEnv *, jclass, jdouble val){
+//    SensorsService::setMaxLiter(val);
+//}
 
 /*
  * Class:     com_auto_service_SensorsService
  * Method:    setOverSpeed
  * Signature: (D)V
  */
-JNIEXPORT void JNICALL Java_com_qcwp_carmanager_obd_SensorsService_setOverSpeed
-        (JNIEnv *, jclass, jdouble overSpeed2){
-    SensorsService::setOverSpeed(overSpeed2);
-}
+//JNIEXPORT void JNICALL Java_com_qcwp_carmanager_obd_SensorsService_setOverSpeed
+//        (JNIEnv *, jclass, jdouble overSpeed2){
+//    SensorsService::setOverSpeed(overSpeed2);
+//}
 
 /*
  * Class:     com_auto_service_SensorsService
  * Method:    isOverSpeed
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_com_qcwp_carmanager_obd_SensorsService_isOverSpeed
-        (JNIEnv *, jclass){
-    return SensorsService::isOverSpeed();
-}
+//JNIEXPORT jint JNICALL Java_com_qcwp_carmanager_obd_SensorsService_isOverSpeed
+//        (JNIEnv *, jclass){
+//    return SensorsService::isOverSpeed();
+//}
 
 
 

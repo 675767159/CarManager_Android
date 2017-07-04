@@ -15,7 +15,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class CarBrandModel {
 
     @Property(nameInDb = "Id")
-    @Id
+    @Id(autoincrement = true)
     @NotNull
     private Long id;
     @Property(nameInDb = "BrandName")

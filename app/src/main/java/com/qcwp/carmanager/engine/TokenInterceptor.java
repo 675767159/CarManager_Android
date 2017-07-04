@@ -76,69 +76,72 @@ public class TokenInterceptor implements Interceptor {
         String url=original.url().toString();
         String token = null;
 
-       String method=url.replace(Engine.QiCheWangPing,"");
-        if (needTokenAPIs.contains(method)){
-            token=this.getNewToken(method);
-            //请求体定制：统一添加token参数
-            if(original.body() instanceof FormBody)/*带参数*/{
-                FormBody.Builder newFormBody = new FormBody.Builder();
-                FormBody oldFormBody = (FormBody) original.body();
-                for (int i = 0;i<oldFormBody.size();i++){
-                    Print.d("getNewToken",oldFormBody.encodedName(i)+"---"+oldFormBody.encodedValue(i));
-                    newFormBody.addEncoded(oldFormBody.encodedName(i),oldFormBody.encodedValue(i));
+        String method=url.replace(Engine.QiCheWangPing,"");
+        for (String API:needTokenAPIs) {
+            if (method.contains(API)){
+                token=this.getNewToken(API);
+                //请求体定制：统一添加token参数
+                if(original.body() instanceof FormBody)/*带参数*/{
+                    FormBody.Builder newFormBody = new FormBody.Builder();
+                    FormBody oldFormBody = (FormBody) original.body();
+                    for (int i = 0;i<oldFormBody.size();i++){
+                        Print.d("getNewToken",oldFormBody.encodedName(i)+"---"+oldFormBody.encodedValue(i));
+                        newFormBody.addEncoded(oldFormBody.encodedName(i),oldFormBody.encodedValue(i));
+                    }
+                    Print.d("getNewToken","token---"+token);
+                    if (token!=null) {
+                        newFormBody.add("token", token);
+                    }
+                    requestBuilder.method(original.method(),newFormBody.build());
                 }
-                Print.d("getNewToken","token---"+token);
-                if (token!=null) {
-                    newFormBody.add("token", token);
-                }
-                requestBuilder.method(original.method(),newFormBody.build());
-            }
-            else if (original.body() instanceof RequestBody)/*不带参数*/{
+                else if (original.body() instanceof RequestBody)/*不带参数*/{
 
 
-                FormBody.Builder newFormBody = new FormBody.Builder();
-                RequestBody oldFormBody = original.body();
+                    FormBody.Builder newFormBody = new FormBody.Builder();
+                    RequestBody oldFormBody = original.body();
 
 
-                Buffer buffer = new Buffer();
-                oldFormBody.writeTo(buffer);
-                Charset charset =  Charset.forName("UTF-8");
-                MediaType contentType = oldFormBody.contentType();
-                if (contentType != null) {
-                    charset = contentType.charset(charset);
-                }
-
-                String bodyString = buffer.clone().readString(charset);
-                Print.d("getNewToken","bodyString---"+bodyString);
-                try {
-                    JSONObject josn=new JSONObject(bodyString);
-                    Print.d("getNewToken","josn---"+josn);
-
-                    Iterator<String> iterator=josn.keys();
-                    for (Iterator iter = iterator; iter.hasNext();) {
-                        String str = (String)iter.next();
-                        String value = josn.optString(str);
-                        newFormBody.add(str, value);
-
-
+                    Buffer buffer = new Buffer();
+                    oldFormBody.writeTo(buffer);
+                    Charset charset =  Charset.forName("UTF-8");
+                    MediaType contentType = oldFormBody.contentType();
+                    if (contentType != null) {
+                        charset = contentType.charset(charset);
                     }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    String bodyString = buffer.clone().readString(charset);
+                    Print.d("getNewToken","bodyString---"+bodyString);
+                    try {
+                        JSONObject josn=new JSONObject(bodyString);
+                        Print.d("getNewToken","josn---"+josn);
+
+                        Iterator<String> iterator=josn.keys();
+                        for (Iterator iter = iterator; iter.hasNext();) {
+                            String str = (String)iter.next();
+                            String value = josn.optString(str);
+                            newFormBody.add(str, value);
+
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    Print.d("getNewToken","token---"+token);
+
+
+                    if (token!=null) {
+                        newFormBody.add("token", token);
+                    }
+                    requestBuilder.method(original.method(),newFormBody.build());
+
                 }
-
-
-                Print.d("getNewToken","token---"+token);
-
-
-                if (token!=null) {
-                    newFormBody.add("token", token);
-                }
-                requestBuilder.method(original.method(),newFormBody.build());
 
             }
-
         }
+
 
         Request request = requestBuilder.build();
         return chain.proceed(request);

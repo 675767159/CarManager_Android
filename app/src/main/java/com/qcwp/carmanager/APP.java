@@ -7,22 +7,23 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 
+import com.blankj.utilcode.util.EmptyUtils;
+import com.blankj.utilcode.util.FileIOUtils;
+import com.google.gson.Gson;
 import com.qcwp.carmanager.engine.Engine;
 import com.qcwp.carmanager.engine.TokenInterceptor;
-import com.qcwp.carmanager.enumeration.UploadStatusEnum;
+import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.greendao.gen.DaoMaster;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.implement.GreenDaoContext;
+import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
-import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
-import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
-import com.qcwp.carmanager.obd.OBDClient;
+import com.qcwp.carmanager.service.MyIntentService;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -109,7 +110,15 @@ public class APP extends Application {
 
         this.setupDatabase();
 
+        String userInfoStr= FileIOUtils.readFile2String(this.getMyFileFolder(PathEnum.UserInfo));
+        if (EmptyUtils.isNotEmpty(userInfoStr)) {
+            LoginModel userInfo = new Gson().fromJson(userInfoStr, LoginModel.class);
+            if (EmptyUtils.isNotEmpty(userInfo)) {
+                UserData.setInstance(userInfo);
+            }
+        }
 
+        MyIntentService.startService(this);
 
 
     }
