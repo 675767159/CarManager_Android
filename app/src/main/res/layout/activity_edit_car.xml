@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.qcwp.carmanager.control.NavBarView
         style="@style/NavBarStyle"
-        app:title="车辆绑定"
+        app:title="车辆编辑"
         />
     <ScrollView
         android:layout_width="match_parent"

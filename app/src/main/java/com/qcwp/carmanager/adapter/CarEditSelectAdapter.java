@@ -71,6 +71,7 @@ public class CarEditSelectAdapter extends BaseAdapter {
             case CarBrand:
                 CarBrandModel carBrandModel=(CarBrandModel)mList.get(position);
                 viewHolder.name.setText(carBrandModel.getBrandName());
+                viewHolder.name_spell.setText(carBrandModel.getBrandNamePinYin());
                 break;
             case CarCommonBrand:
                 CommonBrandModel commonBrandModel=(CommonBrandModel)mList.get(position);

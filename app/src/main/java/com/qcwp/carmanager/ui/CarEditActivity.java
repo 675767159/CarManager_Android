@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.bigkoo.pickerview.TimePickerView;
 import com.blankj.utilcode.util.EmptyUtils;
+import com.blankj.utilcode.util.PinyinUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.adapter.CarEditSelectAdapter;
@@ -32,11 +33,13 @@ import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarSeriesModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarTypeModel;
 import com.qcwp.carmanager.model.sqLiteModel.CommonBrandModel;
+import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -93,11 +96,15 @@ public class CarEditActivity extends BaseActivity {
         if (EmptyUtils.isNotEmpty(vinCode)){
             vincode.setText(vinCode);
             carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(vincode.getText())).build().unique();
+        }else{
+            vincode.setEnabled(true);
         }
+
         type=(Type) getIntent().getSerializableExtra(KeyEnum.typeKey);
         switch (type){
             case Bind:
                 navbarView.setBackButtonHidden(true);
+                navbarView.setTitle("车辆绑定");
                 break;
         }
         updateUI();
@@ -181,8 +188,19 @@ public class CarEditActivity extends BaseActivity {
         List list = null;
         switch (carListType){
             case CarBrand:
+                List<CarBrandModel> carBrandModels=mApp.getDaoInstant().loadAll(CarBrandModel.class);
 
-                list= mApp.getDaoInstant().loadAll(CarBrandModel.class);
+                for (CarBrandModel carBrandModel:carBrandModels){
+                    if (carBrandModel.getBrandNamePinYin()==null) {
+                        String firstLetter=PinyinUtils.getPinyinFirstLetter(carBrandModel.getBrandName());
+                        carBrandModel.setBrandNamePinYin(firstLetter);
+                        mDaoSession.update(carBrandModel);
+
+                    }
+
+                }
+
+                list=mDaoSession.queryBuilder(CarBrandModel.class).orderAsc(CarBrandModelDao.Properties.BrandNamePinYin).list();
                 builder.setTitle("请选择车品牌");
 
 
@@ -337,10 +355,11 @@ public class CarEditActivity extends BaseActivity {
                     Print.d(TAG,requestModel.status+"-----"+requestModel.msg);
                     if (requestModel.isSuccess) {
                         carInfoModel.setNeedUpload(UploadStatusEnum.HadUpload);
-
+                        CarEditActivity.this.updateSuccess();
                     }else {
+                        showToast(requestModel.msg);
                     }
-                    CarEditActivity.this.updateSuccess();
+
 
 
                 }
@@ -349,7 +368,8 @@ public class CarEditActivity extends BaseActivity {
                 public void onFailure(Call<RequestModel> call, Throwable throwable) {
 
                     dismissLoadingDialog();
-                   CarEditActivity.this.updateSuccess();
+                    showToast(throwable.getLocalizedMessage());
+
                 }
             });
 

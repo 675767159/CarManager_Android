@@ -46,6 +46,16 @@ public class EditCarInputView extends RelativeLayout {
             editText.setText(text);
         }
     }
+
+    public void setEnabled(boolean enable){
+
+        if (isButton){
+            selectText.setEnabled(enable);
+
+        }else {
+            editText.setEnabled(enable);
+        }
+    }
     public EditCarInputView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context,attrs);

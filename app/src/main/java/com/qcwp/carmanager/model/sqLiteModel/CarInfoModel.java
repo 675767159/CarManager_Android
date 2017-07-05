@@ -80,7 +80,7 @@ public class CarInfoModel {
   private long memberId;
 
     @Property(nameInDb = "buyDate")
-    @SerializedName("buyDate") private String isoBuyDate;
+    private String buyDate;
 
     @Convert(converter = UploadStatusConverter.class, columnType = Integer.class)
     @Property(nameInDb = "needUpload")
@@ -105,12 +105,12 @@ public class CarInfoModel {
     @Transient
     private String commonBrandName;
 
-    @Generated(hash = 443541963)
+    @Generated(hash = 1201470894)
     public CarInfoModel(@NotNull String vinCode, String carNumber, String spValue, double totalMileage,
             int isTestSteer, String ownerName, String productiveYear, String maintenanceInterval, String carColor,
             String fuelOilType, long mid, long brandId, long carTypeId, long carSeriesId, CarTypeModel carType,
             String carSeries, String brand, String manufacturer, String officialConsume, String actualConsume,
-            long memberId, String isoBuyDate, UploadStatusEnum needUpload, Long id, long timestamp) {
+            long memberId, String buyDate, UploadStatusEnum needUpload, Long id, long timestamp) {
         this.vinCode = vinCode;
         this.carNumber = carNumber;
         this.spValue = spValue;
@@ -132,7 +132,7 @@ public class CarInfoModel {
         this.officialConsume = officialConsume;
         this.actualConsume = actualConsume;
         this.memberId = memberId;
-        this.isoBuyDate = isoBuyDate;
+        this.buyDate = buyDate;
         this.needUpload = needUpload;
         this.id = id;
         this.timestamp = timestamp;
@@ -311,11 +311,11 @@ public class CarInfoModel {
     }
 
     public String getIsoBuyDate() {
-        return this.isoBuyDate;
+        return this.buyDate;
     }
 
     public void setIsoBuyDate(String isoBuyDate) {
-        this.isoBuyDate = isoBuyDate;
+        this.buyDate = isoBuyDate;
     }
 
     public UploadStatusEnum getNeedUpload() {
@@ -366,11 +366,19 @@ public class CarInfoModel {
                 ", officialConsume='" + officialConsume + '\'' +
                 ", actualConsume='" + actualConsume + '\'' +
                 ", memberId=" + memberId +
-                ", isoBuyDate='" + isoBuyDate + '\'' +
+                ", isoBuyDate='" + buyDate + '\'' +
                 ", needUpload=" + needUpload +
                 ", id=" + id +
                 ", timestamp=" + timestamp +
                 '}';
+    }
+
+    public String getBuyDate() {
+        return this.buyDate;
+    }
+
+    public void setBuyDate(String buyDate) {
+        this.buyDate = buyDate;
     }
 
 

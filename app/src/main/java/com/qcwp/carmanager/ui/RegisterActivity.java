@@ -23,6 +23,8 @@ import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
 
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.smssdk.EventHandler;
@@ -93,7 +95,6 @@ public class RegisterActivity extends BaseActivity {
                                 //返回支持发送验证码的国家列表
                             }
                         } else {
-
                             showToast("请输入正确的验证码!");
                         }
                         Print.d(TAG,result+"---"+event+"===="+data.toString());
@@ -106,7 +107,6 @@ public class RegisterActivity extends BaseActivity {
 
         };
         SMSSDK.registerEventHandler(eh); //注册短信回调
-//        this.addLayoutListener(inputMethodLayout,buttonRegister);
 
     }
 
@@ -115,36 +115,7 @@ public class RegisterActivity extends BaseActivity {
 
     }
 
-//    /**
-//     *  1、获取main在窗体的可视区域
-//     *  2、获取main在窗体的不可视区域高度
-//     *  3、判断不可视区域高度
-//     *      1、大于100：键盘显示  获取Scroll的窗体坐标
-//     *                           算出main需要滚动的高度，使scroll显示。
-//     *      2、小于100：键盘隐藏
-//     *
-//     * @param main 根布局
-//     * @param scroll 需要显示的最下方View
-//     */
-//    public void addLayoutListener(final View main, final View scroll) {
-//        main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                Rect rect = new Rect();
-//                main.getWindowVisibleDisplayFrame(rect);
-//                int mainInvisibleHeight = main.getRootView().getHeight() - rect.bottom;
-//                if (mainInvisibleHeight > 100) {
-//                    int[] location = new int[2];
-//                    scroll.getLocationInWindow(location);
-//                    Print.d("addLayoutListener",location[0]+"---"+location[1]);
-//                    int srollHeight = (location[1] + scroll.getHeight()) - rect.bottom;
-//                    main.scrollTo(0, srollHeight);
-//                } else {
-//                    main.scrollTo(0, 0);
-//                }
-//            }
-//        });
-//    }
+
     @Override
     public void onClick(View v) {
         super.onClick(v);
@@ -230,13 +201,16 @@ public class RegisterActivity extends BaseActivity {
                             readyGo(MainActivity.class);
                         }
                     }, 3000);
+                }else {
+
+                    showToast(model.getMsg());
                 }
 
             }
 
             @Override
             public void onFailure(Call<LoginModel> call, Throwable t) {
-
+                showToast(t.getLocalizedMessage());
             }
         });
 

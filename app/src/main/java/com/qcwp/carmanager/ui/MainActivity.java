@@ -2,6 +2,7 @@ package com.qcwp.carmanager.ui;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.R;
@@ -47,6 +48,8 @@ public class MainActivity extends BaseActivity {
     HomeItemView driveHabit;
     @BindView(R.id.menu)
     CoordinatorMenu mCoordinatorMenu;
+    @BindView(R.id.userName)
+    TextView userName;
 
     private CarInfoModel    carInfoModel;
     private CarVinStatisticModel carVinStatisticModel;
@@ -58,6 +61,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initViewsAndEvents(Bundle savedInstanceState) {
+        userName.setText(UserData.getInstance().getUserName());
         carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
         if (carInfoModel!=null) {
             carVinStatisticModel = mApp.getDaoInstant().queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).build().unique();
@@ -72,15 +76,17 @@ public class MainActivity extends BaseActivity {
 
 
     private void getMyAllCarInfo(){
-
+        Print.d(TAG,"=====");
         mEngine.getMyAllCarInfo(UserData.getInstance().getUserId()).enqueue(new Callback<AllCarModel>() {
             @Override
             public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
                 AllCarModel allCarInfoModel=response.body();
+                Print.d(TAG,"------------");
                 if (allCarInfoModel.getStatus()==1){
                     List<CarInfoModel> allCarInfoModels=allCarInfoModel.getVins();
                     for (CarInfoModel carInfoModel:allCarInfoModels){
-                        Print.d(TAG,carInfoModel.getVinCode()+"-----");
+                        Print.d(TAG,carInfoModel.toString());
+
                         CarInfoModel sqCarInfoModel=mDaoSession.queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).unique();
                         if (sqCarInfoModel!=null){
                             carInfoModel.setId(sqCarInfoModel.getId());
@@ -105,6 +111,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+                Print.d(TAG,"++++++++");
             }
         });
 
@@ -137,7 +144,9 @@ public class MainActivity extends BaseActivity {
             case R.id.menu_car_info:
             {
                 Bundle bundle=new Bundle();
-                bundle.putString(KeyEnum.vinCode,carInfoModel.getVinCode());
+                if (carInfoModel!=null) {
+                    bundle.putString(KeyEnum.vinCode, carInfoModel.getVinCode());
+                }
                 bundle.putSerializable(KeyEnum.typeKey,CarEditActivity.Type.Edit);
                 readyGo(CarEditActivity.class,bundle);
             }
