@@ -138,8 +138,8 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
             mLoadingDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
             mLoadingDialog.getProgressHelper().setBarColor(R.color.colorPrimary);
             mLoadingDialog.setCancelable(false);
-            mLoadingDialog.setTitleText(text);
         }
+        mLoadingDialog.setTitleText(text);
         mLoadingDialog.show();
     }
 

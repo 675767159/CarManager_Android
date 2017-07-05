@@ -7,6 +7,8 @@ import com.blankj.utilcode.util.FileUtils;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.enumeration.PathEnum;
+import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.utils.MyActivityManager;
 
 public class SetActivity extends BaseActivity {
 
@@ -29,7 +31,10 @@ public class SetActivity extends BaseActivity {
     @Override
     public void onClick(View v) {
         super.onClick(v);
+
         FileUtils.deleteFile(mApp.getMyFileFolder(PathEnum.UserInfo));
-        readyGoThenKill(LoginActivity.class);
+        MyActivityManager.getInstance().exitToHome();
+        UserData.dropInstance();
+        readyGo(LoginActivity.class);
     }
 }

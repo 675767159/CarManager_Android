@@ -60,6 +60,16 @@ public class UserData implements Serializable {
         return userData;
     }
 
+    public static UserData dropInstance() {
+
+        UserData userData = UserDataHolder.INSTANCE;
+        userData.userId=0;
+        userData.userName=null;
+        userData.password=null;
+        return userData;
+    }
+
+
     public static UserData getInstance() {
 
         return UserDataHolder.INSTANCE;

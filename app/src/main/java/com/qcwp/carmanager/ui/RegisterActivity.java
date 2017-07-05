@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -19,6 +20,7 @@ import com.qcwp.carmanager.control.RegisterInputView;
 import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.PhoneAuthModel;
 import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
 
 import butterknife.BindView;
@@ -51,8 +53,7 @@ public class RegisterActivity extends BaseActivity {
     EditText verifCode;
     @BindView(R.id.scrollView)
     ScrollView scrollView;
-    @BindView(R.id.inputMethodLayout)
-    InputMethodLayout inputMethodLayout;
+
 
     private String
             userName_str,
@@ -73,34 +74,39 @@ public class RegisterActivity extends BaseActivity {
         eh = new EventHandler() {
 
             @Override
-            public void afterEvent(int event, int result, Object data) {
-                dismissLoadingDialog();
-                if (result == SMSSDK.RESULT_COMPLETE) {
+            public void afterEvent(final int event, final int result, final Object data) {
 
-                    //回调完成
-                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
-                        //提交验证码成功
-                        RegisterActivity.this.register();
-                    } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
-                        //获取验证码成功
-                        showToast("获取验证码成功");
-                    } else if (event == SMSSDK.EVENT_GET_SUPPORTED_COUNTRIES) {
-                        //返回支持发送验证码的国家列表
-                    }
-                } else {
-                    RegisterActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                RegisterActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissLoadingDialog();
+                        if (result == SMSSDK.RESULT_COMPLETE) {
+
+                            //回调完成
+                            if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+                                //提交验证码成功
+                                RegisterActivity.this.register();
+                            } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
+                                //获取验证码成功
+                                showToast("获取验证码成功");
+                            } else if (event == SMSSDK.EVENT_GET_SUPPORTED_COUNTRIES) {
+                                //返回支持发送验证码的国家列表
+                            }
+                        } else {
+
                             showToast("请输入正确的验证码!");
                         }
-                    });
+                        Print.d(TAG,result+"---"+event+"===="+data.toString());
 
-                }
+                    }
+                });
             }
+
+
 
         };
         SMSSDK.registerEventHandler(eh); //注册短信回调
-        this.addLayoutListener(inputMethodLayout,buttonRegister);
+//        this.addLayoutListener(inputMethodLayout,buttonRegister);
 
     }
 
@@ -109,36 +115,36 @@ public class RegisterActivity extends BaseActivity {
 
     }
 
-    /**
-     *  1、获取main在窗体的可视区域
-     *  2、获取main在窗体的不可视区域高度
-     *  3、判断不可视区域高度
-     *      1、大于100：键盘显示  获取Scroll的窗体坐标
-     *                           算出main需要滚动的高度，使scroll显示。
-     *      2、小于100：键盘隐藏
-     *
-     * @param main 根布局
-     * @param scroll 需要显示的最下方View
-     */
-    public void addLayoutListener(final View main, final View scroll) {
-        main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect rect = new Rect();
-                main.getWindowVisibleDisplayFrame(rect);
-                int mainInvisibleHeight = main.getRootView().getHeight() - rect.bottom;
-                if (mainInvisibleHeight > 100) {
-                    int[] location = new int[2];
-                    scroll.getLocationInWindow(location);
-                    Print.d("addLayoutListener",location[0]+"---"+location[1]);
-                    int srollHeight = (location[1] + scroll.getHeight()) - rect.bottom;
-                    main.scrollTo(0, srollHeight);
-                } else {
-                    main.scrollTo(0, 0);
-                }
-            }
-        });
-    }
+//    /**
+//     *  1、获取main在窗体的可视区域
+//     *  2、获取main在窗体的不可视区域高度
+//     *  3、判断不可视区域高度
+//     *      1、大于100：键盘显示  获取Scroll的窗体坐标
+//     *                           算出main需要滚动的高度，使scroll显示。
+//     *      2、小于100：键盘隐藏
+//     *
+//     * @param main 根布局
+//     * @param scroll 需要显示的最下方View
+//     */
+//    public void addLayoutListener(final View main, final View scroll) {
+//        main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                Rect rect = new Rect();
+//                main.getWindowVisibleDisplayFrame(rect);
+//                int mainInvisibleHeight = main.getRootView().getHeight() - rect.bottom;
+//                if (mainInvisibleHeight > 100) {
+//                    int[] location = new int[2];
+//                    scroll.getLocationInWindow(location);
+//                    Print.d("addLayoutListener",location[0]+"---"+location[1]);
+//                    int srollHeight = (location[1] + scroll.getHeight()) - rect.bottom;
+//                    main.scrollTo(0, srollHeight);
+//                } else {
+//                    main.scrollTo(0, 0);
+//                }
+//            }
+//        });
+//    }
     @Override
     public void onClick(View v) {
         super.onClick(v);
@@ -207,6 +213,7 @@ public class RegisterActivity extends BaseActivity {
 
 
     private void register() {
+
         mEngine.registerUser(userName_str, mobilePhone_str, password1_str, nickName_str).enqueue(new Callback<LoginModel>() {
             @Override
             public void onResponse(Call<LoginModel> call, Response<LoginModel> response) {
@@ -217,8 +224,10 @@ public class RegisterActivity extends BaseActivity {
                     UserData.setInstance(model);
                     showToast("注册成功，正在登录。。。");
                     new Handler().postDelayed(new Runnable() {
+
                         public void run() {
-                            readyGoThenKill(MainActivity.class);
+                            MyActivityManager.getInstance().exitToHome();
+                            readyGo(MainActivity.class);
                         }
                     }, 3000);
                 }

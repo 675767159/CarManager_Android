@@ -12,7 +12,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="@dimen/login_input_height"
-        android:text="登录"
+        android:text="退出"
         android:layout_below="@id/password_back_view"
         android:layout_marginLeft="@dimen/horizon_margin"
         android:layout_marginRight="@dimen/horizon_margin"

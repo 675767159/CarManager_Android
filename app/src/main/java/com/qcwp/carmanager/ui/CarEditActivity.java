@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 
@@ -367,7 +368,7 @@ public class CarEditActivity extends BaseActivity {
         carTypeModel.setCarTypeName(carType.getText());
         carInfoModel.setCarType(carTypeModel);//后台有一个carType对象，不是字符串，所以传字符串会出错
         mApp.getDaoInstant().insertOrReplace(carInfoModel);
-        showLoadingDialog("绑定成功，请稍等...");
+        showLoadingDialog("绑定成功，请在返回...");
 
         MessageEvent messageEvent=new MessageEvent();
         if (type==Type.Bind) {
@@ -530,5 +531,12 @@ public class CarEditActivity extends BaseActivity {
                 CarEditActivity.this.chooseCarInfo(CarListType.CarType);
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(this.type==Type.Bind&&keyCode==KeyEvent.KEYCODE_BACK)
+            return true;//不执行父类点击事件
+        return super.onKeyDown(keyCode, event);
     }
 }
