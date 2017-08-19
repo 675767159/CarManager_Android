@@ -38,6 +38,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected Engine mEngine;
     protected String TAG;
     protected DaoSession mDaoSession;
+    protected Boolean isActive=true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -226,6 +227,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        isActive=false;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

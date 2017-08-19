@@ -75,6 +75,7 @@ public class NavBarView extends RelativeLayout {
         String  text=typedArray.getString(R.styleable.NavBarView_title);
         int background=typedArray.getResourceId(R.styleable.NavBarView_background_self_define,0);
         Boolean hiddenBackButton=typedArray.getBoolean(R.styleable.NavBarView_hiddenBackButton,false);
+        Boolean hiddenConnectButton=typedArray.getBoolean(R.styleable.NavBarView_hiddenConnectButton,false);
 
         LayoutInflater layoutInflater=(LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -84,14 +85,23 @@ public class NavBarView extends RelativeLayout {
         textView.setText(text);
 
 
-        if (OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeConnectSuccess||OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded){
-            NavBarView.this.setTitleConnectedStatus(true);
+
+        if (hiddenConnectButton){
+
+            textView.setEnabled(false);
+            textView.setCompoundDrawables(null, null, null, null);
+        }else {
+            if (OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeConnectSuccess||OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded){
+                NavBarView.this.setTitleConnectedStatus(true);
+            }
+
         }
 
         button=(ImageButton)view.findViewById(R.id.navBar_back);
         if (background!=0){
             view.setBackgroundResource(background);
         }
+
 
 
 

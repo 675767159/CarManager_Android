@@ -6,11 +6,18 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 
 
+import com.blankj.utilcode.util.EmptyUtils;
+import com.blankj.utilcode.util.ThreadPoolUtils;
 import com.qcwp.carmanager.broadcast.BlueToothReceiver;
 import com.qcwp.carmanager.broadcast.MessageEvent;
+import com.qcwp.carmanager.enumeration.TimeEnum;
+import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.ui.LoginActivity;
+import com.qcwp.carmanager.ui.MainActivity;
 import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
@@ -24,6 +31,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Set;
+
+import static com.blankj.utilcode.util.ThreadPoolUtils.FixedThread;
+import static com.blankj.utilcode.util.ThreadPoolUtils.SingleThread;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class BlueteethService {
 
@@ -55,6 +66,14 @@ public class BlueteethService {
 
 
 	public void startBluetoothService() {
+
+
+
+
+
+
+
+
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		//第一种打开方法： 调用enable 即可
 		boolean result = mBluetoothAdapter.enable();
@@ -92,7 +111,24 @@ public class BlueteethService {
 		} else {
 			BlueToothReceiver.gotOBD = false;
 			mBluetoothAdapter.startDiscovery();
+
 		}
+
+
+		ThreadPoolUtils threadPool = new ThreadPoolUtils(SingleThread, 1);
+		threadPool.schedule(new Runnable() {
+			@Override
+			public void run() {
+				Print.d("mBluetoothAdapter","------------");
+				if (mBluetoothAdapter.isDiscovering()){
+					Print.d("mBluetoothAdapter","++++++++");
+					mBluetoothAdapter.cancelDiscovery();
+					conectOBDListener.completeConect(false,"未搜索到OBD设备，请确认是否插上设备!");
+				}
+
+			}
+		}, TimeEnum.BluetoothDiscovery, SECONDS);
+
 	}
 
 	/**

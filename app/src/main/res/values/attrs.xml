@@ -6,6 +6,7 @@
         <attr name="title" format="string" />
         <attr name="background_self_define" format="reference" />
         <attr name="hiddenBackButton" format="boolean"/>
+        <attr name="hiddenConnectButton" format="boolean"/>
 
     </declare-styleable>
 

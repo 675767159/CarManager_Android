@@ -15,6 +15,8 @@ import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.mvp.contact.LoginContract;
+import com.qcwp.carmanager.mvp.present.LoginPresenter;
 import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
 
@@ -25,7 +27,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends BaseActivity implements LoginContract.View {
 
 
     @BindView(R.id.button_login)
@@ -34,7 +36,7 @@ public class LoginActivity extends BaseActivity {
     EditText editTextUser;
     @BindView(R.id.edit_text_password)
     EditText editTextPassword;
-
+    private LoginContract.Presenter loginPresenter;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_login;
@@ -43,10 +45,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void initViewsAndEvents(Bundle savedInstanceState) {
         CommonUtils.setViewCorner(buttonLogin, 20, 20, Color.parseColor("#23943D"));
-
-
-
-
+        loginPresenter=new LoginPresenter(this);
 
     }
 
@@ -61,16 +60,9 @@ public class LoginActivity extends BaseActivity {
         switch (v.getId()){
             case R.id.button_login:{
 
-                String userName = editTextUser.getText().toString();
+                String loginName = editTextUser.getText().toString();
                 String password = editTextPassword.getText().toString();
-                if (EmptyUtils.isNotEmpty(userName) && EmptyUtils.isNotEmpty(password)) {
-                    if (password.length()>5)
-                    login(userName, password);
-                    else showToast("密码错误");
-                } else {
-                    showToast("请输入完整登录信息");
-                }
-
+                loginPresenter.login(loginName,password);
                 break;
             }
             case R.id.button_register:
@@ -79,34 +71,34 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    private void login(String userName, final String password) {
 
-        showLoadingDialog();
-        mEngine.login(userName, password).enqueue(new Callback<LoginModel>() {
-            @Override
-            public void onResponse(Call<LoginModel> call, Response<LoginModel> response) {
-                dismissLoadingDialog();
-                LoginModel  model=response.body();
-                if (model.getStatus()==1) {
-                     Print.d(TAG,model.getMemberId()+"");
-                      model.setPassword(password);
-                      UserData.setInstance(model);
-                      //这个接口是用来设置Gson转换的排除策略的
-                      String UserDataStr=new Gson().toJson(model);
-                      FileIOUtils.writeFileFromString(mApp.getMyFileFolder(PathEnum.UserInfo),UserDataStr);
-                      Print.d(TAG,model.toString());
-                      readyGoThenKill(MainActivity.class);
-                }else {
-                    showToast(model.getMsg());
-                }
-            }
 
-            @Override
-            public void onFailure(Call<LoginModel> call, Throwable t) {
-                dismissLoadingDialog();
-                showToast(t.getMessage()+"");
-            }
-        });
+    @Override
+    public void loginSuccess() {
+
+        readyGoThenKill(MainActivity.class);
     }
+
+    @Override
+    public void showProgress(String text) {
+        showLoadingDialog(text);
+    }
+
+    @Override
+    public void dismissProgress() {
+        dismissLoadingDialog();
+    }
+
+    @Override
+    public void showTip(String message) {
+        showToast(message);
+    }
+
+    @Override
+    public Boolean isActive() {
+        return isActive;
+    }
+
+
 
 }

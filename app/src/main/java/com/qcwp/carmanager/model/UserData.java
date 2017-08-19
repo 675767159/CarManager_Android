@@ -11,20 +11,12 @@ import java.io.Serializable;
 public class UserData implements Serializable {
 
 
-    private int userId;
-    private String password;
-    private String userName;
-    private double userLocaLatitude;
-    private double userLocaLongitude;
+
 
     public String getPassword() {
         return password;
     }
 
-    private static class UserDataHolder{
-
-        static final UserData INSTANCE = new UserData();
-    }
 
     public int getUserId() {
         return userId;
@@ -42,6 +34,13 @@ public class UserData implements Serializable {
         return userLocaLongitude;
     }
 
+
+    private int userId;
+    private String password;
+    private String userName;
+    private double userLocaLatitude;
+    private double userLocaLongitude;
+
     /**
      * * private的构造函数用于避免外界直接使用new来实例化对象
        */
@@ -53,7 +52,7 @@ public class UserData implements Serializable {
 
     public static UserData setInstance(LoginModel model) {
 
-        UserData userData = UserDataHolder.INSTANCE;
+        UserData userData =UserData.getInstance();
         userData.userId=model.getMemberId();
         userData.userName=model.getUsername();
         userData.password=model.getPassword();
@@ -62,7 +61,7 @@ public class UserData implements Serializable {
 
     public static void dropInstance() {
 
-        UserData userData = UserDataHolder.INSTANCE;
+        UserData userData =UserData.getInstance();
         userData.userId=0;
         userData.userName=null;
         userData.password=null;
@@ -70,15 +69,19 @@ public class UserData implements Serializable {
     }
 
 
-    public static UserData getInstance() {
+    private static UserData INSTANCE;
 
-        return UserDataHolder.INSTANCE;
+    // 提供一个全局的静态方法
+    public static UserData getInstance() {
+        if (INSTANCE == null) {
+            synchronized (UserData.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new UserData();
+                }
+            }
+        }
+        return INSTANCE;
     }
 
-    /**
-     * readResolve方法应对单例对象被序列化时候
-     */
-      private Object readResolve() {
-             return getInstance();
-      }
+
 }

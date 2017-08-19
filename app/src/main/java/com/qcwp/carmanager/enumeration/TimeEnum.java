@@ -7,5 +7,6 @@ package com.qcwp.carmanager.enumeration;
 public class TimeEnum {
     public final static int
      DEFAULT_TIMEOUT=10,//连接超时时间
-    Launch_Time= 3000; //启动界面显示3秒
+    Launch_Time= 3000, //启动界面显示3秒
+     BluetoothDiscovery= 10; //蓝牙扫描10秒
 }

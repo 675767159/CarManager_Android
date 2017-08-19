@@ -19,6 +19,8 @@ import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.SingleCarVinStatisticModel;
+import com.qcwp.carmanager.mvp.contact.MainContract;
+import com.qcwp.carmanager.mvp.present.MainPresenter;
 import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
@@ -33,7 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements MainContract.View{
 
 
     @BindView(R.id.home_carInfo)
@@ -54,6 +56,8 @@ public class MainActivity extends BaseActivity {
     private CarInfoModel    carInfoModel;
     private CarVinStatisticModel carVinStatisticModel;
     private SingleCarVinStatisticModel singleCarVinStatisticModel;
+
+    private MainContract.Presenter presenter;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_main;
@@ -61,61 +65,29 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initViewsAndEvents(Bundle savedInstanceState) {
+        presenter=new MainPresenter(this,mDaoSession);
         userName.setText(UserData.getInstance().getUserName());
-        carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
+
+        carInfoModel=presenter.getLatestCarInfo();
+
+
         if (carInfoModel!=null) {
-            carVinStatisticModel = mApp.getDaoInstant().queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).build().unique();
-            singleCarVinStatisticModel = mApp.getDaoInstant().queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).build().unique();
+            carVinStatisticModel = presenter.getCarVinStatistic(carInfoModel.getVinCode());
+            singleCarVinStatisticModel = presenter.getSingleCarVinStatistic(carInfoModel.getVinCode());
         }
+
+
         this.updateUI();
-        this.getMyAllCarInfo();
+
+        presenter.getMyAllCarInfo();
+
         Print.d(TAG,"UserId="+UserData.getInstance().getUserId());
         Print.d(TAG,"UserName="+UserData.getInstance().getUserName());
     }
 
 
 
-    private void getMyAllCarInfo(){
-        Print.d(TAG,"=====");
-        mEngine.getMyAllCarInfo(UserData.getInstance().getUserId()).enqueue(new Callback<AllCarModel>() {
-            @Override
-            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
-                AllCarModel allCarInfoModel=response.body();
-                Print.d(TAG,"------------");
-                if (allCarInfoModel.getStatus()==1){
-                    List<CarInfoModel> allCarInfoModels=allCarInfoModel.getVins();
-                    for (CarInfoModel carInfoModel:allCarInfoModels){
-                        Print.d(TAG,carInfoModel.toString());
 
-                        CarInfoModel sqCarInfoModel=mDaoSession.queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(carInfoModel.getVinCode())).unique();
-                        if (sqCarInfoModel!=null){
-                            carInfoModel.setId(sqCarInfoModel.getId());
-                            carInfoModel.setTimestamp(sqCarInfoModel.getTimestamp());
-                        }else {
-                            carInfoModel.setTimestamp(TimeUtils.getNowMills());
-                        }
-                        carInfoModel.setNeedUpload(UploadStatusEnum.HadUpload);
-                        carInfoModel.setCarSeries(carInfoModel.getCarType().getCarSeriesModel().getSeriesName());
-                        carInfoModel.setBrand(carInfoModel.getCarType().getCarSeriesModel().getCommonBrandModel().getCarBrand().getBrandName());
-                        carInfoModel.setCommonBrandName(carInfoModel.getCarType().getCarSeriesModel().getCommonBrandModel().getCommonBrandName());
-
-                        mDaoSession.insertOrReplace(carInfoModel);
-                    }
-                    Print.d(TAG,allCarInfoModels.size()+"-----");
-                    carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
-
-                    MainActivity.this.updateUI();
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
-                Print.d(TAG,"++++++++");
-            }
-        });
-
-    }
 
     @Override
     public void onClick(View v) {
@@ -169,9 +141,11 @@ public class MainActivity extends BaseActivity {
             case CarDataUpdate:
             case  CarBlindSuccess:
             case  CarSelected:
-                carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(messageEvent.getMessage())).build().unique();
-                carVinStatisticModel=mApp.getDaoInstant().queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(messageEvent.getMessage())).build().unique();
-singleCarVinStatisticModel=mApp.getDaoInstant().queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(messageEvent.getMessage())).build().unique();
+                carInfoModel=presenter.getCarInfoByVinCode(messageEvent.getMessage());
+
+                carVinStatisticModel=presenter.getCarVinStatistic(messageEvent.getMessage());
+
+                singleCarVinStatisticModel=presenter.getSingleCarVinStatistic(messageEvent.getMessage());
 
                 updateUI();
                 break;
@@ -184,7 +158,6 @@ singleCarVinStatisticModel=mApp.getDaoInstant().queryBuilder(SingleCarVinStatist
         if (carInfoModel!=null){
             carInfo.setValue1(carInfoModel.getCarSeries());
             carInfo.setValue2(carInfoModel.getCarNumber());
-
 
         }
 
@@ -227,4 +200,32 @@ singleCarVinStatisticModel=mApp.getDaoInstant().queryBuilder(SingleCarVinStatist
     }
 
 
+    @Override
+    public void showProgress(String text) {
+        showLoadingDialog(text);
+    }
+
+    @Override
+    public void dismissProgress() {
+        dismissLoadingDialog();
+
+    }
+
+    @Override
+    public void showTip(String message) {
+
+        showToast(message);
+    }
+
+    @Override
+    public Boolean isActive() {
+        return isActive;
+    }
+
+
+    @Override
+    public void onSuccessGetMyAllCarInfo(CarInfoModel carInfoModel) {
+       this.carInfoModel=carInfoModel;
+       this.updateUI();
+    }
 }

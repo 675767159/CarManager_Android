@@ -12,6 +12,7 @@
         <com.qcwp.carmanager.control.NavBarView
             style="@style/NavBarStyle"
             app:title="注册"
+            app:hiddenConnectButton="true"
             />
 
         <ScrollView
