@@ -18,12 +18,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon"
-        >
+        tools:replace="android:icon">
         <activity android:name=".ui.MainActivity" />
-        <activity android:name=".ui.LoginActivity"
-            android:windowSoftInputMode="adjustPan"
-            />
+        <activity
+            android:name=".ui.LoginActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ui.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,11 +32,10 @@
         </activity>
         <activity
             android:name=".ui.RegisterActivity"
-            android:windowSoftInputMode="adjustPan"
-           />
-        <activity android:name=".ui.CarEditActivity"
-            android:windowSoftInputMode="adjustPan"
-            />
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ui.CarEditActivity"
+            android:windowSoftInputMode="adjustPan" />
 
         <receiver android:name=".broadcast.BlueToothReceiver">
             <intent-filter>
@@ -52,9 +50,13 @@
             android:name=".service.MyIntentService"
             android:exported="false" />
 
+        <activity android:name=".ui.SetActivity" />
         <activity
-            android:name=".ui.SetActivity"
-           />
+            android:name=".ui.DrivingActivity"
+            android:label="@string/title_activity_driving"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".ui.CarDetailActivity"></activity>
     </application>
 
 </manifest>

@@ -54,7 +54,8 @@ public class MessageEvent {
        BlueToothScaned,
        OBDLostDisconnection,
        BlueRequestResult,
-       CarSelected
+       CarSelected,
+       Driving
 
    }
 }

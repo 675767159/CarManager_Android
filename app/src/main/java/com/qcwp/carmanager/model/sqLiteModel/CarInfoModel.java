@@ -2,11 +2,16 @@ package com.qcwp.carmanager.model.sqLiteModel;
 
 
 
+import android.content.Context;
+
 import com.blankj.utilcode.util.TimeUtils;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.enumeration.TableEnum;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
+import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
+import com.qcwp.carmanager.ui.BaseActivity;
 
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
@@ -418,6 +423,18 @@ public class CarInfoModel {
     }
 
 
+    public static CarInfoModel getLatestCarInfo(){
+
+        CarInfoModel carInfoModel=APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
+        return carInfoModel;
+    }
+
+    public static CarInfoModel getCarInfoByVinCode(String vinCode){
+
+        CarInfoModel carInfoModel=APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(vinCode)).build().unique();
+
+        return carInfoModel;
+    }
 
 
 

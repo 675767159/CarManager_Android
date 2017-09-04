@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@mipmap/driving_bg">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="@dimen/horizon_margin"
+        android:layout_marginRight="@dimen/horizon_margin"
+        android:id="@+id/dialog_background"
+        >
+
+        <com.qcwp.carmanager.control.InstrumentView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:layout_margin="@dimen/driving_dial_padiing"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/engineRpm"
+            />
+        <com.qcwp.carmanager.control.InstrumentView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:layout_margin="@dimen/driving_dial_padiing"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/vehicleSpeed"
+            />
+        <com.qcwp.carmanager.control.InstrumentView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:layout_margin="@dimen/driving_dial_padiing"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/fuelPressure"
+            />
+
+
+    </LinearLayout>
+
+    <com.qcwp.carmanager.control.TouchHighlightImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/back"
+        android:id="@+id/back"
+        android:onClick="onClick"
+        android:padding="@dimen/padding"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_below="@+id/dialog_background"
+        android:id="@+id/titleContentBackground"
+        >
+        <com.qcwp.carmanager.control.TitleContentView
+           style="@style/DrivingDisplayStyle"
+            app:TitleContent_title="平均速度："
+            android:id="@+id/averageSpeed"
+            />
+        <com.qcwp.carmanager.control.TitleContentView
+            style="@style/DrivingDisplayStyle"
+            app:TitleContent_title="瞬时油耗："
+            android:id="@+id/instantOilConsume"
+            />
+        <com.qcwp.carmanager.control.TitleContentView
+            style="@style/DrivingDisplayStyle"
+            app:TitleContent_title="平均油耗："
+            android:id="@+id/averageOilConsume"
+            />
+        <com.qcwp.carmanager.control.TitleContentView
+            style="@style/DrivingDisplayStyle"
+            app:TitleContent_title="本次里程："
+            android:id="@+id/currentMileage"
+            />
+        <com.qcwp.carmanager.control.TitleContentView
+            style="@style/DrivingDisplayStyle"
+            app:TitleContent_title="总里程  ："
+            android:id="@+id/totalMileage"
+            />
+
+    </LinearLayout>
+
+    <com.qcwp.carmanager.control.TitleContentView
+        style="@style/DrivingDisplayStyle"
+        app:TitleContent_title="行驶时间："
+        android:id="@+id/totalTime"
+        android:layout_toRightOf="@+id/titleContentBackground"
+        android:layout_alignTop="@+id/titleContentBackground"
+        android:layout_marginLeft="10dp"
+        />
+
+   <com.qcwp.carmanager.control.Thermometer
+       android:layout_width="@dimen/ThermometerWidth"
+       android:layout_height="wrap_content"
+       app:therm_color="@android:color/holo_blue_light"
+       android:layout_below="@+id/dialog_background"
+       android:id="@+id/engineCoolant"
+       android:layout_alignParentRight="true"
+       android:layout_alignParentBottom="true"
+       android:layout_marginBottom="@dimen/vertical_margin"
+
+       />
+
+
+
+    <com.qcwp.carmanager.control.Thermometer
+        android:layout_width="@dimen/ThermometerWidth"
+        android:layout_height="wrap_content"
+        app:therm_color="@android:color/holo_blue_light"
+        android:layout_toLeftOf="@+id/engineCoolant"
+        android:id="@+id/intakeTemp"
+        android:layout_alignTop="@+id/engineCoolant"
+        android:layout_alignBottom="@+id/engineCoolant"
+        android:layout_marginRight="@dimen/vertical_margin"
+
+        />
+
+    <TextView
+        android:layout_width="@dimen/ThermometerWidth"
+        android:layout_height="wrap_content"
+        android:text="水温"
+        android:layout_above="@+id/engineCoolant"
+        android:layout_alignRight="@+id/engineCoolant"
+        android:layout_marginBottom="-15dp"
+        android:textColor="@android:color/white"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:layout_width="@dimen/ThermometerWidth"
+        android:layout_height="wrap_content"
+        android:text="进气温度"
+        android:layout_above="@+id/intakeTemp"
+        android:layout_alignRight="@+id/intakeTemp"
+        android:layout_marginBottom="-15dp"
+        android:textColor="@android:color/white"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/engineCoolantTextView"
+        android:layout_toLeftOf="@+id/engineCoolant"
+        android:layout_alignTop="@+id/engineCoolant"
+        android:layout_marginTop="50dp"
+        android:text="0"
+        android:textColor="@android:color/white"
+
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/intakeTempTextView"
+        android:layout_toLeftOf="@+id/intakeTemp"
+        android:layout_alignTop="@+id/intakeTemp"
+        android:layout_marginTop="50dp"
+        android:text="0"
+        android:textColor="@android:color/white"
+
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/driving_annunciator"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="70dp"
+        android:id="@+id/annunciator"
+        android:gravity="center"
+        />
+
+
+</RelativeLayout>

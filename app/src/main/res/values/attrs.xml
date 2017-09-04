@@ -42,4 +42,18 @@
 
     </declare-styleable>
 
+    <declare-styleable name="TitleContentView">
+        <attr name="TitleContent_title" format="string" />
+        <attr name="TitleContent_title_color" format="color" />
+        <attr name="TitleContent_content" format="string"/>
+        <attr name="TitleContent_content_color" format="color" />
+
+    </declare-styleable>
+
+
+    <declare-styleable name="Thermometer">
+
+        <attr name="therm_color" format="color" />
+
+    </declare-styleable>
 </resources>

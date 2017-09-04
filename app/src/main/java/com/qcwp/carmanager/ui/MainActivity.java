@@ -28,6 +28,7 @@ import com.qiantao.coordinatormenu.CoordinatorMenu;
 
 
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import retrofit2.Call;
@@ -108,6 +109,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
             }
             break;
             case R.id.menu_driving:
+                readyGo(DrivingActivity.class);
                 break;
             case R.id.menu_professional_test:
                 break;
@@ -160,27 +162,28 @@ public class MainActivity extends BaseActivity implements MainContract.View{
             carInfo.setValue2(carInfoModel.getCarNumber());
 
         }
-
+        Locale locale=Locale.getDefault();
         if (carVinStatisticModel!=null){
-            totalTravel.setValue1(String.format("%.1fkm",carVinStatisticModel.getDistCount()));
+
+            totalTravel.setValue1(String.format(locale,"%.1fkm",carVinStatisticModel.getDistCount()));
             totalTravel.setValue2(CommonUtils.longTimeToStr(carVinStatisticModel.getTimeCount()));
-            totalTravel.setValue3(String.format("%.1f升",carVinStatisticModel.getFuelCount()));
+            totalTravel.setValue3(String.format(locale,"%.1f升",carVinStatisticModel.getFuelCount()));
 
 
-            professionalTest.setValue1(String.format("%.2fs",carVinStatisticModel.getBmtestBestScore()));
-            professionalTest.setValue2(String.format("%.2fm",carVinStatisticModel.getZdtestBestScore()));
-            professionalTest.setValue3(String.format("%.2fs",carVinStatisticModel.getBltestBestScore()));
+            professionalTest.setValue1(String.format(locale,"%.2fs",carVinStatisticModel.getBmtestBestScore()));
+            professionalTest.setValue2(String.format(locale,"%.2fm",carVinStatisticModel.getZdtestBestScore()));
+            professionalTest.setValue3(String.format(locale,"%.2fs",carVinStatisticModel.getBltestBestScore()));
 
-            driveHabit.setValue1(String.format("%d次",carVinStatisticModel.getAccelerCount()));
-            driveHabit.setValue2(String.format("%d次",carVinStatisticModel.getOverspeedCount()));
-            driveHabit.setValue3(String.format("%d次",carVinStatisticModel.getDecelerCount()));
+            driveHabit.setValue1(String.format(locale,"%d次",carVinStatisticModel.getAccelerCount()));
+            driveHabit.setValue2(String.format(locale,"%d次",carVinStatisticModel.getOverspeedCount()));
+            driveHabit.setValue3(String.format(locale,"%d次",carVinStatisticModel.getDecelerCount()));
         }
 
         if (singleCarVinStatisticModel!=null){
 
-            singleTravel.setValue1(String.format("%.1fkm",singleCarVinStatisticModel.getDistCount()));
+            singleTravel.setValue1(String.format(locale,"%.1fkm",singleCarVinStatisticModel.getDistCount()));
             singleTravel.setValue2(CommonUtils.longTimeToStr(singleCarVinStatisticModel.getTimeCount()));
-            singleTravel.setValue3(String.format("%.1f升",singleCarVinStatisticModel.getFuelCount()));
+            singleTravel.setValue3(String.format(locale,"%.1f升",singleCarVinStatisticModel.getFuelCount()));
 
         }
         if ((OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded||OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeConnectSuccess)&&carInfoModel.getVinCode().equals(OBDClient.getDefaultClien().getVinCode())){

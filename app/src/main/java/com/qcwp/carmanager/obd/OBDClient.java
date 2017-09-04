@@ -52,6 +52,47 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class OBDClient {
 
+    public double getVehicleSpeed() {
+        return vehicleSpeed;
+    }
+
+    public double getEngineRpm() {
+        return engineRpm;
+    }
+
+    public double getFuelPressure() {
+        return fuelPressure;
+    }
+
+
+    public double getAvgVehicleSpeed() {
+        return avgVehicleSpeed;
+    }
+
+    public double getAvgOilConsume() {
+        return avgOilConsume;
+    }
+
+    public double getCurrentOilConsume() {
+        return currentOilConsume;
+    }
+
+    public double getDist() {
+        return dist;
+    }
+
+    public double getIntakeTemp() {
+        return intakeTemp;
+    }
+
+    public double getTotalMileage() {
+
+        return totalMileage;
+    }
+    public double getEngineCoolant() {
+        return engineCoolant;
+    }
+
     private OBDConnectStateEnum connectStatus;//连接状态
     private LoadDataTypeEnum loadDataType;//车辆处于何种状态
     private String vinCode;//车辆的vincode码
@@ -66,11 +107,19 @@ public class OBDClient {
     private double currentOilConsume;//当前油耗
     private double dist;//当前里程
     private double controlModuleVoltage;//控制模块电压
-    private int ambientAirTemperature;//环境空气温度(-40~214)
+    private double intakeTemp;//环境空气温度(-40~214)
     private double engineCoolant;//发动机冷却液温度(-40~214)
     private double totalMileage;//总里程
+
+    public double getTotalTime() {
+        return totalTime;
+    }
+
     private String carCheckUpPidDescriptionList;
     private String carCheckUpUnitsList;
+
+
+
     private String carCheckUpPidList;
     private int DtcCount;
     private int DrivingDataUnusualCount;
@@ -114,10 +163,7 @@ public class OBDClient {
         this.onlyFlag = onlyFlag;
     }
 
-    private static class OBDClientHolder {
 
-        static final OBDClient INSTANCE = new OBDClient();
-    }
 
     /**
      * * private的构造函数用于避免外界直接使用new来实例化对象
@@ -129,10 +175,22 @@ public class OBDClient {
 
     }
 
-    public static OBDClient getDefaultClien() {
 
-        return OBDClient.OBDClientHolder.INSTANCE;
+
+    private static OBDClient INSTANCE;
+
+    // 提供一个全局的静态方法
+    public static OBDClient getDefaultClien() {
+        if (INSTANCE == null) {
+            synchronized (OBDClient.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new OBDClient();
+                }
+            }
+        }
+        return INSTANCE;
     }
+
 
     public void startOBDClient() {
 
@@ -409,8 +467,10 @@ public class OBDClient {
         data=data.replace("\n","");
         double temp = originalCarMileage;
         long summryOnlyFlag=onlyFlag;
-        
-     engineRpm = SensorsService.engineRpm();
+
+        vehicleSpeed= SensorsService.vehicleSpeed();
+        Print.d("readTravelDataWith","vehicleSpeed===="+vehicleSpeed);
+        engineRpm = SensorsService.engineRpm();
     fuelPressure = SensorsService.fuelPressure();
     totalTime = SensorsService.totalTime();
     avgVehicleSpeed = SensorsService.vehicleSpeedAve();
@@ -418,13 +478,14 @@ public class OBDClient {
     currentOilConsume = SensorsService.instantFuel();
     dist = SensorsService.dist();
     controlModuleVoltage = SensorsService.controlModuleVoltage();
-    ambientAirTemperature = SensorsService.ambientAirTemperature();
+        intakeTemp = SensorsService.intakeTemp();
     engineCoolant = SensorsService.engineCoolant();
     totalMileage =originalCarMileage+SensorsService.dist();
     carCheckUpPidDescriptionList= SensorsService.CarCheckUp_PidDescription_list();
     carCheckUpUnitsList=SensorsService.CarCheckUp_Units_list();
     carCheckUpPidList=SensorsService.CarCheckUp_Pid_List();
 
+     EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.Driving,null));
 
      return   String.format("?%.0f&%.0f&%s&%.4f&%.4f&%.0f&%.0f&%.0f&%.0f&%.0f&%.4f&%.0f&%.0f&%.0f&%.0f&%.2f&%.4f&%d&%f&%f&%s&%s\n",SensorsService.acceleratorPedalPosition(),//1
                 SensorsService.airFlowRate(),//2
@@ -553,6 +614,7 @@ public class OBDClient {
                                     if (connectStatus == connectTypeHaveBinded) {
                                         String pid = pids.get(i);
                                         String data = BlueteethService.getData(pid);
+
                                         if (data.length() > 0) {
                                             if (i >= mainPIDList.size()) {
                                                 travelArray.add(OBDClient.this.readTravelDataWith(pid, data));
