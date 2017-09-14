@@ -11,4 +11,6 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="driving_dial_padiing">5dp</dimen>
     <dimen name="ThermometerWidth">35dp</dimen>
+    <dimen name="padding_small">10dp</dimen>
+    <dimen name="margin_small">10dp</dimen>
 </resources>

@@ -1,6 +1,7 @@
 package com.qcwp.carmanager.obd;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.ThreadPoolUtils;
@@ -8,6 +9,7 @@ import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
+import com.qcwp.carmanager.enumeration.ExamnationStatusEnum;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.LoadDataTypeEnum;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
@@ -23,6 +25,7 @@ import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.SingleCarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
+import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.MySharedPreferences;
 import com.qcwp.carmanager.utils.Print;
@@ -30,14 +33,18 @@ import com.qcwp.carmanager.utils.Print;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-import static com.blankj.utilcode.util.ThreadPoolUtils.CachedThread;
 import static com.blankj.utilcode.util.ThreadPoolUtils.FixedThread;
+import static com.qcwp.carmanager.broadcast.MessageEvent.MessageEventType.CarCheck_end;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypeTijian;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypedrive;
 import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeConnectSuccess;
@@ -89,6 +96,11 @@ public class OBDClient {
 
         return totalMileage;
     }
+
+    public void startExamnation() {
+        this.loadDataType = dataTypeTijian;
+    }
+
     public double getEngineCoolant() {
         return engineCoolant;
     }
@@ -119,11 +131,7 @@ public class OBDClient {
     private String carCheckUpUnitsList;
 
 
-
     private String carCheckUpPidList;
-    private int DtcCount;
-    private int DrivingDataUnusualCount;
-    private int carCheckUpScore;
     private int readyToExamination;//连接状态
     private double bfImpactVehicleSpeed; //碰撞前
     private double afImapactVehicleSpeed; //碰撞后
@@ -139,19 +147,22 @@ public class OBDClient {
     private int countOfOBDData, originalTimeCount;
     private double originalDistCount, originalFuelCount, originalCarMileage;
     private DaoSession daoSession;
+    private String phoneModel;
     private ThreadPoolUtils threadPool;
 
-    public  OBDConnectStateEnum getConnectStatus() {
+    public OBDConnectStateEnum getConnectStatus() {
         return connectStatus;
     }
 
     public String startTime;
 
+    public String getStartTime() {
+        return startTime;
+    }
 
     public String getVinCode() {
         return vinCode;
     }
-
 
 
     public void setStartTime(String startTime) {
@@ -164,7 +175,6 @@ public class OBDClient {
     }
 
 
-
     /**
      * * private的构造函数用于避免外界直接使用new来实例化对象
      */
@@ -174,7 +184,6 @@ public class OBDClient {
         EventBus.getDefault().register(OBDClient.this);
 
     }
-
 
 
     private static OBDClient INSTANCE;
@@ -200,7 +209,7 @@ public class OBDClient {
             @Override
             public Object call() throws Exception {
 
-                BlueteethService blueteethService =  BlueteethService.getDefaultBluetoothService();
+                BlueteethService blueteethService = BlueteethService.getDefaultBluetoothService();
                 blueteethService.setConectOBDListener(new BlueteethService.ConectOBDListener() {
                     @Override
                     public void completeConect(Boolean success, String message) {
@@ -218,7 +227,7 @@ public class OBDClient {
 
                                 connectStatus = connectTypeConnectSuccess;
 
-                                MessageEvent messageEvent=new MessageEvent(MessageEvent.MessageEventType.OBDConnectSuccess,message);
+                                MessageEvent messageEvent = new MessageEvent(MessageEvent.MessageEventType.OBDConnectSuccess, message);
                                 EventBus.getDefault().post(messageEvent);
 
                                 blockMessage = vinCode;
@@ -243,14 +252,13 @@ public class OBDClient {
                             }
                         });
 
-                        if (!blockSuccess){
+                        if (!blockSuccess) {
                             threadPool.shutDownNow();
                         }
 
                     }
                 });
                 blueteethService.startBluetoothService();
-
 
 
                 return null;
@@ -323,11 +331,13 @@ public class OBDClient {
     }
 
     private ReadVinCodeCompleteListener readVinCodeCompleteListener;
+
     public interface ReadVinCodeCompleteListener {
         void connectComplete(Boolean success, String message);
     }
-    public void setReadVinCodeCompleteListener(ReadVinCodeCompleteListener readVinCodeCompleteListener){
-        this.readVinCodeCompleteListener=readVinCodeCompleteListener;
+
+    public void setReadVinCodeCompleteListener(ReadVinCodeCompleteListener readVinCodeCompleteListener) {
+        this.readVinCodeCompleteListener = readVinCodeCompleteListener;
     }
 
     /**
@@ -335,15 +345,15 @@ public class OBDClient {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        switch (event.getType()){
+        switch (event.getType()) {
             case CarBlindSuccess:
                 OBDClient.this.initData();
                 break;
             case OBDLostDisconnection:
                 //重连
-                connectStatus=OBDConnectStateEnum.connectTypeDisconnectionWithOBD;
+                connectStatus = OBDConnectStateEnum.connectTypeDisconnectionWithOBD;
                 threadPool.shutDownNow();
-                vinCode=null;
+                vinCode = null;
                 OBDClient.this.startOBDClient();
                 break;
         }
@@ -365,14 +375,14 @@ public class OBDClient {
         travelArray = new ArrayList();
 
 
-       CarVinStatisticModel carVinStatisticModel = daoSession.queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+        CarVinStatisticModel carVinStatisticModel = daoSession.queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
         if (carVinStatisticModel == null) {
             carVinStatisticModel = new CarVinStatisticModel();
         }
         carVinStatisticModel.setVinCode(vinCode);
         daoSession.insertOrReplace(carVinStatisticModel);
 
-        SingleCarVinStatisticModel singleCarVinStatisticModel =daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+        SingleCarVinStatisticModel singleCarVinStatisticModel = daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
         if (singleCarVinStatisticModel == null) {
             singleCarVinStatisticModel = new SingleCarVinStatisticModel();
         }
@@ -395,6 +405,7 @@ public class OBDClient {
 
         connectStatus = connectTypeHaveBinded;
 
+        phoneModel=android.os.Build.MODEL==null?"未知":android.os.Build.MODEL;
         this.getCarData();
 
     }
@@ -402,40 +413,37 @@ public class OBDClient {
     private String getCurrentSummryData() {
 
 
-        double showUsaLiter=SensorsService.showUsaLiter();
-        double maxVehicleSpeed=SensorsService.maxVehicleSpeed();
-        double avgVehicleSpeed=SensorsService.vehicleSpeedAve();
-        double maxEngineRpm=SensorsService.maxEngineRpm();
-        double avgEngineRpm=SensorsService.engineRpmAve();
-        double maxAcceleratorPedalPosition=SensorsService.maxAcceleratorPedalPosition();
-        double avgAcceleratorPedalPosition=SensorsService.acceleratorPedalPositionAvg();
-        double cureentDist=SensorsService.dist();
-        double carDist=originalCarMileage+cureentDist;
-        int travelTime=SensorsService.travelTime();
-        int stopTime=SensorsService.stopTime();
-        String startDate=startTime;
-        String endDate=TimeUtils.getNowString();
+        double showUsaLiter = SensorsService.showUsaLiter();
+        double maxVehicleSpeed = SensorsService.maxVehicleSpeed();
+        double avgVehicleSpeed = SensorsService.vehicleSpeedAve();
+        double maxEngineRpm = SensorsService.maxEngineRpm();
+        double avgEngineRpm = SensorsService.engineRpmAve();
+        double maxAcceleratorPedalPosition = SensorsService.maxAcceleratorPedalPosition();
+        double avgAcceleratorPedalPosition = SensorsService.acceleratorPedalPositionAvg();
+        double cureentDist = SensorsService.dist();
+        double carDist = originalCarMileage + cureentDist;
+        int travelTime = SensorsService.travelTime();
+        int stopTime = SensorsService.stopTime();
+        String startDate = startTime;
+        String endDate = TimeUtils.getNowString();
 
 
-        return  "@OnlyFlag="+onlyFlag+"&VinId="+0+"&UserId="+UserData.getInstance().getUserId()+"&LiterAvg="+showUsaLiter+"&MaxVehicleSpeed="+maxVehicleSpeed+"&VehicleSpeedAve="+avgVehicleSpeed+"&MaxEngineRpm="+maxEngineRpm+"&EngineRpmAve="+avgEngineRpm+"&MaxAcceleratorPedalPosition="+maxAcceleratorPedalPosition+"&AcceleratorPedalPositionAve="+avgAcceleratorPedalPosition+"&StartDate="+startDate+"&EndDate="+endDate+"&CarDist="+carDist+"&Dist="+cureentDist+"&CountSecond="+travelTime+"&StopSecond="+stopTime+"\n";
+        return "@OnlyFlag=" + onlyFlag + "&VinId=" + 0 + "&UserId=" + UserData.getInstance().getUserId() + "&LiterAvg=" + showUsaLiter + "&MaxVehicleSpeed=" + maxVehicleSpeed + "&VehicleSpeedAve=" + avgVehicleSpeed + "&MaxEngineRpm=" + maxEngineRpm + "&EngineRpmAve=" + avgEngineRpm + "&MaxAcceleratorPedalPosition=" + maxAcceleratorPedalPosition + "&AcceleratorPedalPositionAve=" + avgAcceleratorPedalPosition + "&StartDate=" + startDate + "&EndDate=" + endDate + "&CarDist=" + carDist + "&Dist=" + cureentDist + "&CountSecond=" + travelTime + "&StopSecond=" + stopTime +"&phoneBrand"+phoneModel+"\n";
 
     }
 
     //计算和保存
 
     private void calculateTraveData() {
-        if (connectStatus == connectTypeHaveBinded)
-        {
+        if (connectStatus == connectTypeHaveBinded) {
             SensorsService.calculateTraveData();
-            if (((int)SensorsService.totalTime()) % 2!=0)
-            {
+            if (((int) SensorsService.totalTime()) % 2 != 0) {
                 //是否急加速
-               OBDClient.this.isHardAcceleration();
+                OBDClient.this.isHardAcceleration();
             }
 
             //是否急刹车
             OBDClient.this.isBrakes();
-
 
 
             if (loadDataType == dataTypedrive) {
@@ -454,43 +462,168 @@ public class OBDClient {
 
     }
 
+    private void carCheckSome(JSONObject jsonObject) {
+
+        String info = jsonObject.optString(KeyEnum.pidInfoKey);
+        String pid = jsonObject.optString(KeyEnum.pidKey);
+        BlueteethService.getData(pid);//没有什么用
+        EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarCheck_some, info));
+    }
+
     //体检
     private void healthExamination() {
 
-        // TODO: 2017/6/23
+        JSONArray jsonArray = CommonUtils.getJSONArrayFromText("AllPids.json");
+        Integer index = 0;
+
+        for (; index < 3; index++) {
+
+            JSONObject jsonObject = jsonArray.optJSONObject(index);
+            this.carCheckSome(jsonObject);
+        }
+
+
+        //获取故障码-体检
+        SensorsService.Car_CheckUp_init();
+        String data = BlueteethService.getData("03");
+        //    NSLog(@"故障码   %@",data);
+        SensorsService.DTC_CheckUp(data);
+        Resources mResource=APP.getInstance().getResources();
+        String[] titleArray =mResource.getStringArray(R.array.FaultCodeType);
+        for (int i = 0; i < titleArray.length; i++) {
+            if (loadDataType != dataTypeTijian) return;
+            List<String> valueList = new ArrayList<>();
+            if (i == 0) valueList = SensorsService.powertrainDTCList();
+            else if (i == 1) valueList = SensorsService.chassisDTCList();
+            else if (i == 2) valueList = SensorsService.bodyDTCList();
+            else if (i == 3) valueList = SensorsService.networkDTCList();
+
+
+            MessageEvent messageEvent = new MessageEvent();
+            messageEvent.setType(MessageEvent.MessageEventType.CarCheck_faultCode);
+            Map map = new HashMap();
+            map.put(KeyEnum.nameKey, titleArray[i]);
+            map.put(KeyEnum.statusKey, valueList);
+            messageEvent.setData(map);
+            EventBus.getDefault().post(messageEvent);
+
+
+
+            for (int j = 0; j < 4; j++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(index);
+                this.carCheckSome(jsonObject);
+                index++;
+            }
+
+        }
+
+
+
+
+//    //获取汽车工况-体检
+        data = BlueteethService.getData("0141");
+        int[] engineConditions = SensorsService.EngineBehaviour_CheckUp(data);
+        titleArray = mResource.getStringArray(R.array.EngineConditions);
+        for (int j = 0; j < 6; j++) {
+            if (loadDataType != dataTypeTijian) return;
+            MessageEvent messageEvent = new MessageEvent();
+            messageEvent.setType(MessageEvent.MessageEventType.CarCheck_engineCondition);
+            Map map = new HashMap();
+            map.put(KeyEnum.nameKey, titleArray[j]);
+            map.put(KeyEnum.statusKey, ExamnationStatusEnum.fromInteger(engineConditions[j]));
+            messageEvent.setData(map);
+            EventBus.getDefault().post(messageEvent);
+
+
+            for (int i = 0; i < 4; i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(index);
+                this.carCheckSome(jsonObject);
+                index++;
+            }
+        }
+
+
+        //获取行车数据-体检
+//        String examnation_pidStr = SensorsService.CarCheckUp_Pid_List();
+//        String[] examnationPidArray = examnation_pidStr.split(",");
+
+       JSONArray driveDataPidArray = CommonUtils.getJSONArrayFromText("CarCheckDriveDataPids.json");
+
+
+        for (int i=0;i<driveDataPidArray.length();i++) {
+            if (loadDataType != dataTypeTijian) return;
+            for (int j = 0; j < 2; j++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(index);
+                this.carCheckSome(jsonObject);
+                index++;
+            }
+
+
+            JSONObject jsonObject=driveDataPidArray.optJSONObject(i);
+
+            String pid=jsonObject.optString(KeyEnum.pidKey);
+            data = BlueteethService.getData(pid);
+
+            int drivingDataStatus = SensorsService.DrivingData_CheckUp(data, pid);
+
+
+            MessageEvent messageEvent = new MessageEvent();
+            messageEvent.setType(MessageEvent.MessageEventType.CarCheck_driveData);
+            Map map = new HashMap();
+            map.put(KeyEnum.nameKey, jsonObject.optString(KeyEnum.pidInfoKey));
+            map.put(KeyEnum.statusKey, ExamnationStatusEnum.fromInteger(drivingDataStatus));
+            messageEvent.setData(map);
+            EventBus.getDefault().post(messageEvent);
+        }
+
+
+        Integer  carCheckUpScore = SensorsService.Car_CheckUp_score();
+        Integer DtcCount = SensorsService.DtcCount();
+        Integer  DrivingDataUnusualCount = SensorsService.DrivingDataUnusualCount();
+
+        MessageEvent messageEvent=new MessageEvent();
+        messageEvent.setType(CarCheck_end);
+        Map map=new HashMap();
+        map.put("carCheckUpScore",carCheckUpScore);
+        map.put("DtcCount",DtcCount);
+        map.put("DrivingDataUnusualCount",DrivingDataUnusualCount);
+        messageEvent.setData(map);
+
+        EventBus.getDefault().post(messageEvent);
+        loadDataType=dataTypedrive;
+
     }
 
     @SuppressLint("DefaultLocale")
     private String readTravelDataWith(String pid, String data) {
 
-        data =data.replace("\r","");
-        data=data.replace("\n","");
+        data = data.replace("\r", "");
+        data = data.replace("\n", "");
         double temp = originalCarMileage;
-        long summryOnlyFlag=onlyFlag;
+        long summryOnlyFlag = onlyFlag;
 
-        vehicleSpeed= SensorsService.vehicleSpeed();
-        Print.d("readTravelDataWith","vehicleSpeed===="+vehicleSpeed);
+        vehicleSpeed = SensorsService.vehicleSpeed();
         engineRpm = SensorsService.engineRpm();
-    fuelPressure = SensorsService.fuelPressure();
-    totalTime = SensorsService.totalTime();
-    avgVehicleSpeed = SensorsService.vehicleSpeedAve();
-    avgOilConsume = SensorsService.showUsaLiter();
-    currentOilConsume = SensorsService.instantFuel();
-    dist = SensorsService.dist();
-    controlModuleVoltage = SensorsService.controlModuleVoltage();
+        fuelPressure = SensorsService.fuelPressure();
+        totalTime = SensorsService.totalTime();
+        avgVehicleSpeed = SensorsService.vehicleSpeedAve();
+        avgOilConsume = SensorsService.showUsaLiter();
+        currentOilConsume = SensorsService.instantFuel();
+        dist = SensorsService.dist();
+        controlModuleVoltage = SensorsService.controlModuleVoltage();
         intakeTemp = SensorsService.intakeTemp();
-    engineCoolant = SensorsService.engineCoolant();
-    totalMileage =originalCarMileage+SensorsService.dist();
-    carCheckUpPidDescriptionList= SensorsService.CarCheckUp_PidDescription_list();
-    carCheckUpUnitsList=SensorsService.CarCheckUp_Units_list();
-    carCheckUpPidList=SensorsService.CarCheckUp_Pid_List();
+        engineCoolant = SensorsService.engineCoolant();
+        totalMileage = originalCarMileage + SensorsService.dist();
+        carCheckUpPidDescriptionList = SensorsService.CarCheckUp_PidDescription_list();
+        carCheckUpUnitsList = SensorsService.CarCheckUp_Units_list();
+        carCheckUpPidList = SensorsService.CarCheckUp_Pid_List();
 
-     EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.Driving,null));
+        EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.Driving, null));
 
-     return   String.format("?%.0f&%.0f&%s&%.4f&%.4f&%.0f&%.0f&%.0f&%.0f&%.0f&%.4f&%.0f&%.0f&%.0f&%.0f&%.2f&%.4f&%d&%f&%f&%s&%s\n",SensorsService.acceleratorPedalPosition(),//1
+        return String.format("?%.0f&%.0f&%s&%.4f&%.4f&%.0f&%.0f&%.0f&%.0f&%.0f&%.4f&%.0f&%.0f&%.0f&%.0f&%.2f&%.4f&%d&%f&%f&%s&%s\n", SensorsService.acceleratorPedalPosition(),//1
                 SensorsService.airFlowRate(),//2
                 TimeUtils.getNowString(),//3
-        SensorsService.dist(),//4
+                SensorsService.dist(),//4
                 temp + SensorsService.dist(),//5
                 SensorsService.engineCoolant(),//6
                 SensorsService.engineLoadValue(),//7
@@ -548,7 +681,6 @@ public class OBDClient {
                 List<String> mainPIDList = new ArrayList<>(Arrays.asList(mainPIDS));
 
 
-
                 for (String pid : mainPIDList) {
                     String tmpData = BlueteethService.getData(pid);
                     SensorsService.SensorsDataHandler(tmpData, pid);
@@ -577,7 +709,7 @@ public class OBDClient {
 
 
                 String[] ALL_DRIVE_PIDs = APP.getInstance().getResources().getStringArray(R.array.ALL_PID_DRIVE);
-                List<String> allDrivePidList =new ArrayList<>( Arrays.asList(ALL_DRIVE_PIDs));
+                List<String> allDrivePidList = new ArrayList<>(Arrays.asList(ALL_DRIVE_PIDs));
 
                 allDrivePidList.removeAll(mainPIDList);
 
@@ -657,14 +789,14 @@ public class OBDClient {
 
 
     }
-    //是否急加速
-    private void isHardAcceleration(){
 
+    //是否急加速
+    private void isHardAcceleration() {
 
 
     }
 
-    private void isBrakes(){
+    private void isBrakes() {
 
     }
 
@@ -672,70 +804,56 @@ public class OBDClient {
     /**
      * 保存数据
      */
-    private void saveOBDData(){
+    private void saveOBDData() {
 
-        Print.d("saveOBDData","========"+travelArray.size());
-        if (travelArray.size() >60)
-        {
+        if (travelArray.size() > 60) {
 
 
-            List<String> tempTravelArray=new ArrayList();
+            List<String> tempTravelArray = new ArrayList();
             tempTravelArray.addAll(travelArray);
-            Print.d("saveOBDData","tempTravelArray------------"+tempTravelArray.size());
             travelArray.clear();
-            Print.d("saveOBDData","------------"+onlyFlag);
-            Print.d("saveOBDData","tempTravelArray------------"+tempTravelArray.size());
             //勋章
 
             //距离和时间的值是设备自己累积的，所以这两个数值逐渐增大
             double driveDist = SensorsService.dist();//走了多远距离
-            int driveTime =(int)SensorsService.totalTime();//走了多久时间
+            int driveTime = (int) SensorsService.totalTime();//走了多久时间
 
 
             //车辆统计数据
 
-            double showfuelCount=SensorsService.showUsaLiter();//行车100公里的油耗
+            double showfuelCount = SensorsService.showUsaLiter();//行车100公里的油耗
 
-            double fuelCount=showfuelCount*driveDist/100;
+            double fuelCount = showfuelCount * driveDist / 100;
 
-            Print.d("saveOBDData","111111");
-            CarVinStatisticModel carVinStatisticModel=daoSession.queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+            CarVinStatisticModel carVinStatisticModel = daoSession.queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
 
-            if (carVinStatisticModel.getMaxTime() <driveTime)
-            {
+            if (carVinStatisticModel.getMaxTime() < driveTime) {
                 carVinStatisticModel.setMaxTime(driveTime);
             }
 
-            Print.d("saveOBDData","222222");
-            if (carVinStatisticModel.getMaxDist() <driveDist)
-            {
+            if (carVinStatisticModel.getMaxDist() < driveDist) {
                 carVinStatisticModel.setMaxDist(driveDist);
             }
 
 
+            carVinStatisticModel.setDistCount(originalDistCount + driveDist);
+            carVinStatisticModel.setTimeCount(originalTimeCount + driveTime);
 
-            carVinStatisticModel.setDistCount(originalDistCount+driveDist);
-            carVinStatisticModel.setTimeCount(originalTimeCount+driveTime);
-
-            carVinStatisticModel.setFuelCount(originalFuelCount+fuelCount);
+            carVinStatisticModel.setFuelCount(originalFuelCount + fuelCount);
 
             carVinStatisticModel.setAvgFuel(showfuelCount);
 
             daoSession.update(carVinStatisticModel);
-            Print.d("saveOBDData","3333333");
-
 
 
             //车辆原始数据
-            carInfoModel.setTotalMileage(originalCarMileage+driveDist);
+            carInfoModel.setTotalMileage(originalCarMileage + driveDist);
 
             daoSession.update(carInfoModel);
             //保存勋章数据
 
 
-
-            Print.d("saveOBDData","444444");
-            SingleCarVinStatisticModel singleCarVinStatisticModel=daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+            SingleCarVinStatisticModel singleCarVinStatisticModel = daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
             singleCarVinStatisticModel.setDistCount(driveDist);
             singleCarVinStatisticModel.setTimeCount(driveTime);
             singleCarVinStatisticModel.setFuelCount(fuelCount);
@@ -745,8 +863,6 @@ public class OBDClient {
             daoSession.update(singleCarVinStatisticModel);
 
 
-
-            Print.d("saveOBDData","555555");
             TravelSummaryModel travelSummaryModel = daoSession.queryBuilder(TravelSummaryModel.class).where(TravelSummaryModelDao.Properties.OnlyFlag.eq(onlyFlag)).unique();
             travelSummaryModel.setMileage(driveDist);
             travelSummaryModel.setDriveTime(driveTime);
@@ -756,10 +872,8 @@ public class OBDClient {
             travelSummaryModel.setEndDate(TimeUtils.getNowString());
             daoSession.update(travelSummaryModel);
 
-            Print.d("saveOBDData","666666");
-            for (String data:tempTravelArray) {
-                Print.d("saveOBDData","---------"+data);
-                TravelDataModel travelDataModel=new TravelDataModel();
+            for (String data : tempTravelArray) {
+                TravelDataModel travelDataModel = new TravelDataModel();
                 travelDataModel.setOnlyFlag(onlyFlag);
                 travelDataModel.setVinCode(vinCode);
                 travelDataModel.setTravelData(data);
@@ -768,18 +882,14 @@ public class OBDClient {
                 daoSession.insert(travelDataModel);
 
             }
-            Print.d("saveOBDData","777777");
 
 
-            EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarDataUpdate,vinCode));
-            Print.d("saveOBDData","============"+travelArray.size());
+            EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarDataUpdate, vinCode));
 
         }
 
 
     }
-
-
 
 
 }

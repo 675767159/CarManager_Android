@@ -1,9 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.qcwp.carmanager.ui.CarDetailActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.qcwp.carmanager.ui.CarListActivity"
+    android:background="@color/backgroundColor"
+    android:orientation="vertical"
+    >
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="车辆详情">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="编辑"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/whiteColor"
+            android:background="@null"
 
-</android.support.constraint.ConstraintLayout>
+            />
+    </com.qcwp.carmanager.control.NavBarView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="UnknownId"
+        android:padding="@dimen/padding_small"
+        android:orientation="horizontal"
+        android:gravity="fill"
+        >
+        <com.qcwp.carmanager.control.TitleContentView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:TitleContent_title="车系名称："
+            android:id="@+id/carSeries"
+            app:TitleContent_title_color="@color/carDetailTitleColor"
+
+            />
+        <com.qcwp.carmanager.control.TitleContentView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:TitleContent_title="车牌："
+            android:id="@+id/carNumber"
+            android:layout_marginStart="@dimen/margin_small"
+            app:TitleContent_title_color="@color/carDetailTitleColor"
+            />
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical"
+        android:padding="@dimen/padding_small"
+        >
+        <com.qcwp.carmanager.control.TitleContentView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:TitleContent_title="车架号："
+            android:id="@+id/carVinCode"
+            app:TitleContent_title_color="@color/carDetailTitleColor"
+
+            />
+        <com.qcwp.carmanager.control.TitleContentView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:TitleContent_title="行驶里程："
+            android:id="@+id/carTotalMileage"
+            android:layout_marginTop="@dimen/vertical_margin"
+            app:TitleContent_title_color="@color/carDetailTitleColor"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="健康状况："
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:padding="@dimen/padding_small"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_small"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.qcwp.carmanager.control.TitleContentView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:TitleContent_title="共体检："
+                app:TitleContent_title_color="@color/carDetailTitleColor"
+                />
+            <com.qcwp.carmanager.control.TitleContentView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:TitleContent_title="平均得分："
+                android:layout_marginLeft="@dimen/margin_small"
+                app:TitleContent_title_color="@color/carDetailTitleColor"
+                />
+
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vertical_margin"
+            >
+
+            <com.qcwp.carmanager.control.TitleContentView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:TitleContent_title="最近一次体检得分："
+                app:TitleContent_title_color="@color/carDetailTitleColor"
+                android:layout_centerVertical="true"
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="马上体检"
+                android:textColor="@color/colorPrimary"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:onClick="onClick"
+                android:id="@+id/physicalExamination"
+
+                />
+        </RelativeLayout>
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:TitleContent_title="共检测发现故障码："
+            android:layout_marginTop="@dimen/vertical_margin"
+            app:TitleContent_title_color="@color/carDetailTitleColor"
+            >
+
+        </com.qcwp.carmanager.control.TitleContentView>
+    </LinearLayout>
+
+
+
+</LinearLayout>

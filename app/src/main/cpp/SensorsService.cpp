@@ -1108,71 +1108,53 @@ vector<string> SensorsService::dtcs(string data ) {
     //if(null == data || "".equals(data)) return null;
     vector<string> valueList;
     if(data.empty()) return valueList;
-    
+
     //System.out.println("--------------->>>>" + data);
     data = replace_all_distinct(data ,">","");
     //data = data.replace(">", "").trim();
     //    list<string> valueList = new ArrayList<string>();
-    
+    data=replace_all_distinct(data," ", "");
     data.erase(0,data.find_first_not_of("\r\t\n "));
     data.erase(data.find_last_not_of("\r\t\n ")+1);
-    
+
     data = replace_all_distinct(data ,"\r","@");
     vector<string> arr =split_for_string(data,"@");
     //vector<string> arr = data.replace("\r", "@").split("@");
     string tmpStr = "";
-    if (arr.size() > 0 && arr[0].length() < 14) {
-        
-        if (arr.size() == 1) {
-            tmpStr = arr[0];
-            //tmpStr = tmpStr.substring(4);
-            tmpStr=tmpStr.erase(0,4);
-            int num = tmpStr.length() / 4;
-            for (int i = 0; i < num; i++) {
-                string tmpValue =tmpStr.substr(i*4,4);
-                //String tmpValue = tmpStr.substring(i * 4, i * 4 + 4);
-                //if (!"0000".equals(tmpValue)) {
-                if(tmpValue.compare("0000")!=0){
-                    // valueList.add(analysisDTC(tmpValue));
-                    valueList.push_back(analysisDTC(tmpValue));
-                }
-            }
-        } else {
-            for (vector<string *>::size_type  i = 1; i < arr.size(); i++) {
-                //0:430320290082
-                tmpStr += arr[i].substr(arr[i].find_first_of(":") + 1);
-            }
-            
-            // tmpStr = tmpStr.substring(4);
-            tmpStr= tmpStr.erase(0,4);
-            int num = tmpStr.length() / 4;
-            for (int i = 0; i < num; i++) {
-                //   string tmpValue = tmpStr.substring(i * 4, i * 4 + 4);
-                string tmpValue = tmpStr.substr(i * 4,  4);
-                if(tmpValue.compare("0000")!=0){
-                    // valueList.add(analysisDTC(tmpValue));
-                    valueList.push_back(analysisDTC(tmpValue));
-                }
-            }
-        }
-    } else {
+    if (arr.size() > 0 ) {
+
         for (vector<string *>::size_type  i = 0; i < arr.size(); i++) {
-            //string tmpStr = arr[i].substring(2, arr[i].length());
-            string tmpStr = arr[i].erase(0,2);
-            for (int j = 0; j < 3; j++) {
-                string tmpValue = tmpStr.substr(i * 4,  4);
-                if(tmpValue.compare("0000")!=0){
-                    valueList.push_back(analysisDTC(tmpValue));
+            //0:430320290082
+            if (arr[i].size()>3) {
+                if (arr[i].find(":")!=string::npos) {
+                    tmpStr += arr[i].substr(arr[i].find_first_of(":") + 1);
+                }else{
+
+                    tmpStr+=arr[i];
                 }
+
+            }
+
+        }
+
+        // tmpStr = tmpStr.substring(4);
+        tmpStr= tmpStr.erase(0,4);
+        int num = tmpStr.length() / 4;
+        for (int i = 0; i < num; i++) {
+            //   string tmpValue = tmpStr.substring(i * 4, i * 4 + 4);
+            string tmpValue = tmpStr.substr(i * 4,  4);
+            if(tmpValue.compare("0000")!=0){
+                // valueList.add(analysisDTC(tmpValue));
+                valueList.push_back(analysisDTC(tmpValue));
             }
         }
+
     }
-    
     /*for (int i = 0; i < valueList.size(); i++) {
      System.out.println(valueList.get(i) + " - ");
      }*/
-    
-    
+
+
     return valueList;
 }
 

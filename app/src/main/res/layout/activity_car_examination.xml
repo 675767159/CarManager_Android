@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/backgroundColor"
+    >
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="汽车体检"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/NavbarView"
+        tools:ignore="UnknownId"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginLeft="@dimen/margin_small"
+        android:id="@+id/labelBackground"
+        >
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/startBackground"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/car_examination_start_bg"
+                />
+            <com.qcwp.carmanager.control.TouchHighlightImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_start"
+                android:src="@mipmap/car_examination_play"
+                android:layout_centerInParent="true"
+                android:scaleType="center"
+                android:onClick="onClick"
+                />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/startBackground"
+            >
+            <com.qcwp.carmanager.control.TitleContentView
+                style="@style/CarExaminationTitleContentStyle"
+                app:TitleContent_title="车辆："
+                android:id="@+id/carSeries"
+                app:TitleContent_title_color="@color/blackColor"
+                />
+
+            <com.qcwp.carmanager.control.TitleContentView
+                style="@style/CarExaminationTitleContentStyle"
+                app:TitleContent_title="状况："
+                android:id="@+id/carState"
+                android:layout_below="@+id/carSeries"
+                app:TitleContent_title_color="@color/blackColor"
+                />
+            <TextView
+                style="@style/CarExaminationTitleContentStyle"
+                android:id="@+id/score"
+                android:layout_toRightOf="@+id/carState"
+                android:textColor="@android:color/holo_red_dark"
+                android:layout_alignTop="@+id/carState"
+                android:layout_marginLeft="@dimen/horizon_margin"
+                />
+          <ProgressBar
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:paddingLeft="@dimen/marginLeft"
+              android:layout_marginRight="@dimen/marginLeft"
+              android:layout_below="@+id/carState"
+              style="?android:attr/progressBarStyleHorizontal"
+              android:id="@+id/examinationProgress"
+              />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/examinationProgress"
+                android:textSize="12sp"
+                android:paddingLeft="@dimen/marginLeft"
+                android:layout_marginRight="@dimen/marginLeft"
+                android:lines="1"
+                />
+
+            <com.qcwp.carmanager.control.TitleContentView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:TitleContent_title="故障码："
+                android:id="@+id/faultCode"
+                app:TitleContent_title_color="@color/blackColor"
+                android:layout_below="@+id/examinationProgress"
+                android:layout_marginLeft="@dimen/marginLeft"
+                />
+
+            <com.qcwp.carmanager.control.TitleContentView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:TitleContent_title="异常值："
+                android:id="@+id/unusualValue"
+                app:TitleContent_title_color="@color/blackColor"
+                android:layout_alignTop="@+id/faultCode"
+                android:layout_toRightOf="@+id/faultCode"
+                android:layout_marginLeft="@dimen/marginLeft"
+
+                />
+
+
+            <com.qcwp.carmanager.control.TitleContentView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:TitleContent_title="体检时间："
+                android:id="@+id/examinationTime"
+                app:TitleContent_title_color="@color/blackColor"
+                android:layout_marginLeft="@dimen/marginLeft"
+                android:layout_below="@+id/faultCode"
+                android:layout_marginTop="@dimen/margin_small"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_below="@id/examinationProgress"
+                android:id="@+id/examnationItem"
+                android:visibility="gone"
+                android:maxLines="1"
+                android:layout_marginLeft="@dimen/marginLeft"
+                />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/labelBackground"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/selectModel"
+        >
+        <RadioButton
+            style="@style/CarExaminationSegmentStyle"
+            android:text="所有"
+            android:checked="true"
+            android:id="@+id/radioButton1"
+            />
+        <RadioButton
+            style="@style/CarExaminationSegmentStyle"
+            android:text="记录"
+            android:id="@+id/radioButton3"
+            android:layout_marginLeft="1dp"
+            />
+    </RadioGroup>
+
+    <ExpandableListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/expandablelistview"
+        android:background="@color/whiteColor"
+        android:layout_below="@+id/selectModel"
+        android:groupIndicator="@null"
+        />
+
+
+
+</RelativeLayout>

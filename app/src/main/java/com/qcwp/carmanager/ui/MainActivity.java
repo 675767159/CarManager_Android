@@ -131,6 +131,9 @@ public class MainActivity extends BaseActivity implements MainContract.View{
             case R.id.home_carInfo:
                readyGo(CarListActivity.class);
                 break;
+            case R.id.home_totalTravel:
+                readyGo(CarDetailActivity.class);
+                break;
         }
     }
 

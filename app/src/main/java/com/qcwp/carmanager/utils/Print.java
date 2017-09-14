@@ -11,8 +11,8 @@ import com.qcwp.carmanager.APP;
 
 public class Print {
 
-
-        public final static void e(String tag, String msg, Throwable tr) {
+    private final static int LOG_MAXLENGTH = 2000;
+    public final static void e(String tag, String msg, Throwable tr) {
             if (APP.isDebug&&msg!=null)
                 Log.e(tag, msg, tr);
         }
@@ -32,8 +32,21 @@ public class Print {
         }
 
         public final static void d(String tag, String msg) {
-            if (APP.isDebug&&msg!=null)
-                Log.d(tag, msg);
+            if (APP.isDebug&&msg!=null) {
+                long length = msg.length();
+                if (length <= LOG_MAXLENGTH ) {// 长度小于等于限制直接打印
+                    Log.d(tag, msg);
+                }else {
+                    while (msg.length() > LOG_MAXLENGTH ) {// 循环分段打印日志
+                        String logContent = msg.substring(0, LOG_MAXLENGTH );
+                        msg = msg.replace(logContent, "");
+                        Log.d(tag, logContent);
+                    }
+                    Log.d(tag, msg);// 打印剩余日志
+                }
+
+
+            }
 
         }
 

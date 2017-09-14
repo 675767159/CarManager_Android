@@ -20,9 +20,17 @@ public class KeyEnum {
             switchStateKey="switchStateKey",
             cleanTimeKey="cleanTimeKey",
             wifiName="wifiName",
-            wifiPassword="wifiPassword",
+            currentTimeKey="currentTime",
             vinCode="vinCode",
             currentOBDrotocol="currentOBDrotocol",
-            carNumber="carNumber";
+            carNumber="carNumber",
+            childKey="childKey",
+            groupKey="groupKey",
+            nameKey="nameKey",
+            statusKey="statusKey",
+            pidKey="pid",
+            pidInfoKey="pidInfo",
+            latitudeKey="latitude",
+            longitudeKey="longitude";
 
 }

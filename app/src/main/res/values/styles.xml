@@ -1,4 +1,5 @@
-<resources>
+<resources
+    >
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -38,6 +39,25 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_marginLeft">@dimen/horizon_margin</item>
         <item name="android:layout_weight">1</item>
+    </style>
+
+
+    <style name="CarExaminationTitleContentStyle"
+        >
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/padding_small</item>
+    </style>
+
+
+    <style name="CarExaminationSegmentStyle">
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/car_examnation_segment</item>
+        <item name="android:textColor">@color/radibutton_text</item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

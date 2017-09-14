@@ -6,9 +6,17 @@ import android.graphics.Color;
 import android.os.Environment;
 import android.view.View;
 
+import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.implement.StateRoundRectDrawable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 
 
@@ -119,5 +127,47 @@ public class CommonUtils {
             }
         }
         return Integer.parseInt(sbu.toString());
+    }
+
+    public static JSONArray getJSONArrayFromText(String fileName){
+
+           /*获取到assets文件下的TExt.json文件的数据，并以输出流形式返回。*/
+        InputStream is = APP.getInstance().getClass().getClassLoader().getResourceAsStream("assets/" + fileName);
+        InputStreamReader streamReader = new InputStreamReader(is);
+        BufferedReader reader = new BufferedReader(streamReader);
+        String line;
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            while ((line = reader.readLine()) != null) {
+                // stringBuilder.append(line);
+                stringBuilder.append(line);
+            }
+            reader.close();
+            reader.close();
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONArray person = null;
+        try {
+            person = new JSONArray(stringBuilder.toString());
+            return person;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    public static String carCheckUpStatus(int score) {
+        String status = "未知";
+        if (score <= 70) status = "较差";
+        else if (score <= 80) status = "一般";
+        else if (score <= 90) status = "良好";
+        else if (score <= 100) status ="非常棒";
+        return  status;
     }
 }

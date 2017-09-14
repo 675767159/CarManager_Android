@@ -55,7 +55,13 @@ public class MessageEvent {
        OBDLostDisconnection,
        BlueRequestResult,
        CarSelected,
-       Driving
+       Driving,
+       CarCheck_some,
+       CarCheck_faultCode,
+       CarCheck_engineCondition,
+       CarCheck_driveData,
+       CarCheck_end
+
 
    }
 }

@@ -7,7 +7,8 @@
     tools:context="com.qcwp.carmanager.ui.CarListActivity">
     <com.qcwp.carmanager.control.NavBarView
         style="@style/NavBarStyle"
-        app:title="我的车辆"/>
+        app:title="我的车辆">
+    </com.qcwp.carmanager.control.NavBarView>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

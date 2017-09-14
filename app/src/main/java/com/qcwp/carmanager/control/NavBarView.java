@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.LocationClient;
 import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
@@ -23,9 +25,11 @@ import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.SingleCarVinStatisticModelDao;
 import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
+import com.qcwp.carmanager.implement.MyLocationListener;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.SingleCarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
+import com.qcwp.carmanager.mvp.present.LocationPresent;
 import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.obd.SensorsService;
 import com.qcwp.carmanager.ui.BaseActivity;
@@ -180,7 +184,7 @@ public class NavBarView extends RelativeLayout {
        }else {
            obdClient.setOnlyFlag(travelSummaryModel.getOnlyFlag()+1);
        }
-        obdClient.setStartTime(TimeUtils.getNowString());
+       obdClient.setStartTime(TimeUtils.getNowString());
        SensorsService.initData();
        obdClient.setReadVinCodeCompleteListener(new OBDClient.ReadVinCodeCompleteListener() {
            @Override
@@ -202,6 +206,10 @@ public class NavBarView extends RelativeLayout {
                        messageEvent.setMessage(message);
                        EventBus.getDefault().post(messageEvent);
                    }
+
+                 
+                   LocationPresent locationPresent=new LocationPresent();
+                   locationPresent.startLocation();
                }
 
                currentActivity.showToast(message);

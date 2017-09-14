@@ -9,6 +9,7 @@ import android.util.DisplayMetrics;
 
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
+import com.blankj.utilcode.util.PhoneUtils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.engine.Engine;
 import com.qcwp.carmanager.engine.TokenInterceptor;
@@ -19,8 +20,13 @@ import com.qcwp.carmanager.implement.GreenDaoContext;
 import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.service.MyIntentService;
+import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -119,6 +125,8 @@ public class APP extends Application {
         }
 
         MyIntentService.startService(this);
+
+
 
 
     }

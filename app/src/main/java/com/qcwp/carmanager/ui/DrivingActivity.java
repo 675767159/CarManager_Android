@@ -91,7 +91,7 @@ public class DrivingActivity extends BaseActivity {
         if (messageEvent.getType() == MessageEvent.MessageEventType.Driving) {
 
 
-            Print.d(TAG, String.valueOf(obdClient.getIntakeTemp()));
+
             vehicleSpeed.setValue((int) obdClient.getVehicleSpeed());
             engineRpm.setValue2((int) obdClient.getEngineRpm());
             fuelPressure.setValue2((int) obdClient.getFuelPressure());
