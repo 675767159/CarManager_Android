@@ -1,11 +1,11 @@
 package com.qcwp.carmanager.mvp.present;
 
-import com.baidu.location.BDAbstractLocationListener;
-import com.baidu.location.LocationClient;
+import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.model.LatLng;
 import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.APP;
-import com.qcwp.carmanager.enumeration.KeyEnum;
+import com.qcwp.carmanager.broadcast.LocationEvent;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
@@ -14,12 +14,16 @@ import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.sqLiteModel.LocationModel;
 import com.qcwp.carmanager.mvp.contact.LocationContract;
 import com.qcwp.carmanager.obd.OBDClient;
+import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static com.qcwp.carmanager.utils.CommonUtils.MAX;
+import static com.qcwp.carmanager.utils.CommonUtils.MIN;
 
 /**
  * Created by qyh on 2017/9/11.
@@ -27,24 +31,51 @@ import java.util.Map;
  * @email:675767159@qq.com
  */
 
-public class LocationPresent implements LocationContract.Presenter {
-    public LocationClient mLocationClient = null;
-    private List<LocationModel> mapPointArray;
+public class LocationClient implements LocationContract {
+
+
+
+
+    private static LocationClient INSTANCE;
+    // 提供一个全局的静态方法
+    public static LocationClient getDefaultClien() {
+        if (INSTANCE == null) {
+            synchronized (LocationClient.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new LocationClient();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+
+
+
+    public com.baidu.location.LocationClient mLocationClient = null;
+    private List<LatLng> mapPointArray;
     private String travelStartTime,userName,vinCode;
     private DaoSession mDaoSession;
-    public LocationPresent(){
-        mLocationClient = new LocationClient(APP.getInstance());
 
-        BDAbstractLocationListener myListener = new MyLocationListener(this);
+    private    double minLat = 90.0,maxLat = -90.0,minLon = 180.0,maxLon = -180.0;
+    private LocationClient(){
+        mLocationClient = new com.baidu.location.LocationClient(APP.getInstance());
+
+        BDLocationListener myListener = new MyLocationListener(this);
         //声明LocationClient类
         mLocationClient.registerLocationListener( myListener );
         //注册监听函数
+
+        LocationClient.this.initData();
+        LocationClient.this.initLocation();
+    }
+
+    private void initData(){
         mapPointArray=new ArrayList();
         travelStartTime=OBDClient.getDefaultClien().getStartTime();
         userName= UserData.getInstance().getUserName();
         vinCode=OBDClient.getDefaultClien().getVinCode();
         mDaoSession=APP.getInstance().getDaoInstant();
-        LocationPresent.this.initLocation();
     }
 
     private void initLocation(){
@@ -94,9 +125,6 @@ public class LocationPresent implements LocationContract.Presenter {
         mLocationClient.start();
     }
 
-    public void stopLocation(){
-        mLocationClient.stop();
-    }
 
     @Override
     public void didUpdateBMKUserLocation(final double latitude, final double longitude) {
@@ -115,22 +143,48 @@ public class LocationPresent implements LocationContract.Presenter {
             locationModel.setUserName(userName);
             mDaoSession.insert(locationModel);
 
-////            mDaoSession.insert(locationModel);
-//
-//            mapPointArray.add(locationModel);
-//
-//
-//            if (mapPointArray.size()>4){
-//
-//                Print.d("didUpdateBMKUserLocation", "insert");
-////                mDaoSession.insert(mapPointArray);
-//
-//
-//            }
 
+
+
+
+            LatLng location = new LatLng(latitude, longitude);
+            mapPointArray.add(location);
+
+
+            if (mapPointArray.size()>2000){
+                mLocationClient.stop();
+
+                List arr = new ArrayList();
+                for(int i = 0 ; i <mapPointArray.size(); i++)
+                {
+                    if (i % 2 == 0)
+                    {
+                        arr.add(mapPointArray.get(i));
+                    }
+                }
+                mapPointArray.clear();
+                mapPointArray=arr;
+
+                mLocationClient.start();
+            }
+
+
+
+
+            minLat = MIN(minLat, latitude);
+            maxLat = MAX(maxLat, latitude);
+            minLon = MIN(minLon, longitude);
+            maxLon = MAX(maxLon, longitude);
+
+            LocationEvent locationEvent=new LocationEvent();
+            locationEvent.setMapPoints(mapPointArray);
+            locationEvent.setCenterLatLng(new LatLng( (minLat + maxLat) * 0.5f, (minLon + maxLon) * 0.5f));
+            EventBus.getDefault().post(locationEvent);
 
         }
 
 
     }
+
+
 }

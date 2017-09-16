@@ -38,6 +38,7 @@ public class UserData implements Serializable {
     private int userId;
     private String password;
     private String userName;
+    private String vinCode;
     private double userLocaLatitude;
     private double userLocaLongitude;
 
@@ -48,6 +49,14 @@ public class UserData implements Serializable {
 
 
 
+    }
+
+    public String getVinCode() {
+        return vinCode;
+    }
+
+    public void setVinCode(String vinCode) {
+        this.vinCode = vinCode;
     }
 
     public static UserData setInstance(LoginModel model) {
@@ -61,10 +70,8 @@ public class UserData implements Serializable {
 
     public static void dropInstance() {
 
-        UserData userData =UserData.getInstance();
-        userData.userId=0;
-        userData.userName=null;
-        userData.password=null;
+        INSTANCE=null;
+
 
     }
 

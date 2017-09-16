@@ -42,6 +42,8 @@
             />
 
 
+
+
     </LinearLayout>
 
     <com.qcwp.carmanager.control.TouchHighlightImageView
@@ -51,6 +53,21 @@
         android:id="@+id/back"
         android:onClick="onClick"
         android:padding="@dimen/padding"
+        android:layout_marginTop="@dimen/marginLeft"
+        android:layout_marginLeft="@dimen/marginLeft"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/whiteColor"
+        android:textSize="20sp"
+        android:text="地图"
+        android:background="@null"
+        android:layout_toRightOf="@+id/back"
+        android:id="@+id/map"
+        android:onClick="onClick"
+        android:layout_marginLeft="60dp"
         />
 
     <LinearLayout
@@ -178,7 +195,9 @@
         android:layout_marginBottom="70dp"
         android:id="@+id/annunciator"
         android:gravity="center"
+        android:padding="@dimen/padding"
         />
+
 
 
 </RelativeLayout>

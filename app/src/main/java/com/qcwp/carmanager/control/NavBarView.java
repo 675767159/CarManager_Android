@@ -14,8 +14,6 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.baidu.location.BDAbstractLocationListener;
-import com.baidu.location.LocationClient;
 import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
@@ -23,19 +21,15 @@ import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
-import com.qcwp.carmanager.greendao.gen.SingleCarVinStatisticModelDao;
 import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
-import com.qcwp.carmanager.implement.MyLocationListener;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
-import com.qcwp.carmanager.model.sqLiteModel.SingleCarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
-import com.qcwp.carmanager.mvp.present.LocationPresent;
+import com.qcwp.carmanager.mvp.present.LocationClient;
 import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.obd.SensorsService;
 import com.qcwp.carmanager.ui.BaseActivity;
 import com.qcwp.carmanager.ui.CarEditActivity;
 import com.qcwp.carmanager.utils.MyActivityManager;
-import com.qcwp.carmanager.utils.Print;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -207,9 +201,9 @@ public class NavBarView extends RelativeLayout {
                        EventBus.getDefault().post(messageEvent);
                    }
 
-                 
-                   LocationPresent locationPresent=new LocationPresent();
-                   locationPresent.startLocation();
+
+                   LocationClient locationClient =LocationClient.getDefaultClien();
+                   locationClient.startLocation();
                }
 
                currentActivity.showToast(message);

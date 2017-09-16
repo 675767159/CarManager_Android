@@ -12,6 +12,7 @@ import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
+import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 
 import org.greenrobot.eventbus.EventBus;
@@ -54,6 +55,7 @@ public class CarListActivity extends BaseActivity {
                 CarInfoModel carInfoModel=carInfoModels.get(position);
                 carInfoModel.setTimestamp(TimeUtils.getNowMills());
                 mDaoSession.update(carInfoModel);
+                UserData.getInstance().setVinCode(carInfoModel.getVinCode());
                 EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarSelected,carInfoModel.getVinCode()));
                 finish();
             }

@@ -73,6 +73,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
 
 
         if (carInfoModel!=null) {
+            UserData.getInstance().setVinCode(carInfoModel.getVinCode());
             carVinStatisticModel = presenter.getCarVinStatistic(carInfoModel.getVinCode());
             singleCarVinStatisticModel = presenter.getSingleCarVinStatistic(carInfoModel.getVinCode());
         }

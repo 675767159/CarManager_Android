@@ -7,9 +7,6 @@ package com.qcwp.carmanager.mvp.contact;
  * @email:675767159@qq.com
  */
 
-public class LocationContract {
-
-    public interface Presenter  {
-        void didUpdateBMKUserLocation(double latitude, double longitude);
-    }
+public interface LocationContract {
+    void didUpdateBMKUserLocation(double latitude, double longitude);
 }

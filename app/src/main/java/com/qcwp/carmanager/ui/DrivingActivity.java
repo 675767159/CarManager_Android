@@ -88,10 +88,12 @@ public class DrivingActivity extends BaseActivity {
 
     @Override
     protected void onReceiveMessageEvent(MessageEvent messageEvent) {
+
+
         if (messageEvent.getType() == MessageEvent.MessageEventType.Driving) {
 
 
-
+            Print.d(TAG,"---------");
             vehicleSpeed.setValue((int) obdClient.getVehicleSpeed());
             engineRpm.setValue2((int) obdClient.getEngineRpm());
             fuelPressure.setValue2((int) obdClient.getFuelPressure());
@@ -120,15 +122,13 @@ public class DrivingActivity extends BaseActivity {
             case R.id.back:
                 finish();
                 break;
+            case R.id.map:
+               readyGo(DriveTrackActivity.class);
+                break;
 
         }
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
-    }
+
 }

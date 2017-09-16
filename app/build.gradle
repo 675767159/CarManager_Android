@@ -93,5 +93,7 @@ dependencies {
 
     //µ¥Ôª²âÊÔ
     testCompile "org.mockito:mockito-core:2.+"
+
+    compile files('libs/BaiduLBS_Android.jar')
 }
 

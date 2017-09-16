@@ -1,9 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    tools:context="com.qcwp.carmanager.ui.DriveTrackActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="行车轨迹"
+        />
 
-</android.support.constraint.ConstraintLayout>
+ <com.baidu.mapapi.map.MapView
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:id="@+id/mapView"
+     android:layout_below="@id/NavbarView"
+     android:layout_above="@+id/displayBackground"
+     tools:ignore="UnknownId"
+     />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/displayBackground"
+        android:background="@color/navbarBackGroundColor"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/gray_btn_bg_pressed_color"
+            android:id="@+id/grayBackground"
+            >
+            <com.qcwp.carmanager.control.TouchHighlightImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/drive_track_record"
+                android:padding="@dimen/marginLeft"
+                android:layout_centerVertical="true"
+                android:id="@+id/record"
+                android:onClick="onClick"
+                />
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/grayBackground"
+            android:orientation="vertical"
+            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                >
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/whiteColor"
+                    android:text="当前行程记录"
+                    android:paddingLeft="@dimen/marginLeft"
+                    android:gravity="center_vertical|left"
+                    android:layout_weight="1"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:src="@mipmap/drive_track_totalmileage"
+                        style="@style/DriveTrackDisplayImage"
+                        />
+                    <TextView
+                        style="@style/DriveTrackDisplayText"
+                        android:id="@+id/totalMileage"
+                        />
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:src="@mipmap/drive_track_dist"
+                        style="@style/DriveTrackDisplayImage"
+                        />
+                    <TextView
+                        style="@style/DriveTrackDisplayText"
+                        android:id="@+id/distance"
+                        />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:src="@mipmap/drive_track_drive_time"
+                        style="@style/DriveTrackDisplayImage"
+                        />
+                    <TextView
+                        style="@style/DriveTrackDisplayText"
+                        android:id="@+id/driveTime"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:src="@mipmap/drive_track_speed"
+                        style="@style/DriveTrackDisplayImage"
+                        />
+                    <TextView
+                        style="@style/DriveTrackDisplayText"
+                        android:id="@+id/averageSpeed"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:src="@mipmap/drive_track_oilconsume"
+                        style="@style/DriveTrackDisplayImage"
+                        />
+                    <TextView
+                        style="@style/DriveTrackDisplayText"
+                        android:id="@+id/avgOilConsume"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+
+
+
+
+
+    </RelativeLayout>
+
+
+    </RelativeLayout>

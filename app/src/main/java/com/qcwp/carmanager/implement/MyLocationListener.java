@@ -2,6 +2,7 @@ package com.qcwp.carmanager.implement;
 
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.qcwp.carmanager.mvp.contact.LocationContract;
 import com.qcwp.carmanager.utils.Print;
@@ -12,10 +13,11 @@ import com.qcwp.carmanager.utils.Print;
  * @email:675767159@qq.com
  */
 
-public class MyLocationListener extends BDAbstractLocationListener {
+public class MyLocationListener implements BDLocationListener {
 
-    private LocationContract.Presenter delegate;
-    public MyLocationListener(LocationContract.Presenter delegate){
+
+    private LocationContract delegate;
+    public MyLocationListener(LocationContract delegate){
         this.delegate=delegate;
     }
 

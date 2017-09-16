@@ -170,4 +170,12 @@ public class CommonUtils {
         else if (score <= 100) status ="非常棒";
         return  status;
     }
+
+    public static double MIN(double number1,double number2){
+        return number1<number2?number1:number2;
+    }
+
+    public static double MAX(double number1,double number2){
+        return number1>number2?number1:number2;
+    }
 }

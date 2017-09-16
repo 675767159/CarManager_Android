@@ -36,6 +36,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -746,7 +747,6 @@ public class OBDClient {
                                     if (connectStatus == connectTypeHaveBinded) {
                                         String pid = pids.get(i);
                                         String data = BlueteethService.getData(pid);
-
                                         if (data.length() > 0) {
                                             if (i >= mainPIDList.size()) {
                                                 travelArray.add(OBDClient.this.readTravelDataWith(pid, data));
