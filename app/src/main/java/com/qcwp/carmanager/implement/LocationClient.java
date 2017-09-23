@@ -1,4 +1,4 @@
-package com.qcwp.carmanager.mvp.present;
+package com.qcwp.carmanager.implement;
 
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClientOption;
@@ -9,12 +9,10 @@ import com.qcwp.carmanager.broadcast.LocationEvent;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
-import com.qcwp.carmanager.implement.MyLocationListener;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.sqLiteModel.LocationModel;
 import com.qcwp.carmanager.mvp.contact.LocationContract;
 import com.qcwp.carmanager.obd.OBDClient;
-import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
 
 import org.greenrobot.eventbus.EventBus;
@@ -94,7 +92,7 @@ public class LocationClient implements LocationContract {
 //        option.setIsNeedAddress(true);
 //        //可选，设置是否需要地址信息，默认不需要
 
-        option.setOpenGps(true);
+        option.setOpenGps(false);
         //可选，默认false,设置是否使用gps
 
 //        option.setLocationNotify(false);
@@ -176,9 +174,13 @@ public class LocationClient implements LocationContract {
             minLon = MIN(minLon, longitude);
             maxLon = MAX(maxLon, longitude);
 
+
+            LatLng center=new LatLng( (minLat + maxLat) * 0.5f, (minLon + maxLon) * 0.5f);
+
+            Print.d("didUpdateBMKUserLocation",center.toString());
             LocationEvent locationEvent=new LocationEvent();
             locationEvent.setMapPoints(mapPointArray);
-            locationEvent.setCenterLatLng(new LatLng( (minLat + maxLat) * 0.5f, (minLon + maxLon) * 0.5f));
+            locationEvent.setCenterLatLng(center);
             EventBus.getDefault().post(locationEvent);
 
         }

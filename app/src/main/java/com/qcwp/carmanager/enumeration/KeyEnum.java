@@ -31,6 +31,7 @@ public class KeyEnum {
             pidKey="pid",
             pidInfoKey="pidInfo",
             latitudeKey="latitude",
-            longitudeKey="longitude";
+            longitudeKey="longitude",
+            professionalTestType="professionalTestType";
 
 }

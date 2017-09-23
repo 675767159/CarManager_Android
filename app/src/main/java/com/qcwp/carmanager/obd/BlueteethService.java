@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -93,8 +94,17 @@ public class BlueteethService {
 	private void startDiscoveryOrconectOBD(){
 
         if (Build.VERSION.SDK_INT >= 6.0) {
-            ActivityCompat.requestPermissions(MyActivityManager.getInstance().getCurrentActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSION_REQUEST_CONSTANT);
+			PackageManager pm =MyActivityManager.getInstance().getCurrentActivity().getPackageManager();
+
+			boolean permission = (PackageManager.PERMISSION_GRANTED ==
+					pm.checkPermission("android.permission.ACCESS_FINE_LOCATION", "com.qcwp.carmanager"));
+
+			if (!permission)  {
+				ActivityCompat.requestPermissions(MyActivityManager.getInstance().getCurrentActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+						MY_PERMISSION_REQUEST_CONSTANT);
+			}
+
+
         }
 
 

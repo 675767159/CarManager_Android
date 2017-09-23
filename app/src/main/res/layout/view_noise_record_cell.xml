@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/padding_small"
+    >
+
+    <com.qcwp.carmanager.control.TitleContentView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/createDate"
+        android:layout_weight="1"
+        app:TitleContent_title="创建日期："
+        app:TitleContent_title_color="@color/blackColor"
+        android:layout_marginTop="10dp"
+        />
+    <com.qcwp.carmanager.control.TitleContentView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/carNumber"
+        android:layout_weight="1"
+        app:TitleContent_title="车牌号：　"
+        app:TitleContent_title_color="@color/blackColor"
+        android:layout_marginTop="10dp"
+        />
+
+    <com.qcwp.carmanager.control.TitleContentView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/averageSpeed"
+        android:layout_weight="1"
+        app:TitleContent_title="平均速度："
+        app:TitleContent_title_color="@color/blackColor"
+        android:layout_marginTop="10dp"
+        />
+
+    <com.qcwp.carmanager.control.TitleContentView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+        android:id="@+id/averageNoise"
+        android:layout_weight="1"
+        app:TitleContent_title="平均噪音："
+        app:TitleContent_title_color="@color/blackColor"
+        android:layout_marginTop="10dp"
+        />
+
+
+
+
+</LinearLayout>

@@ -24,7 +24,7 @@ import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
-import com.qcwp.carmanager.mvp.present.LocationClient;
+import com.qcwp.carmanager.implement.LocationClient;
 import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.obd.SensorsService;
 import com.qcwp.carmanager.ui.BaseActivity;

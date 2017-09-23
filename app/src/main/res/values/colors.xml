@@ -16,4 +16,10 @@
     <color name="RadioButtonNoSelectBack">#EAEAEA</color>
     <color name="RadioButtonNoSelectTextColor">#999999</color>
     <color name="red">#FF0000</color>
+
+    <color name="lineBackground">#DDDDDD</color>
+
+    <color name="professionalTestColor1">#F86428</color>
+    <color name="professionalTestColor2">#00872B</color>
+    <color name="professionalTestColor3">#8122A5</color>
 </resources>

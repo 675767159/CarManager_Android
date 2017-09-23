@@ -29,6 +29,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:name=".APP"
@@ -90,7 +92,12 @@
 
         <activity android:name=".ui.DriveTrackActivity" />
         <activity android:name=".ui.TrackRecordActivity" />
-        <activity android:name=".ui.ProfessionTestActivity"></activity>
+        <activity android:name=".ui.ProfessionTestActivity" />
+        <activity android:name=".ui.ProfessionalTestDetailActivity" />
+        <activity android:name=".ui.TestRecordActivity" />
+        <activity android:name=".ui.NoiseTestActivity" />
+        <activity android:name=".ui.NoiseRecordActivity" />
+        <activity android:name=".ui.TraveActivity"></activity>
     </application>
 
 </manifest>

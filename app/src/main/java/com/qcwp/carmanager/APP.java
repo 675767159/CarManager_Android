@@ -128,8 +128,10 @@ public class APP extends Application {
 
 
 
-
     }
+
+
+
     public static APP getInstance() {
         return sInstance;
     }

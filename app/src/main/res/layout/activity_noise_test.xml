@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/backgroundColor"
+    >
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="噪音测试"
+        />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/NavbarView"
+        tools:ignore="UnknownId"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_margin"
+                android:layout_marginLeft="@dimen/marginLeft"
+                android:layout_marginRight="@dimen/marginLeft"
+                android:background="@color/whiteColor"
+                android:orientation="vertical"
+
+                android:id="@+id/background"
+                >
+                <com.qcwp.carmanager.control.NoiseTestItemView
+                    android:layout_height="50dp"
+                    android:layout_width="match_parent"
+                    app:NoiseTestItem_title="当前时速"
+                    app:unit="KM/h"
+                    app:valueColor="@android:color/holo_blue_bright"
+                    android:id="@+id/currentSpeed"
+                    />
+                <com.qcwp.carmanager.control.NoiseTestItemView
+                    android:layout_height="50dp"
+                    android:layout_width="match_parent"
+                    app:NoiseTestItem_title="平均时速"
+                    app:unit="KM/h"
+                    app:valueColor="@android:color/holo_blue_bright"
+                    android:id="@+id/averageSpeed"
+                    />
+                <com.qcwp.carmanager.control.NoiseTestItemView
+                    android:layout_height="50dp"
+                    android:layout_width="match_parent"
+                    app:NoiseTestItem_title="噪音平均值"
+                    app:unit="dB"
+                    app:valueColor="@android:color/holo_red_dark"
+                    android:id="@+id/averageNoise"
+                    />
+                <com.qcwp.carmanager.control.NoiseTestItemView
+                    android:layout_height="50dp"
+                    android:layout_width="match_parent"
+                    app:NoiseTestItem_title="噪音当前值"
+                    app:unit="dB"
+                    app:valueColor="@android:color/holo_red_dark"
+                    android:id="@+id/currentNoise"
+                    />
+                <com.qcwp.carmanager.control.NoiseTestItemView
+                    android:layout_height="50dp"
+                    android:layout_width="match_parent"
+                    app:NoiseTestItem_title="噪音最大值"
+                    app:unit="dB"
+                    app:valueColor="@android:color/holo_red_dark"
+                    android:id="@+id/maxNoise"
+                    />
+                <com.qcwp.carmanager.control.NoiseTestItemView
+                    android:layout_height="50dp"
+                    android:layout_width="match_parent"
+                    app:NoiseTestItem_title="噪音最小值"
+                    app:unit="dB"
+                    app:valueColor="@android:color/holo_red_dark"
+                    android:id="@+id/minMoise"
+                    />
+
+
+
+            </LinearLayout>
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_input_height"
+                android:text="开始测试"
+                android:layout_below="@id/background"
+                android:layout_marginLeft="@dimen/horizon_margin"
+                android:layout_marginRight="@dimen/horizon_margin"
+                android:layout_marginTop="@dimen/login_vertical_margin"
+                android:background="@color/red"
+                android:textColor="@android:color/white"
+                android:id="@+id/button_start_test"
+                android:onClick="onClick"
+
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="备注：测试约20s，单位为分贝"
+                android:gravity="center"
+                android:layout_below="@+id/button_start_test"
+                android:layout_marginTop="@dimen/vertical_margin"
+                android:textSize="18sp"
+                android:textColor="@color/gray_btn_bg_pressed_color"
+                android:layout_centerHorizontal="true"
+                />
+
+
+        </RelativeLayout>
+    </ScrollView>
+
+
+</RelativeLayout>

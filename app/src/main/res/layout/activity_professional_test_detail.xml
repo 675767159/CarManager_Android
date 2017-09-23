@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/backgroundColor"
+    >
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="@string/hectometerAccelerateName"
+        >
+        <com.qcwp.carmanager.control.TouchHighlightImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:padding="@dimen/padding_small"
+            android:layout_marginRight="@dimen/margin_small"
+            android:id="@+id/startTest"
+            android:src="@mipmap/professional_test_play"
+            android:onClick="onClick"
+            android:visibility="gone"
+            />
+    </com.qcwp.carmanager.control.NavBarView>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/NavbarView"
+        tools:ignore="UnknownId"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <lecho.lib.hellocharts.view.LineChartView
+                android:id="@+id/chartView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:padding="10dp"
+                android:background="@color/whiteColor"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:layout_below="@+id/chartView"
+                android:background="#D0D0D0"
+                android:textColor="@color/red"
+                android:textSize="18sp"
+                android:id="@+id/testState"
+                android:text="请将速度降为0"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@+id/testState"
+                android:layout_marginTop="5dp"
+                android:background="#D0D0D0"
+                android:id="@+id/testDataBackground"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+
+                    >
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="加速时间"
+                        android:textColor="#778370"
+                        android:textSize="18sp"
+                        android:padding="@dimen/padding_small"
+                        android:gravity="center"
+                        android:id="@+id/testTimeName"
+                        />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="最高时速"
+                        android:textColor="#778370"
+                        android:textSize="18sp"
+                        android:padding="@dimen/padding_small"
+                        android:gravity="center"
+                        android:id="@+id/testItemName"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+
+                    >
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="0s"
+                        android:textColor="@color/blackColor"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:paddingBottom="@dimen/padding_small"
+                        android:id="@+id/accelerateTime"
+                        />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="0"
+                        android:textColor="@color/blackColor"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:paddingBottom="@dimen/padding_small"
+                        android:id="@+id/testItemValue"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/testDataBackground"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="车型基本信息"
+                    android:textSize="20sp"
+                    android:textColor="#778370"
+                    android:padding="@dimen/padding_small"
+                    />
+
+
+                    <com.qcwp.carmanager.control.TitleContentView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:TitleContent_title="所属车系："
+                        app:TitleContent_title_color="@color/blackColor"
+                        android:id="@id/carSeries"
+                        android:layout_marginLeft="@dimen/margin_small"
+                        android:layout_marginTop="@dimen/margin_small"
+
+                        />
+                    <com.qcwp.carmanager.control.TitleContentView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:TitleContent_title="所属车型："
+                        app:TitleContent_title_color="@color/blackColor"
+                        android:id="@id/carType"
+                        android:layout_marginLeft="@dimen/margin_small"
+                        android:layout_marginTop="@dimen/margin_small"
+                        />
+
+
+
+                    <com.qcwp.carmanager.control.TitleContentView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:TitleContent_title="生成年份："
+                        app:TitleContent_title_color="@color/blackColor"
+                        android:id="@+id/productYear"
+                        android:layout_marginLeft="@dimen/margin_small"
+                        android:layout_marginTop="@dimen/margin_small"
+                        />
+                    <com.qcwp.carmanager.control.TitleContentView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:TitleContent_title="当前里程："
+                        app:TitleContent_title_color="@color/blackColor"
+                        android:id="@id/carTotalMileage"
+                        android:layout_marginLeft="@dimen/margin_small"
+                        android:layout_marginTop="@dimen/margin_small"
+                        />
+
+
+
+
+
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+
+
+
+    </RelativeLayout>

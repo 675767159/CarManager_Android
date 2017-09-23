@@ -82,4 +82,40 @@
         <item name="android:layout_marginLeft">@dimen/marginLeft</item>
     </style>
 
+    <style name="ProfessionalTestVerticalLine">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:background">@color/lineBackground</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="ProfessionalTestVerticalTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#C5C5C5</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@color/whiteColor</item>
+    </style>
+
+
+    <style name="ProfessionalTestDisplayViewStyle">
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/vertical_margin</item>
+        <item name="android:layout_marginLeft">@dimen/margin_small</item>
+        <item name="android:layout_marginRight">@dimen/margin_small</item>
+
+
+    </style>
+
+
+    <style name="Dialog" parent="android:style/Theme.Dialog">
+        <item name="android:background">#00000000</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
 </resources>

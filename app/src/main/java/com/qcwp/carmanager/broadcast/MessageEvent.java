@@ -60,7 +60,8 @@ public class MessageEvent {
        CarCheck_faultCode,
        CarCheck_engineCondition,
        CarCheck_driveData,
-       CarCheck_end
+       CarCheck_end,
+       CarTest
 
 
    }

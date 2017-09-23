@@ -47,11 +47,17 @@ public class TitleContentView extends RelativeLayout {
     }
 
 
+    public void setTitleTextViewText(String text){
+
+        titleTextView.setText(text);
+    }
+
     public void setContentTextViewText(String text){
 
         contentTextView.setText(text);
     }
     private TextView contentTextView;
+    private TextView titleTextView;
     private void init(Context context, AttributeSet attrs) {
 
         TypedArray typedArray=context.obtainStyledAttributes(attrs, R.styleable.TitleContentView);
@@ -67,9 +73,9 @@ public class TitleContentView extends RelativeLayout {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view= layoutInflater.inflate(R.layout.view_title_content,null);
 
-        TextView textView=(TextView)view.findViewById(R.id.title);
-        textView.setText(title);
-        textView.setTextColor(titleColor);
+        titleTextView=(TextView)view.findViewById(R.id.title);
+        titleTextView.setText(title);
+        titleTextView.setTextColor(titleColor);
 
         contentTextView = (TextView) view.findViewById(R.id.content);
         contentTextView.setTextColor(contentColor);

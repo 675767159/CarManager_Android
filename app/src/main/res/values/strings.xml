@@ -16,4 +16,25 @@
     <string name="driveData">行车数据</string>
 
     <string name="BaiduMapKey">Hlp8UY4YA7Gmksxn18gXlXLsezXoz9Xn</string>
+
+
+    <string name="hectometerAccelerateName">百米加速测试</string>
+
+    <string name="kilometersAccelerateName">百公里加速测试</string>
+
+
+    <string name="kilometersBrakeName">百公里制动测试</string>
+
+
+    <string name="hectometerAccelerateHelp">百米测试:进入预测试阶段,当车速大于 0km/h 时测试开始,当车速下降或者行程 100M 时自动结束,并显示相关测试数据.</string>
+
+    <string name="kilometersAccelerateHelp">百公里测试:进入预测试阶段,当车速大于 0km/h 时测试开始,当车速下降或车速达到 100km/h 时自动结束,并显示相关测试数据.</string>
+
+
+    <string name="kilometersBrakeHelp">制动测试:进入预测试阶段,当车速从 100km/h 下降时测试开始,车速降至0km/h或车速变为上升时自动结束,并显示相关测试数据.</string>
+
+    <string name="professionalTest_testReady">预测试阶段</string>
+    <string name="professionalTest_testStart">测试开始</string>
+    <string name="professionalTest_testEnd">测试结束</string>
+    <string name="professionalTest_testFailure">测试失败</string>
 </resources>

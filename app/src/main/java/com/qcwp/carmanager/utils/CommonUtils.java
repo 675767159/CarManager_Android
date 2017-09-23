@@ -1,11 +1,14 @@
 package com.qcwp.carmanager.utils;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
 import android.view.View;
 
+import com.blankj.utilcode.util.FileUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.implement.StateRoundRectDrawable;
 
@@ -14,6 +17,7 @@ import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -177,5 +181,37 @@ public class CommonUtils {
 
     public static double MAX(double number1,double number2){
         return number1>number2?number1:number2;
+    }
+    //这种方法状态栏是空白，显示不了状态栏的信息
+    public static void saveCurrentImage(Activity activity,String crateDate)
+    {
+        //获取当前屏幕的大小
+        int width = activity.getWindow().getDecorView().getRootView().getWidth();
+        int height = activity.getWindow().getDecorView().getRootView().getHeight();
+        //生成相同大小的图片
+        Bitmap temBitmap = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888 );
+        //找到当前页面的跟布局
+        View view =  activity.getWindow().getDecorView().getRootView();
+        //设置缓存
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        //从缓存中获取当前屏幕的图片
+        temBitmap = view.getDrawingCache();
+
+        //输出到sd卡
+        if (FileUtils.createOrExistsDir(APP.getInstance().getMyFileFolder(""))) {
+            File file = new File(APP.getInstance().getMyFileFolder(crateDate));
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                FileOutputStream foStream = new FileOutputStream(file);
+                temBitmap.compress(Bitmap.CompressFormat.PNG, 100, foStream);
+                foStream.flush();
+                foStream.close();
+            } catch (Exception e) {
+                Print.e("Show", e.toString());
+            }
+        }
     }
 }

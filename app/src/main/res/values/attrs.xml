@@ -56,4 +56,18 @@
         <attr name="therm_color" format="color" />
 
     </declare-styleable>
+
+
+    <declare-styleable name="ProfessionalTestDisplayView">
+        <attr name="ProfessionalTest_itemName" format="string" />
+        <attr name="ProfessionalTest_itemBackgrondcolor" format="color" />
+    </declare-styleable>
+
+
+    <declare-styleable name="NoiseTestItemView">
+        <attr name="NoiseTestItem_title" format="string" />
+        <attr name="unit" format="string" />
+        <attr name="valueColor" format="color"/>
+
+    </declare-styleable>
 </resources>

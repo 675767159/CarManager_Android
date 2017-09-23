@@ -113,6 +113,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
                 readyGo(DrivingActivity.class);
                 break;
             case R.id.menu_professional_test:
+                readyGo(ProfessionTestActivity.class);
                 break;
             case R.id.menu_travel:
                 break;
@@ -233,6 +234,9 @@ public class MainActivity extends BaseActivity implements MainContract.View{
     @Override
     public void onSuccessGetMyAllCarInfo(CarInfoModel carInfoModel) {
        this.carInfoModel=carInfoModel;
+        if (carInfoModel!=null){
+            UserData.getInstance().setVinCode(carInfoModel.getVinCode());
+        }
        this.updateUI();
     }
 }

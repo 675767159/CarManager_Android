@@ -1,9 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    tools:context="com.qcwp.carmanager.ui.ProfessionTestActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/backgroundColor"
+    >
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="专业测试"
+        />
 
-</android.support.constraint.ConstraintLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/NavbarView"
+        tools:ignore="UnknownId">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_margin"
+                android:background="@color/whiteColor"
+                android:padding="10dp"
+                android:id="@+id/infoBackground"
+                >
+                <com.qcwp.carmanager.control.TitleContentView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:TitleContent_title="当前车辆："
+                    android:id="@+id/carSeries"
+                    app:TitleContent_title_color="@color/blackColor"
+                    />
+                <com.qcwp.carmanager.control.TitleContentView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:TitleContent_title="车牌："
+                    android:id="@+id/carNumber"
+                    android:layout_toRightOf="@+id/carSeries"
+                    android:layout_marginLeft="@dimen/margin_small"
+                    app:TitleContent_title_color="@color/blackColor"
+                    />
+                <com.qcwp.carmanager.control.TitleContentView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:TitleContent_title="行驶里程："
+                    android:id="@+id/carTotalMileage"
+                    android:layout_below="@+id/carSeries"
+                    app:TitleContent_title_color="@color/blackColor"
+                    android:layout_marginTop="10dp"
+                    />
+
+
+            </RelativeLayout>
+
+            <com.qcwp.carmanager.control.ProfessionalTestDisplayView
+              style="@style/ProfessionalTestDisplayViewStyle"
+                android:layout_below="@+id/infoBackground"
+                app:ProfessionalTest_itemName="@string/hectometerAccelerateName"
+                app:ProfessionalTest_itemBackgrondcolor="@color/professionalTestColor1"
+                android:id="@+id/hectometerAccelerate"
+                />
+            <com.qcwp.carmanager.control.ProfessionalTestDisplayView
+                style="@style/ProfessionalTestDisplayViewStyle"
+                android:layout_below="@+id/hectometerAccelerate"
+                app:ProfessionalTest_itemName="@string/kilometersAccelerateName"
+                app:ProfessionalTest_itemBackgrondcolor="@color/professionalTestColor2"
+                android:id="@+id/kilometersAccelerate"
+                />
+            <com.qcwp.carmanager.control.ProfessionalTestDisplayView
+                style="@style/ProfessionalTestDisplayViewStyle"
+                android:layout_below="@+id/kilometersAccelerate"
+                app:ProfessionalTest_itemName="@string/kilometersBrakeName"
+                app:ProfessionalTest_itemBackgrondcolor="@color/professionalTestColor3"
+                android:id="@+id/kilometersBrake"
+                />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/kilometersBrake"
+                android:layout_marginTop="30dp"
+                android:background="@color/whiteColor"
+                >
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/professional_test_play"
+                    android:text="噪音测试"
+                    android:layout_margin="@dimen/vertical_margin"
+                    android:background="@null"
+                    android:onClick="onClick"
+                    android:id="@+id/btn_noise_test"
+
+                    />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="记录"
+                    android:textColor="@color/professionalTestColor1"
+                    android:layout_alignParentRight="true"
+                    android:padding="@dimen/padding"
+                    android:background="@null"
+                    android:id="@+id/noiseRecord"
+                    android:onClick="onClick"
+                    />
+
+
+                <com.qcwp.carmanager.control.TitleContentView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/noiseRecord"
+                    android:layout_marginTop="@dimen/vertical_margin"
+                    android:id="@+id/noiseValue"
+                    app:TitleContent_title="噪音："
+                    app:TitleContent_title_color="#C5C5C5"
+                    app:TitleContent_content_color="@color/blackColor"
+                    app:TitleContent_content="0 dB"
+                    />
+
+                <com.qcwp.carmanager.control.TitleContentView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/noiseRecord"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_below="@+id/noiseValue"
+                    android:id="@+id/vehicleSpeed"
+                    app:TitleContent_title="速度："
+                    app:TitleContent_title_color="#C5C5C5"
+                    app:TitleContent_content_color="@color/blackColor"
+                    app:TitleContent_content="0 km/h"
+                    />
+
+
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+    </ScrollView>
+
+    </RelativeLayout>

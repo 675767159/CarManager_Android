@@ -46,6 +46,7 @@ import java.util.concurrent.Callable;
 
 import static com.blankj.utilcode.util.ThreadPoolUtils.FixedThread;
 import static com.qcwp.carmanager.broadcast.MessageEvent.MessageEventType.CarCheck_end;
+import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypeTest;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypeTijian;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypedrive;
 import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeConnectSuccess;
@@ -102,6 +103,15 @@ public class OBDClient {
         this.loadDataType = dataTypeTijian;
     }
 
+    public void startTest() {
+        this.loadDataType = dataTypeTest;
+//        SensorsService.testing(0.01);
+    }
+
+    public void stopTest() {
+        this.loadDataType = dataTypedrive;
+    }
+
     public double getEngineCoolant() {
         return engineCoolant;
     }
@@ -128,11 +138,8 @@ public class OBDClient {
         return totalTime;
     }
 
-    private String carCheckUpPidDescriptionList;
-    private String carCheckUpUnitsList;
 
 
-    private String carCheckUpPidList;
     private int readyToExamination;//连接状态
     private double bfImpactVehicleSpeed; //碰撞前
     private double afImapactVehicleSpeed; //碰撞后
@@ -615,9 +622,6 @@ public class OBDClient {
         intakeTemp = SensorsService.intakeTemp();
         engineCoolant = SensorsService.engineCoolant();
         totalMileage = originalCarMileage + SensorsService.dist();
-        carCheckUpPidDescriptionList = SensorsService.CarCheckUp_PidDescription_list();
-        carCheckUpUnitsList = SensorsService.CarCheckUp_Units_list();
-        carCheckUpPidList = SensorsService.CarCheckUp_Pid_List();
 
         EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.Driving, null));
 
@@ -726,7 +730,8 @@ public class OBDClient {
 
                                 String tmpData = BlueteethService.getData("010D");
                                 SensorsService.SensorsDataHandler(tmpData, "010D");
-
+                                vehicleSpeed=SensorsService.vehicleSpeed();
+                                EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarTest,String.valueOf(vehicleSpeed)));
                                 break;
                             case dataTypeTijian:
                                 OBDClient.this.healthExamination();

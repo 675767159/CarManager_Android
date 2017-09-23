@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/whiteColor"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@color/professionalTestColor1"
+        android:id="@+id/titleBackground"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/marginLeft"
+            android:textColor="#FED649"
+            android:textSize="13sp"
+            android:layout_centerVertical="true"
+            android:id="@+id/testItemName"
+            />
+        <com.qcwp.carmanager.control.TouchHighlightImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/testItemName"
+            android:id="@+id/testHelp"
+            android:layout_marginLeft="@dimen/margin_small"
+            android:src="@mipmap/professional_test_help"
+            android:padding="@dimen/padding"
+            />
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:text="我来挑战"
+            android:textColor="@color/whiteColor"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/margin_small"
+            android:layout_toLeftOf="@+id/testRecord"
+            android:layout_marginLeft="@dimen/horizon_margin"
+            android:id="@+id/challenge"
+            />
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:text="记录"
+            android:textColor="@color/whiteColor"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/margin_small"
+            android:id="@+id/testRecord"
+            />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        >
+        <TextView
+          style="@style/ProfessionalTestVerticalTitle"
+            android:text="最好"
+            />
+        <LinearLayout
+           style="@style/ProfessionalTestVerticalLine"/>
+        <TextView
+            style="@style/ProfessionalTestVerticalTitle"
+            android:text="官方"
+            />
+        <LinearLayout
+            style="@style/ProfessionalTestVerticalLine"/>
+        <TextView
+            style="@style/ProfessionalTestVerticalTitle"
+            android:text="本车"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/lineBackground"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        >
+        <TextView
+            style="@style/ProfessionalTestVerticalTitle"
+            android:textColor="@color/blackColor"
+            android:id="@+id/bestRecord"
+            />
+        <LinearLayout
+            style="@style/ProfessionalTestVerticalLine"/>
+        <TextView
+            style="@style/ProfessionalTestVerticalTitle"
+            android:textColor="@color/blackColor"
+            android:id="@+id/officalRecord"
+            />
+        <LinearLayout
+            style="@style/ProfessionalTestVerticalLine"/>
+        <TextView
+            style="@style/ProfessionalTestVerticalTitle"
+            android:textColor="@color/blackColor"
+            android:id="@+id/myCarRecord"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

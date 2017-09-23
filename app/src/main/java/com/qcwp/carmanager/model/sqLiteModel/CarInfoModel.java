@@ -11,6 +11,7 @@ import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.enumeration.TableEnum;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
+import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.ui.BaseActivity;
 
 import org.greenrobot.greendao.annotation.Convert;
@@ -437,5 +438,11 @@ public class CarInfoModel {
     }
 
 
+    public static CarInfoModel getCurrentCarInfo(){
+        if (UserData.getInstance().getVinCode()!=null) {
+            return CarInfoModel.getCarInfoByVinCode(UserData.getInstance().getVinCode());
+        }
+        return null;
+    }
 
 }
