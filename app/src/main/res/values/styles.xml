@@ -118,4 +118,19 @@
         <item name="android:windowIsFloating">true</item>
     </style>
 
+    <style name="TravelItemViewStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/vertical_margin</item>
+
+    </style>
+
+    <style name="TravelRecordCellViewStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">10dp</item>
+
+
+    </style>
+
 </resources>

@@ -31,6 +31,8 @@ import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.model.sqLiteModel.CarBrandModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarCheckModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
+import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
+import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
 import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
@@ -416,6 +418,19 @@ public class CarExaminationActivity extends BaseActivity {
 
 
 
+        CarVinStatisticModel carVinStatisticModel=obdClient.getCarVinStatisticModel();
+        carVinStatisticModel.setFaultCodeCount(carVinStatisticModel.getFaultCodeCount()+faultCodeCount);
+
+        double averageScore=(carVinStatisticModel.getCarCheckCount()*carVinStatisticModel.getCarCheckAvg()+score)*1f/(carVinStatisticModel.getCarCheckCount()+1);
+
+        carVinStatisticModel.setCarCheckAvg(averageScore);
+        carVinStatisticModel.setLastCarCheck(score);
+        carVinStatisticModel.setCarCheckCount(carVinStatisticModel.getCarCheckCount()+1);
+        mDaoSession.update(carVinStatisticModel);
+
+        TravelSummaryModel travelSummaryModel=obdClient.getTravelSummaryModel();
+        travelSummaryModel.setCarCheckUpScore(score);
+        mDaoSession.update(carVinStatisticModel);
 
 
 

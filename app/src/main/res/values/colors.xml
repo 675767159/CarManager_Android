@@ -22,4 +22,6 @@
     <color name="professionalTestColor1">#F86428</color>
     <color name="professionalTestColor2">#00872B</color>
     <color name="professionalTestColor3">#8122A5</color>
+
+    <color name="blueColor">#3C99D3</color>
 </resources>

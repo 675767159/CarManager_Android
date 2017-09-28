@@ -50,7 +50,7 @@ public class MainPresenter extends BasePresenter implements MainContract.Present
     @Override
     public void getMyAllCarInfo() {
 
-
+        Print.d(TAG,"------------"+UserData.getInstance().getUserId());
         mEngine.getMyAllCarInfo(UserData.getInstance().getUserId()).enqueue(new MyCallBack<AllCarModel>() {
             @Override
             public void onCompleted() {

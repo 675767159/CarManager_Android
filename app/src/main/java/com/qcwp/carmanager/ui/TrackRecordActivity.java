@@ -39,9 +39,9 @@ public class TrackRecordActivity extends BaseActivity {
 
       String vinCode=UserData.getInstance().getVinCode();
         if (EmptyUtils.isNotEmpty(vinCode)) {
-            final List<TravelSummaryModel> list = mDaoSession.queryBuilder(TravelSummaryModel.class).where(TravelSummaryModelDao.Properties.VinCode.eq(vinCode)).orderDesc(TestSummaryModelDao.Properties.CreateDate).list();
+            final List<TravelSummaryModel> list = mDaoSession.queryBuilder(TravelSummaryModel.class).where(TravelSummaryModelDao.Properties.VinCode.eq(vinCode)).orderDesc(TravelSummaryModelDao.Properties.StartDate).list();
 
-            if (list.size()>0) {
+            if (list!=null&&list.size()>0) {
                 TrackRecordAdapter trackRecordAdapter = new TrackRecordAdapter(this, list);
                 listView.setAdapter(trackRecordAdapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

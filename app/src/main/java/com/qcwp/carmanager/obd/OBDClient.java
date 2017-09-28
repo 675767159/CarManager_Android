@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
+import com.qcwp.carmanager.enumeration.DrivingCustomEnum;
 import com.qcwp.carmanager.enumeration.ExamnationStatusEnum;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.LoadDataTypeEnum;
@@ -22,6 +23,7 @@ import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
+import com.qcwp.carmanager.model.sqLiteModel.DrivingCustomModel;
 import com.qcwp.carmanager.model.sqLiteModel.SingleCarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
@@ -76,6 +78,10 @@ public class OBDClient {
 
     public double getAvgVehicleSpeed() {
         return avgVehicleSpeed;
+    }
+
+    public void setVinCode(String vinCode) {
+        this.vinCode = vinCode;
     }
 
     public double getAvgOilConsume() {
@@ -149,8 +155,13 @@ public class OBDClient {
     private long onlyFlag;
 
 
+    private CarVinStatisticModel carVinStatisticModel;
+    private SingleCarVinStatisticModel singleCarVinStatisticModel;
+    private  TravelSummaryModel travelSummaryModel;
+
     private CarInfoModel carInfoModel;
-    private List<String> engineRpmArray, vehicleSpeedArray, travelArray;
+    private List<Double> engineRpmArray, vehicleSpeedArray;
+    private List<String>  travelArray;
 
     private int countOfOBDData, originalTimeCount;
     private double originalDistCount, originalFuelCount, originalCarMileage;
@@ -175,6 +186,18 @@ public class OBDClient {
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
+    }
+
+    public CarVinStatisticModel getCarVinStatisticModel() {
+        return carVinStatisticModel;
+    }
+
+    public SingleCarVinStatisticModel getSingleCarVinStatisticModel() {
+        return singleCarVinStatisticModel;
+    }
+
+    public TravelSummaryModel getTravelSummaryModel() {
+        return travelSummaryModel;
     }
 
     public void setOnlyFlag(long onlyFlag) {
@@ -383,16 +406,18 @@ public class OBDClient {
         travelArray = new ArrayList();
 
 
-        CarVinStatisticModel carVinStatisticModel = daoSession.queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+        carVinStatisticModel = daoSession.queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
         if (carVinStatisticModel == null) {
             carVinStatisticModel = new CarVinStatisticModel();
+            carVinStatisticModel.setId(onlyFlag);
         }
         carVinStatisticModel.setVinCode(vinCode);
         daoSession.insertOrReplace(carVinStatisticModel);
 
-        SingleCarVinStatisticModel singleCarVinStatisticModel = daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+         singleCarVinStatisticModel = daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
         if (singleCarVinStatisticModel == null) {
             singleCarVinStatisticModel = new SingleCarVinStatisticModel();
+            singleCarVinStatisticModel.setOnlyFlag(onlyFlag);
         }
         singleCarVinStatisticModel.setVinCode(vinCode);
         singleCarVinStatisticModel.setTimeCount(0);
@@ -693,7 +718,7 @@ public class OBDClient {
                 loadDataType = dataTypedrive;
 
                 //添加行驶记录的起始状态
-                TravelSummaryModel travelSummaryModel = new TravelSummaryModel();
+                travelSummaryModel = new TravelSummaryModel();
                 travelSummaryModel.setSummryData(OBDClient.this.getCurrentSummryData());
                 travelSummaryModel.setCarNumber(carInfoModel.getCarNumber());
                 travelSummaryModel.setOnlyFlag(onlyFlag);
@@ -795,13 +820,78 @@ public class OBDClient {
 
     }
 
-    //是否急加速
-    private void isHardAcceleration() {
+    private double lastEngineRpm=0;
 
+    //是否急加速
+    private boolean isHardAcceleration() {
+
+
+        double engineGap =  engineRpm-lastEngineRpm;
+        lastEngineRpm = engineRpm;
+        if (engineGap > 1800 && vehicleSpeed > 0) {
+
+
+            addDriveCustomRecord(DrivingCustomEnum.Acceleration);
+
+
+
+            return true;
+        }
+
+        return false;
 
     }
 
-    private void isBrakes() {
+    private double lastVehicleSpeed=0;
+    //是否急减速
+    private boolean isBrakes() {
+
+
+            double speedGap= lastVehicleSpeed-vehicleSpeed;
+            lastVehicleSpeed=vehicleSpeed;
+
+            if (speedGap > 10) {
+                addDriveCustomRecord(DrivingCustomEnum.Deceleration);
+                return true;
+            }
+
+        return false;
+
+    }
+
+
+    private void addDriveCustomRecord(DrivingCustomEnum type){
+
+
+        switch (type){
+            case Acceleration:
+                accelerCount++;
+                carVinStatisticModel.setAccelerCount(carVinStatisticModel.getAccelerCount()+1);
+                singleCarVinStatisticModel.setAccelerCount(accelerCount);
+                travelSummaryModel.setAccelerCount(accelerCount);
+                break;
+            case Deceleration:
+                decelerCount++;
+                carVinStatisticModel.setDecelerCount(carVinStatisticModel.getDecelerCount()+1);
+                singleCarVinStatisticModel.setDecelerCount(decelerCount);
+                travelSummaryModel.setDecelerCount(decelerCount);
+
+                break;
+            case Overdrive:
+                break;
+        }
+
+
+        daoSession.update(carVinStatisticModel);
+        daoSession.update(singleCarVinStatisticModel);
+        daoSession.update(travelSummaryModel);
+
+        DrivingCustomModel drivingCustomModel=new DrivingCustomModel();
+        drivingCustomModel.setVinCode(vinCode);
+        drivingCustomModel.setStartDate(startTime);
+        drivingCustomModel.setType(type);
+        drivingCustomModel.setCreateDate(TimeUtils.getNowString());
+        daoSession.insert(drivingCustomModel);
 
     }
 
@@ -826,11 +916,11 @@ public class OBDClient {
 
             //车辆统计数据
 
-            double showfuelCount = SensorsService.showUsaLiter();//行车100公里的油耗
+            double showfuelCount = SensorsService.showUsaLiter();//行车平均油耗 L/100公里
 
             double fuelCount = showfuelCount * driveDist / 100;
 
-            CarVinStatisticModel carVinStatisticModel = daoSession.queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+
 
             if (carVinStatisticModel.getMaxTime() < driveTime) {
                 carVinStatisticModel.setMaxTime(driveTime);
@@ -846,7 +936,9 @@ public class OBDClient {
 
             carVinStatisticModel.setFuelCount(originalFuelCount + fuelCount);
 
-            carVinStatisticModel.setAvgFuel(showfuelCount);
+            double totalAvgFuel=(originalFuelCount + fuelCount)/(originalDistCount + driveDist)*100;
+
+            carVinStatisticModel.setAvgFuel(totalAvgFuel);
 
             daoSession.update(carVinStatisticModel);
 
@@ -858,7 +950,7 @@ public class OBDClient {
             //保存勋章数据
 
 
-            SingleCarVinStatisticModel singleCarVinStatisticModel = daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+
             singleCarVinStatisticModel.setDistCount(driveDist);
             singleCarVinStatisticModel.setTimeCount(driveTime);
             singleCarVinStatisticModel.setFuelCount(fuelCount);
@@ -868,7 +960,7 @@ public class OBDClient {
             daoSession.update(singleCarVinStatisticModel);
 
 
-            TravelSummaryModel travelSummaryModel = daoSession.queryBuilder(TravelSummaryModel.class).where(TravelSummaryModelDao.Properties.OnlyFlag.eq(onlyFlag)).unique();
+
             travelSummaryModel.setMileage(driveDist);
             travelSummaryModel.setDriveTime(driveTime);
             travelSummaryModel.setAverageSpeed(SensorsService.vehicleSpeedAve());

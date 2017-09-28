@@ -66,7 +66,7 @@ public class TestRecordActivity extends BaseActivity {
         if (EmptyUtils.isNotEmpty(vinCode)) {
             final List<TestSummaryModel> list = mDaoSession.queryBuilder(TestSummaryModel.class).where(TestSummaryModelDao.Properties.VinCode.eq(vinCode),TestSummaryModelDao.Properties.TestType.eq(professionalTestType.getValue())).orderDesc(TestSummaryModelDao.Properties.CreateDate).list();
 
-            if (list.size()>0) {
+            if (list!=null&&list.size()>0) {
 
                 TestRecordAdapter testRecordAdapter = new TestRecordAdapter(this, list, professionalTestType);
                 listView.setAdapter(testRecordAdapter);

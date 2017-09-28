@@ -4,18 +4,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.HomeItemView;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
-import com.qcwp.carmanager.enumeration.UploadStatusEnum;
-import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
-import com.qcwp.carmanager.greendao.gen.CarVinStatisticModelDao;
-import com.qcwp.carmanager.greendao.gen.SingleCarVinStatisticModelDao;
 import com.qcwp.carmanager.model.UserData;
-import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.SingleCarVinStatisticModel;
@@ -27,13 +21,9 @@ import com.qcwp.carmanager.utils.Print;
 import com.qiantao.coordinatormenu.CoordinatorMenu;
 
 
-import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class MainActivity extends BaseActivity implements MainContract.View{
@@ -116,15 +106,11 @@ public class MainActivity extends BaseActivity implements MainContract.View{
                 readyGo(ProfessionTestActivity.class);
                 break;
             case R.id.menu_travel:
+                readyGo(TravelActivity.class);
                 break;
             case R.id.menu_car_info:
             {
-                Bundle bundle=new Bundle();
-                if (carInfoModel!=null) {
-                    bundle.putString(KeyEnum.vinCode, carInfoModel.getVinCode());
-                }
-                bundle.putSerializable(KeyEnum.typeKey,CarEditActivity.Type.Edit);
-                readyGo(CarEditActivity.class,bundle);
+                readyGo(CarDetailActivity.class);
             }
                 break;
             case R.id.menu_set:
@@ -191,7 +177,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
             singleTravel.setValue3(String.format(locale,"%.1f升",singleCarVinStatisticModel.getFuelCount()));
 
         }
-        if ((OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded||OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeConnectSuccess)&&carInfoModel.getVinCode().equals(OBDClient.getDefaultClien().getVinCode())){
+        if ((OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded)&&carInfoModel.getVinCode().equals(OBDClient.getDefaultClien().getVinCode())){
             singleTravel.setTitle1("本次行驶里程");
             singleTravel.setTitle2("本次行驶时间");
             singleTravel.setTitle3("本次行驶用油");
@@ -233,6 +219,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
 
     @Override
     public void onSuccessGetMyAllCarInfo(CarInfoModel carInfoModel) {
+
        this.carInfoModel=carInfoModel;
         if (carInfoModel!=null){
             UserData.getInstance().setVinCode(carInfoModel.getVinCode());

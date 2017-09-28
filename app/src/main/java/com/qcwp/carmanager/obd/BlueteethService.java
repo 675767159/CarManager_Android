@@ -46,7 +46,7 @@ public class BlueteethService {
     
     public static int connectLostFlag = 1;
 	private static String returnConnectBluetoothExceptionStr = "";
-	public static final int REQUEST_OPEN_BT_CODE=1,MY_PERMISSION_REQUEST_CONSTANT=2;
+	public static final int REQUEST_OPEN_BT_CODE=1000,MY_PERMISSION_REQUEST_CONSTANT=2000;
     /**
      * 蓝牙是否断开1为是，0为否
      */
@@ -79,6 +79,8 @@ public class BlueteethService {
 		//第一种打开方法： 调用enable 即可
 		boolean result = mBluetoothAdapter.enable();
 
+		Print.d("startBluetoothService","result=="+result);
+
 
 	//第二种打开方法 ，调用系统API去打开蓝牙
 		if (!result) //未打开蓝牙，才需要打开蓝牙
@@ -102,16 +104,18 @@ public class BlueteethService {
 			if (!permission)  {
 				ActivityCompat.requestPermissions(MyActivityManager.getInstance().getCurrentActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
 						MY_PERMISSION_REQUEST_CONSTANT);
+				Print.d("startBluetoothService","result==VERSION");
 			}
 
 
         }
 
-
+		Print.d("startBluetoothService","result==ddd");
         String address = null;
 		Set<BluetoothDevice> sets = mBluetoothAdapter.getBondedDevices();
 		for (BluetoothDevice bluetoothDevice : sets) {
 			String name = bluetoothDevice.getName();
+			Print.d("startBluetoothService","name=="+name);
 			if (name.contains("OBD")) {
 				address = bluetoothDevice.getAddress();
 			}
@@ -119,25 +123,27 @@ public class BlueteethService {
 		if (address != null) {
 			conectOBD(address);
 		} else {
+			Print.d("startBluetoothService","name=="+"000000");
 			BlueToothReceiver.gotOBD = false;
 			mBluetoothAdapter.startDiscovery();
+			ThreadPoolUtils threadPool = new ThreadPoolUtils(SingleThread, 1);
+			threadPool.schedule(new Runnable() {
+				@Override
+				public void run() {
+					Print.d("startBluetoothService","------------");
+					if (!BlueToothReceiver.gotOBD){
+						Print.d("startBluetoothService","++++++++");
+						mBluetoothAdapter.cancelDiscovery();
+						conectOBDListener.completeConect(false,"未连接到OBD设备，请确认是否插上设备再重试!");
+					}
+
+				}
+			}, TimeEnum.BluetoothDiscovery, SECONDS);
 
 		}
 
 
-		ThreadPoolUtils threadPool = new ThreadPoolUtils(SingleThread, 1);
-		threadPool.schedule(new Runnable() {
-			@Override
-			public void run() {
-				Print.d("mBluetoothAdapter","------------");
-				if (mBluetoothAdapter.isDiscovering()){
-					Print.d("mBluetoothAdapter","++++++++");
-					mBluetoothAdapter.cancelDiscovery();
-					conectOBDListener.completeConect(false,"未搜索到OBD设备，请确认是否插上设备!");
-				}
 
-			}
-		}, TimeEnum.BluetoothDiscovery, SECONDS);
 
 	}
 
@@ -150,6 +156,7 @@ public class BlueteethService {
 		switch (event.getType()){
 			case BlueToothScaned:
 				if (mBluetoothAdapter!=null) {
+					Print.d("startBluetoothService","event"+event.getMessage());
 					mBluetoothAdapter.cancelDiscovery();
 					conectOBD(event.getMessage());
 				}
@@ -216,20 +223,39 @@ public class BlueteethService {
 	private Boolean conectOBD(String address){
 
 		BluetoothDevice mmDevice = mBluetoothAdapter.getRemoteDevice(address);
+		Print.d("startBluetoothService","getRemoteDevice");
 		BluetoothSocket mmSocket =null;
 		try {
 			BluetoothSocket tmp = null;
 			boolean isConnectSuccess = false;
 
-			for (int i = 0; i <=100; i++) {
+
+			for (int i = 0; i <=5; i++) {
+				Print.d("startBluetoothService","getRemoteDevice"+i);
 				try {
-					if(i == 0) {
+//					if(i == 0) {
+
+//					Method removeBondMethod = btClass.getDeclaredMethod("setPin",
+//							new Class[]
+//									{byte[].class});
+//					tmp = (BluetoothSocket) removeBondMethod.invoke(mmDevice,
+//							new Object[]{"1234".getBytes()});
+//
+//					tmp.connect();
+//					isConnectSuccess = true;
+
+
 						Method m = mmDevice.getClass().getMethod("createRfcommSocket", int.class);
-						tmp = (BluetoothSocket)m.invoke(mmDevice, 1);
+
+						tmp =CommonUtils.setPin(mmDevice.getClass(),mmDevice,"1234");
+					    if (tmp==null) {
+							Print.d("startBluetoothService","null");
+						tmp=(BluetoothSocket) m.invoke(mmDevice, 1);
+				      	}
 						tmp.connect();
 						isConnectSuccess = true;
 						break;
-					}
+//					}
 
 				} catch(Exception eee) {
 					//TODO 蓝牙连接失败返回的代码有：

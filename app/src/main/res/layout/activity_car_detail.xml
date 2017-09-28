@@ -19,6 +19,7 @@
             android:layout_centerVertical="true"
             android:textColor="@color/whiteColor"
             android:background="@null"
+            android:id="@+id/carEdit"
 
             />
     </com.qcwp.carmanager.control.NavBarView>
@@ -100,6 +101,7 @@
                 android:layout_height="wrap_content"
                 app:TitleContent_title="共体检："
                 app:TitleContent_title_color="@color/carDetailTitleColor"
+                android:id="@+id/totalCarCheckCount"
                 />
             <com.qcwp.carmanager.control.TitleContentView
                 android:layout_width="wrap_content"
@@ -107,6 +109,7 @@
                 app:TitleContent_title="平均得分："
                 android:layout_marginLeft="@dimen/margin_small"
                 app:TitleContent_title_color="@color/carDetailTitleColor"
+                android:id="@+id/averageCarCheckScore"
                 />
 
         </LinearLayout>
@@ -122,6 +125,7 @@
                 app:TitleContent_title="最近一次体检得分："
                 app:TitleContent_title_color="@color/carDetailTitleColor"
                 android:layout_centerVertical="true"
+                android:id="@+id/latestCarCheckScore"
                 />
 
             <Button
@@ -143,6 +147,7 @@
             app:TitleContent_title="共检测发现故障码："
             android:layout_marginTop="@dimen/vertical_margin"
             app:TitleContent_title_color="@color/carDetailTitleColor"
+            android:id="@+id/totalFaultCodeCount"
             >
 
         </com.qcwp.carmanager.control.TitleContentView>

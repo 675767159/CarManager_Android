@@ -81,26 +81,31 @@
            style="@style/DrivingDisplayStyle"
             app:TitleContent_title="平均速度："
             android:id="@+id/averageSpeed"
+            app:TitleContent_content_color="@color/red_btn_bg_color"
             />
         <com.qcwp.carmanager.control.TitleContentView
             style="@style/DrivingDisplayStyle"
             app:TitleContent_title="瞬时油耗："
             android:id="@+id/instantOilConsume"
+            app:TitleContent_content_color="@color/red_btn_bg_color"
             />
         <com.qcwp.carmanager.control.TitleContentView
             style="@style/DrivingDisplayStyle"
             app:TitleContent_title="平均油耗："
             android:id="@+id/averageOilConsume"
+            app:TitleContent_content_color="@color/red_btn_bg_color"
             />
         <com.qcwp.carmanager.control.TitleContentView
             style="@style/DrivingDisplayStyle"
             app:TitleContent_title="本次里程："
             android:id="@+id/currentMileage"
+            app:TitleContent_content_color="@color/red_btn_bg_color"
             />
         <com.qcwp.carmanager.control.TitleContentView
             style="@style/DrivingDisplayStyle"
             app:TitleContent_title="总里程  ："
             android:id="@+id/totalMileage"
+            app:TitleContent_content_color="@color/red_btn_bg_color"
             />
 
     </LinearLayout>
@@ -112,6 +117,7 @@
         android:layout_toRightOf="@+id/titleContentBackground"
         android:layout_alignTop="@+id/titleContentBackground"
         android:layout_marginLeft="10dp"
+        app:TitleContent_content_color="@color/red_btn_bg_color"
         />
 
    <com.qcwp.carmanager.control.Thermometer

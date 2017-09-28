@@ -15,6 +15,7 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -85,5 +86,10 @@ public  interface Engine {
     @POST("doAppToken_getToken")
     Call<TokenModel> getToken(@Field("username") String username,@Field("password") String password,@Field("url") String url);
 
+
+
+    @FormUrlEncoded
+    @POST("doMapPoint_addPoints")
+    Call<AllCarModel> uploadMapPointOfDrive(@FieldMap() Map<String,Object> map);
 
 }

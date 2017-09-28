@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/backgroundColor"
+    >
+    <com.qcwp.carmanager.control.NavBarView
+        style="@style/NavBarStyle"
+        app:title="驾驶行为"
+        />
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_small"
+    android:layout_below="@id/NavbarView"
+    tools:ignore="UnknownId"
+    android:id="@+id/carType"
+    android:background="@color/whiteColor"
+    android:textSize="18sp"
+
+    />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/carType"
+
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/vertical_margin"
+
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="总驾驶行为分析"
+                android:textSize="22sp"
+                android:textColor="#4AA1D6"
+                android:layout_marginLeft="@dimen/margin_small"
+                android:layout_marginTop="10dp"
+                />
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="累积行程："
+                android:id="@+id/totalMileage"
+                />
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="累积时长："
+                android:id="@id/totalTime"
+                />
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="单次最长："
+                android:id="@+id/singleLongestMileage"
+                />
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="单次最久："
+                android:id="@+id/singleLongestTime"
+                />
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="累积急加速："
+                android:id="@+id/totalAccelerate"
+                />
+
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="累积急刹车："
+                android:id="@+id/totalBrake"
+                />
+
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="累积超速："
+                android:id="@+id/totalOverSpeed"
+                />
+
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="累积用油："
+                android:id="@+id/totalOilResume"
+                />
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="平均油耗："
+                android:id="@+id/totalAverageOilResume"
+                />
+
+           <RelativeLayout
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="10dp"
+
+               >
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="上次驾车行为分析"
+                   android:textSize="22sp"
+                   android:textColor="#4AA1D6"
+                   android:layout_marginLeft="@dimen/margin_small"
+                  android:layout_centerVertical="true"
+                   />
+
+               <Button
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="行驶记录"
+                   android:layout_gravity="right"
+                   android:background="@color/blue_btn_bg_color"
+                   android:id="@+id/travelRecord"
+                   android:onClick="onClick"
+                   android:layout_marginRight="@dimen/margin_small"
+                   android:layout_alignParentRight="true"
+                   />
+
+           </RelativeLayout>
+
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="行程："
+                android:id="@+id/singleMileage"
+                />
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="用时："
+                android:id="@+id/singleTime"
+                />
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="平均时速："
+                android:id="@+id/singleAverageSpeed"
+                />
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="平均油耗："
+                android:id="@+id/singleAverageOilResume"
+                />
+
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="急加速："
+                android:id="@+id/singleAccelerate"
+                />
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="急刹车："
+                android:id="@+id/singleBrake"
+                />
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="超速："
+                android:id="@+id/singleOverSpeed"
+                />
+            <com.qcwp.carmanager.control.TravelItemView
+                style="@style/TravelItemViewStyle"
+                app:TravelItemView_title="体检得分："
+                android:id="@+id/carCheckScore"
+                android:visibility="gone"
+                />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+    </RelativeLayout>

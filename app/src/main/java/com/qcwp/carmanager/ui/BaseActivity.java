@@ -228,6 +228,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         super.onDestroy();
         EventBus.getDefault().unregister(this);
         isActive=false;
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

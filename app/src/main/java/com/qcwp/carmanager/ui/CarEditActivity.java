@@ -33,6 +33,7 @@ import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarSeriesModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarTypeModel;
 import com.qcwp.carmanager.model.sqLiteModel.CommonBrandModel;
+import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
 
@@ -98,6 +99,7 @@ public class CarEditActivity extends BaseActivity {
             carInfoModel=mApp.getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(vincode.getText())).build().unique();
         }else{
             vincode.setEnabled(true);
+
         }
 
         type=(Type) getIntent().getSerializableExtra(KeyEnum.typeKey);
@@ -112,7 +114,9 @@ public class CarEditActivity extends BaseActivity {
     }
 
     private void updateUI(){
+        Print.d(TAG,"-------------");
         if (carInfoModel!=null){
+
             carNumber.setText(carInfoModel.getCarNumber());
             carBrand.setText(carInfoModel.getBrand());
             carBrandId=carInfoModel.getBrandId();
@@ -345,6 +349,7 @@ public class CarEditActivity extends BaseActivity {
             carInfoModel.setMemberId(UserData.getInstance().getUserId());
             carInfoModel.setNeedUpload(UploadStatusEnum.NotUpload);
             carInfoModel.setCarType(null);
+            Print.d(TAG,carInfoModel.toString());
             showLoadingDialog();
 
             mEngine.uploadCarInfo(carInfoModel).enqueue(new Callback<RequestModel>() {
@@ -392,6 +397,8 @@ public class CarEditActivity extends BaseActivity {
 
         MessageEvent messageEvent=new MessageEvent();
         if (type==Type.Bind) {
+            OBDClient.getDefaultClien().setVinCode(vincode.getText());
+            UserData.getInstance().setVinCode(vincode.getText());
             messageEvent.setType(MessageEvent.MessageEventType.CarBlindSuccess);
         }else {
             messageEvent.setType(MessageEvent.MessageEventType.CarSelected);

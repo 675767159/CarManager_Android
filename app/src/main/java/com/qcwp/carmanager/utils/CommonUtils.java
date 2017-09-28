@@ -2,7 +2,9 @@ package com.qcwp.carmanager.utils;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
@@ -10,6 +12,7 @@ import android.view.View;
 
 import com.blankj.utilcode.util.FileUtils;
 import com.qcwp.carmanager.APP;
+import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.implement.StateRoundRectDrawable;
 
 import org.json.JSONArray;
@@ -22,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -78,16 +83,19 @@ public class CommonUtils {
         return  timeStr;
     }
 
-    static public boolean setPin(Class btClass, BluetoothDevice btDevice,
+    static public BluetoothSocket setPin(Class btClass, BluetoothDevice btDevice,
                                  String str) throws Exception
     {
         try
         {
             Method removeBondMethod = btClass.getDeclaredMethod("setPin",
                     byte[].class);
-            Boolean returnValue = (Boolean) removeBondMethod.invoke(btDevice,
+            BluetoothSocket socket = (BluetoothSocket) removeBondMethod.invoke(btDevice,
                     new Object[]
                             {str.getBytes()});
+            Print.d("startBluetoothService","startBluetoothService=="+socket);
+            return socket;
+
         }
         catch (SecurityException e)
         {
@@ -104,7 +112,7 @@ public class CommonUtils {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return true;
+        return null;
 
     }
     public static String asciiToString(String value)
@@ -213,5 +221,20 @@ public class CommonUtils {
                 Print.e("Show", e.toString());
             }
         }
+    }
+
+    public static List listEName(DaoSession session,String SQL_DISTINCT_ENAME) {
+        ArrayList result = new ArrayList<>();
+        Cursor c = session.getDatabase().rawQuery(SQL_DISTINCT_ENAME, null);
+        try{
+            if (c.moveToFirst()) {
+                do {
+                    result.add(c.getString(0));
+                } while (c.moveToNext());
+            }
+        } finally {
+            c.close();
+        }
+        return result;
     }
 }

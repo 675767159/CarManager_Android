@@ -64,7 +64,11 @@ public class TitleContentView extends RelativeLayout {
         String  title=typedArray.getString(R.styleable.TitleContentView_TitleContent_title);
         String  content=typedArray.getString(R.styleable.TitleContentView_TitleContent_content);
         int titleColor=typedArray.getColor(R.styleable.TitleContentView_TitleContent_title_color, ContextCompat.getColor(context, R.color.whiteColor));
-        int contentColor=typedArray.getColor(R.styleable.TitleContentView_TitleContent_content_color, ContextCompat.getColor(context, R.color.greenColor));
+        int contentColor=typedArray.getColor(R.styleable.TitleContentView_TitleContent_content_color, ContextCompat.getColor(context, R.color.blueColor));
+
+
+        float titleSize=typedArray.getDimension(R.styleable.TitleContentView_TitleContent_title_size, 18);
+        float contentSize=typedArray.getDimension(R.styleable.TitleContentView_TitleContent_content_size, 16);
 
 
 
@@ -76,9 +80,12 @@ public class TitleContentView extends RelativeLayout {
         titleTextView=(TextView)view.findViewById(R.id.title);
         titleTextView.setText(title);
         titleTextView.setTextColor(titleColor);
+        titleTextView.setTextSize(titleSize);
+
 
         contentTextView = (TextView) view.findViewById(R.id.content);
         contentTextView.setTextColor(contentColor);
+        contentTextView.setTextSize(contentSize);
         if (content!=null) {
             contentTextView.setText(content);
 

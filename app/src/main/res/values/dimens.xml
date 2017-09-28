@@ -13,4 +13,6 @@
     <dimen name="ThermometerWidth">35dp</dimen>
     <dimen name="padding_small">10dp</dimen>
     <dimen name="margin_small">10dp</dimen>
+    <dimen name="travelRecordItemTitleSize">17px</dimen>
+    <dimen name="travelRecordItemContentSize">15px</dimen>
 </resources>

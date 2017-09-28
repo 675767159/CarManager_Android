@@ -4,6 +4,7 @@ package com.qcwp.carmanager.model.sqLiteModel;
 
 import android.content.Context;
 
+import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -24,6 +25,8 @@ import org.greenrobot.greendao.annotation.Transient;
 import org.greenrobot.greendao.annotation.Unique;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.converter.PropertyConverter;
+
+import retrofit2.http.QueryName;
 
 @Entity(nameInDb = "CarInfo",indexes = {
         @Index(value = "vinCode", unique = true)
@@ -85,8 +88,10 @@ public class CarInfoModel {
     @Property(nameInDb = "memberId")
   private long memberId;
 
+    @SerializedName("buyDate")
+    @Expose
     @Property(nameInDb = "buyDate")
-    private String buyDate;
+    private String isoBuyDate;
 
     @Convert(converter = UploadStatusConverter.class, columnType = Integer.class)
     @Property(nameInDb = "needUpload")
@@ -111,12 +116,11 @@ public class CarInfoModel {
     @Transient
     private String commonBrandName;
 
-    @Generated(hash = 1201470894)
-    public CarInfoModel(@NotNull String vinCode, String carNumber, String spValue, double totalMileage,
-            int isTestSteer, String ownerName, String productiveYear, String maintenanceInterval, String carColor,
-            String fuelOilType, long mid, long brandId, long carTypeId, long carSeriesId, CarTypeModel carType,
-            String carSeries, String brand, String manufacturer, String officialConsume, String actualConsume,
-            long memberId, String buyDate, UploadStatusEnum needUpload, Long id, long timestamp) {
+    @Generated(hash = 443541963)
+    public CarInfoModel(@NotNull String vinCode, String carNumber, String spValue, double totalMileage, int isTestSteer, String ownerName, String productiveYear,
+            String maintenanceInterval, String carColor, String fuelOilType, long mid, long brandId, long carTypeId, long carSeriesId, CarTypeModel carType, String carSeries,
+            String brand, String manufacturer, String officialConsume, String actualConsume, long memberId, String isoBuyDate, UploadStatusEnum needUpload, Long id,
+            long timestamp) {
         this.vinCode = vinCode;
         this.carNumber = carNumber;
         this.spValue = spValue;
@@ -138,7 +142,7 @@ public class CarInfoModel {
         this.officialConsume = officialConsume;
         this.actualConsume = actualConsume;
         this.memberId = memberId;
-        this.buyDate = buyDate;
+        this.isoBuyDate = isoBuyDate;
         this.needUpload = needUpload;
         this.id = id;
         this.timestamp = timestamp;
@@ -146,6 +150,68 @@ public class CarInfoModel {
 
     @Generated(hash = 1135225804)
     public CarInfoModel() {
+    }
+
+   
+
+    public static class UploadStatusConverter implements PropertyConverter<UploadStatusEnum, Integer> {
+        @Override
+        public UploadStatusEnum convertToEntityProperty(Integer databaseValue) {
+            if (databaseValue == null) {
+                return null;
+            }
+            for (UploadStatusEnum role : UploadStatusEnum.values()) {
+                if (role.getValue() == databaseValue) {
+                    return role;
+                }
+            }
+            return UploadStatusEnum.NotUpload;
+        }
+
+        @Override
+        public Integer convertToDatabaseValue(UploadStatusEnum entityProperty) {
+            return entityProperty == null ? UploadStatusEnum.NotUpload.getValue() : entityProperty.getValue();
+        }
+    }
+
+    public static class CarTypeConverter implements PropertyConverter<CarTypeModel, String> {
+
+        @Override
+        public CarTypeModel convertToEntityProperty(String databaseValue) {
+            CarTypeModel carTypeModel=new CarTypeModel();
+            carTypeModel.setCarTypeName(databaseValue);
+            return carTypeModel;
+        }
+
+        @Override
+        public String convertToDatabaseValue(CarTypeModel entityProperty) {
+            return entityProperty==null?null:entityProperty.getCarTypeName();
+        }
+    }
+
+
+    public static CarInfoModel getLatestCarInfo(){
+
+        CarInfoModel carInfoModel=APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
+        return carInfoModel;
+    }
+
+    public static CarInfoModel getCarInfoByVinCode(String vinCode){
+
+        if (EmptyUtils.isNotEmpty(vinCode)) {
+            CarInfoModel carInfoModel = APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(vinCode)).build().unique();
+
+            return carInfoModel;
+        }
+        return null;
+    }
+
+
+    public static CarInfoModel getCurrentCarInfo(){
+        if (UserData.getInstance().getVinCode()!=null) {
+            return CarInfoModel.getCarInfoByVinCode(UserData.getInstance().getVinCode());
+        }
+        return null;
     }
 
     public String getVinCode() {
@@ -317,11 +383,11 @@ public class CarInfoModel {
     }
 
     public String getIsoBuyDate() {
-        return this.buyDate;
+        return this.isoBuyDate;
     }
 
     public void setIsoBuyDate(String isoBuyDate) {
-        this.buyDate = isoBuyDate;
+        this.isoBuyDate = isoBuyDate;
     }
 
     public UploadStatusEnum getNeedUpload() {
@@ -342,10 +408,6 @@ public class CarInfoModel {
 
     public long getTimestamp() {
         return this.timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     @Override
@@ -372,77 +434,16 @@ public class CarInfoModel {
                 ", officialConsume='" + officialConsume + '\'' +
                 ", actualConsume='" + actualConsume + '\'' +
                 ", memberId=" + memberId +
-                ", isoBuyDate='" + buyDate + '\'' +
+                ", isoBuyDate='" + isoBuyDate + '\'' +
                 ", needUpload=" + needUpload +
                 ", id=" + id +
                 ", timestamp=" + timestamp +
+                ", commonBrandName='" + commonBrandName + '\'' +
                 '}';
     }
 
-    public String getBuyDate() {
-        return this.buyDate;
-    }
-
-    public void setBuyDate(String buyDate) {
-        this.buyDate = buyDate;
-    }
-
-
-    public static class UploadStatusConverter implements PropertyConverter<UploadStatusEnum, Integer> {
-        @Override
-        public UploadStatusEnum convertToEntityProperty(Integer databaseValue) {
-            if (databaseValue == null) {
-                return null;
-            }
-            for (UploadStatusEnum role : UploadStatusEnum.values()) {
-                if (role.getValue() == databaseValue) {
-                    return role;
-                }
-            }
-            return UploadStatusEnum.NotUpload;
-        }
-
-        @Override
-        public Integer convertToDatabaseValue(UploadStatusEnum entityProperty) {
-            return entityProperty == null ? UploadStatusEnum.NotUpload.getValue() : entityProperty.getValue();
-        }
-    }
-
-    public static class CarTypeConverter implements PropertyConverter<CarTypeModel, String> {
-
-        @Override
-        public CarTypeModel convertToEntityProperty(String databaseValue) {
-            CarTypeModel carTypeModel=new CarTypeModel();
-            carTypeModel.setCarTypeName(databaseValue);
-            return carTypeModel;
-        }
-
-        @Override
-        public String convertToDatabaseValue(CarTypeModel entityProperty) {
-            return entityProperty==null?null:entityProperty.getCarTypeName();
-        }
-    }
-
-
-    public static CarInfoModel getLatestCarInfo(){
-
-        CarInfoModel carInfoModel=APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).orderDesc(CarInfoModelDao.Properties.Timestamp).limit(1).unique();
-        return carInfoModel;
-    }
-
-    public static CarInfoModel getCarInfoByVinCode(String vinCode){
-
-        CarInfoModel carInfoModel=APP.getInstance().getDaoInstant().queryBuilder(CarInfoModel.class).where(CarInfoModelDao.Properties.VinCode.eq(vinCode)).build().unique();
-
-        return carInfoModel;
-    }
-
-
-    public static CarInfoModel getCurrentCarInfo(){
-        if (UserData.getInstance().getVinCode()!=null) {
-            return CarInfoModel.getCarInfoByVinCode(UserData.getInstance().getVinCode());
-        }
-        return null;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
 }
