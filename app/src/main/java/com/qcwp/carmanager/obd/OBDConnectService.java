@@ -40,6 +40,27 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class OBDConnectService {
 
 	public static final int REQUEST_OPEN_BT_CODE=1000,REQUEST_WIFILocationRequestResult_Code=2000,REQUEST_BluetoothLocationRequestResult_Code=3000;
+	private static OBDConnectService INSTANCE;
+	private static InputStream mmInStream;
+	private static OutputStream mmOutStream;
+	private static int connectLostFlag;
+	private final String serverIp = "192.168.0.10";
+	private ConectOBDListener conectOBDListener;
+	private OBDConnectType connectType;
+	private String message;
+	private WifiManager wifiManager;
+	private Activity currentActivity;
+	private BluetoothAdapter mBluetoothAdapter;
+	private BluetoothSocket bluetoothSocket;
+	private Boolean isTowTypehadConnect = false;
+
+	private OBDConnectService() {
+
+		EventBus.getDefault().register(this);
+		wifiManager = (WifiManager) APP.getInstance().getApplicationContext().getSystemService(WIFI_SERVICE);
+		currentActivity = MyActivityManager.getInstance().getCurrentActivity();
+	}
+
 	// 提供一个全局的静态方法
 	public static OBDConnectService getInstance() {
 		if (INSTANCE == null) {
@@ -52,18 +73,6 @@ public class OBDConnectService {
 		return INSTANCE;
 	}
 
-	public void startConnectService(){
-		switch (connectType){
-			case WIFI:
-				this.connectWiFi();
-				break;
-
-			case BlueTooth:
-				this.connectBlueTooth();
-				break;
-		}
-	}
-
 	@SuppressWarnings("finally")
 	public static synchronized String getData(String pid) {
 		StringBuffer tmpValue = new StringBuffer();
@@ -73,7 +82,7 @@ public class OBDConnectService {
 
 			int buffSize = 1024;
 			byte[] buffer2 = new byte[buffSize];
-			int bytes = 0;
+			int bytes;
 
 			while(true) {
 				bytes = mmInStream.read(buffer2, 0, buffSize);
@@ -94,7 +103,17 @@ public class OBDConnectService {
 		}
 	}
 
+	void startConnectService() {
+		switch (connectType) {
+			case WIFI:
+				this.connectWiFi();
+				break;
 
+			case BlueTooth:
+				this.connectBlueTooth();
+				break;
+		}
+	}
 
 	private  void closeConnect() {
 		try {
@@ -108,40 +127,13 @@ public class OBDConnectService {
 		}
 	}
 
-
-	public interface ConectOBDListener{
-		void completeConect(Boolean success,String message);
-	}
-	private ConectOBDListener conectOBDListener;
-	public void setConectOBDListener(ConectOBDListener conectOBDListener){
+	void setConectOBDListener(ConectOBDListener conectOBDListener) {
 		this.conectOBDListener=conectOBDListener;
 	}
 
-
-	private OBDConnectType connectType;
-	private static OBDConnectService INSTANCE;
-	private final String serverIp = "192.168.0.10";
-	private  static InputStream mmInStream;
-	private  static OutputStream mmOutStream;
-	private static  int connectLostFlag;
-	private String message;
-	private WifiManager wifiManager;
-	private Activity currentActivity;
-	private BluetoothAdapter mBluetoothAdapter;
-	private BluetoothSocket bluetoothSocket;
-	public void setConnectType(OBDConnectType connectType) {
+	void setConnectType(OBDConnectType connectType) {
 		this.connectType = connectType;
 	}
-
-	private OBDConnectService() {
-
-		EventBus.getDefault().register(this);
-		wifiManager=(WifiManager)APP.getInstance().getApplicationContext().getSystemService(WIFI_SERVICE);
-		currentActivity=MyActivityManager.getInstance().getCurrentActivity();
-	}
-
-
-
 
 	private void connectWiFi(){
 
@@ -240,8 +232,6 @@ public class OBDConnectService {
 
 	}
 
-
-	private Boolean isTowTypehadConnect=false;
 	private void returnConnetResult(Boolean isSuccess){
 
 
@@ -273,7 +263,6 @@ public class OBDConnectService {
 
 
 	}
-
 
 	private Boolean connectWiFiOBD(){
 
@@ -369,7 +358,6 @@ public class OBDConnectService {
 
 	}
 
-
 	private Boolean connectBlueToothOBD(String address){
 
 		BluetoothDevice mmDevice = mBluetoothAdapter.getRemoteDevice(address);
@@ -396,7 +384,7 @@ public class OBDConnectService {
 					break;
 
 				} catch(Exception eee) {
-					
+
 					//【Connection refused】 （不包含中括号）再用第二种方法连接是可以连接上的
 					//【Device or resource busy】当另一个软件退出的时候，才可以连接上，可以多试几次第二种方法，可以提示用户退出其它线程
 					//【Permission denied】这是主要问题，有时可以多次进行连接而连上，有时不行（还有个大问题就是当连不上时，有一直弹出输入框），解决办法：如果已经配对过重启蓝牙，取消配对再连即可连上
@@ -444,7 +432,7 @@ public class OBDConnectService {
 
 	}
 
-	public void stopConnectSoket(){
+	void stopConnectSoket() {
 
 
 		switch (connectType){
@@ -458,6 +446,10 @@ public class OBDConnectService {
 				}
 				break;
 		}
+	}
+
+	interface ConectOBDListener {
+		void completeConect(Boolean success, String message);
 	}
 
 

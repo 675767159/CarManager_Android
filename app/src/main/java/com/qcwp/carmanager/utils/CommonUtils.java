@@ -1,7 +1,6 @@
 package com.qcwp.carmanager.utils;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -10,25 +9,18 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 
 import com.blankj.utilcode.util.FileUtils;
-import com.blankj.utilcode.util.NetworkUtils;
 import com.qcwp.carmanager.APP;
-import com.qcwp.carmanager.enumeration.DrivingCustomEnum;
-import com.qcwp.carmanager.enumeration.WifiTypeEnum;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.implement.StateRoundRectDrawable;
-import com.qcwp.carmanager.model.sqLiteModel.DrivingCustomModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +34,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Locale;
 
 
 /**
@@ -73,7 +65,7 @@ public class CommonUtils {
     }
 
     public static  String longTimeToStr(int sec){
-        String timeStr = new String();
+        String timeStr = "";
         int day = sec / (60 * 60 * 24);
         sec -= day * 60 * 60 * 24;
         int ousr = sec / (60 * 60);
@@ -81,20 +73,21 @@ public class CommonUtils {
         int minutes = sec / 60;
         sec -= minutes * 60;
 
+        Locale locale = Locale.getDefault();
         if (day > 0) {
-            timeStr= timeStr+String.format("%d天",day);
+            timeStr = timeStr + String.format(locale, "%d天", day);
         }
         if (ousr > 0) {
-            timeStr= timeStr+String.format("%d小时",ousr);
+            timeStr = timeStr + String.format(locale, "%d小时", ousr);
         }
         if (day > 0) {
-            timeStr= timeStr+String.format("%d分",minutes);
+            timeStr = timeStr + String.format(locale, "%d分", minutes);
             return  timeStr;
         }
         if (sec < 10) {
-            timeStr= timeStr+String.format("%d分0%d秒",minutes,sec);
+            timeStr = timeStr + String.format(locale, "%d分0%d秒", minutes, sec);
         }else{
-            timeStr= timeStr+String.format("%d分%d秒",minutes,sec);
+            timeStr = timeStr + String.format(locale, "%d分%d秒", minutes, sec);
         }
         return  timeStr;
     }
@@ -240,7 +233,7 @@ public class CommonUtils {
     }
 
     public static List listEName(DaoSession session,String SQL_DISTINCT_ENAME) {
-        ArrayList result = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
         Cursor c = session.getDatabase().rawQuery(SQL_DISTINCT_ENAME, null);
         try{
             if (c.moveToFirst()) {
@@ -261,6 +254,7 @@ public class CommonUtils {
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         int level=wifiInfo.getRssi();
         Print.d("SCAN_RESULTS_AVAILABLE_ACTION","level="+level);
+
         return wifiInfo != null && wifiInfo.getSSID().contains("OBD") && level > -100;
     }
 
