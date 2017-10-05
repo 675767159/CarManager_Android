@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/padding_small">
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@+id/createDate"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title=""
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@+id/distance"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title="行驶里程："
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@+id/averageSpeed"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title="平均时速："
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@+id/accelerateCount"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title="急加速：　"
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@+id/driveTime"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title="驾驶时长："
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@id/carCheckScore"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title="体检得分："
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@id/averageOilConsume"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title="平均油耗："
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+        <com.qcwp.carmanager.control.TitleContentView
+            android:id="@+id/brakeCount"
+            style="@style/TravelRecordCellViewStyle"
+            app:TitleContent_content_color="@color/blueColor"
+            app:TitleContent_content_size="@dimen/travelRecordItemContentSize"
+            app:TitleContent_title="急刹车：　"
+            app:TitleContent_title_color="@color/blackColor"
+            app:TitleContent_title_size="@dimen/travelRecordItemTitleSize" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
