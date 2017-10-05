@@ -95,7 +95,7 @@ public class CarDetailActivity extends BaseActivity {
                 break;
             case R.id.carEdit:
                 Bundle bundle=new Bundle();
-                bundle.putString(KeyEnum.vinCode, OBDClient.getDefaultClien().getVinCode());
+                bundle.putString(KeyEnum.vinCode,UserData.getInstance().getVinCode());
                 bundle.putSerializable(KeyEnum.typeKey,CarEditActivity.Type.Edit);
                 readyGo(CarEditActivity.class,bundle);
                 break;

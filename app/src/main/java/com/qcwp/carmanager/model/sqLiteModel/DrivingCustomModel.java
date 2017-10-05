@@ -4,6 +4,7 @@ import com.qcwp.carmanager.enumeration.DrivingCustomEnum;
 
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
 import org.greenrobot.greendao.converter.PropertyConverter;
 import org.greenrobot.greendao.annotation.Generated;
@@ -20,27 +21,51 @@ public class DrivingCustomModel {
     @Property(nameInDb = "pointx")private double pointx;
     @Property(nameInDb = "pointy")private double pointy;
 
+
+
     @Convert(converter = DrivingCustomTypeConverter.class, columnType = Integer.class)
     @Property(nameInDb = "type")DrivingCustomEnum  type;
 
+    @Property(nameInDb = "id")
+    @Id(autoincrement = true)
+    private Long id;
 
 
-    @Generated(hash = 565421307)
+
+
+
+
+    @Generated(hash = 631252637)
     public DrivingCustomModel(String startDate, String vinCode, String createDate, double pointx, double pointy,
-            DrivingCustomEnum type) {
+            DrivingCustomEnum type, Long id) {
         this.startDate = startDate;
         this.vinCode = vinCode;
         this.createDate = createDate;
         this.pointx = pointx;
         this.pointy = pointy;
         this.type = type;
+        this.id = id;
     }
 
-
+    @Override
+    public String toString() {
+        return "DrivingCustomModel{" +
+                "startDate='" + startDate + '\'' +
+                ", vinCode='" + vinCode + '\'' +
+                ", createDate='" + createDate + '\'' +
+                ", pointx=" + pointx +
+                ", pointy=" + pointy +
+                ", type=" + type +
+                ", id=" + id +
+                '}';
+    }
 
     @Generated(hash = 1956051040)
     public DrivingCustomModel() {
     }
+
+
+
 
 
 
@@ -50,9 +75,15 @@ public class DrivingCustomModel {
 
 
 
+
+
+
     public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
+
+
+
 
 
 
@@ -62,9 +93,15 @@ public class DrivingCustomModel {
 
 
 
+
+
+
     public void setVinCode(String vinCode) {
         this.vinCode = vinCode;
     }
+
+
+
 
 
 
@@ -74,9 +111,15 @@ public class DrivingCustomModel {
 
 
 
+
+
+
     public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
+
+
+
 
 
 
@@ -86,9 +129,15 @@ public class DrivingCustomModel {
 
 
 
+
+
+
     public void setPointx(double pointx) {
         this.pointx = pointx;
     }
+
+
+
 
 
 
@@ -98,9 +147,15 @@ public class DrivingCustomModel {
 
 
 
+
+
+
     public void setPointy(double pointy) {
         this.pointy = pointy;
     }
+
+
+
 
 
 
@@ -110,9 +165,33 @@ public class DrivingCustomModel {
 
 
 
+
+
+
     public void setType(DrivingCustomEnum type) {
         this.type = type;
     }
+
+
+
+
+
+
+    public Long getId() {
+        return this.id;
+    }
+
+
+
+
+
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+
 
 
 

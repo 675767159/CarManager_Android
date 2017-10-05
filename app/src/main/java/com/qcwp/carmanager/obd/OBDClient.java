@@ -14,12 +14,12 @@ import com.qcwp.carmanager.enumeration.ExamnationStatusEnum;
 import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.enumeration.LoadDataTypeEnum;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
+import com.qcwp.carmanager.enumeration.OBDConnectType;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.CarVinStatisticModelDao;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.greendao.gen.SingleCarVinStatisticModelDao;
-import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
@@ -38,21 +38,23 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledFuture;
 
 import static com.blankj.utilcode.util.ThreadPoolUtils.FixedThread;
 import static com.qcwp.carmanager.broadcast.MessageEvent.MessageEventType.CarCheck_end;
+import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypeClearErr;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypeTest;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypeTijian;
 import static com.qcwp.carmanager.enumeration.LoadDataTypeEnum.dataTypedrive;
 import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeConnectSuccess;
 import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeConnectingWithSP;
+import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeDisconnection;
 import static com.qcwp.carmanager.enumeration.OBDConnectStateEnum.connectTypeHaveBinded;
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -109,6 +111,13 @@ public class OBDClient {
         this.loadDataType = dataTypeTijian;
     }
 
+
+    public void clearFaultCode() {
+        this.loadDataType = dataTypeClearErr;
+    }
+
+
+
     public void startTest() {
         this.loadDataType = dataTypeTest;
 //        SensorsService.testing(0.01);
@@ -128,6 +137,11 @@ public class OBDClient {
     private String spValue;//协议
     private double vehicleSpeed;//当前速度
     private String isGetVehicleSpeed;//是否初始化成功
+
+    public LoadDataTypeEnum getLoadDataType() {
+        return loadDataType;
+    }
+
     private double engineRpm;//转速
     private double fuelPressure;//气压
     private double totalTime;//行驶时间
@@ -168,12 +182,13 @@ public class OBDClient {
     private DaoSession daoSession;
     private String phoneModel;
     private ThreadPoolUtils threadPool;
+    private  ScheduledFuture scheduledFuture;
 
     public OBDConnectStateEnum getConnectStatus() {
         return connectStatus;
     }
 
-    public String startTime;
+    private String startTime;
 
     public String getStartTime() {
         return startTime;
@@ -232,6 +247,17 @@ public class OBDClient {
     }
 
 
+    private void stopOBDClient(){
+        connectStatus=connectTypeDisconnection;
+        loadDataType=LoadDataTypeEnum.dataTypeDisConnected;
+        scheduledFuture.cancel(true);
+        scheduledFuture=null;
+        threadPool.shutDown();
+        threadPool=null;
+
+
+    }
+
     public void startOBDClient() {
 
 
@@ -240,8 +266,8 @@ public class OBDClient {
             @Override
             public Object call() throws Exception {
 
-                BlueteethService blueteethService = BlueteethService.getDefaultBluetoothService();
-                blueteethService.setConectOBDListener(new BlueteethService.ConectOBDListener() {
+                OBDConnectService obdConnectService = OBDConnectService.getInstance();
+                obdConnectService.setConectOBDListener(new OBDConnectService.ConectOBDListener() {
                     @Override
                     public void completeConect(Boolean success, String message) {
                         connectStatus = connectTypeConnectingWithSP;
@@ -250,8 +276,8 @@ public class OBDClient {
                         if (success) {
                             if (EmptyUtils.isNotEmpty(OBDClient.this.detectProtocol())) {
 
-                                String data = BlueteethService.getData(SensorsService.VIN_PIDS);
-                                Print.d("BlueteethService", data + "----");
+                                String data = OBDConnectService.getData(SensorsService.VIN_PIDS);
+                                Print.d("OBDConnectService", data + "----");
 
                                 SensorsService.SensorsDataHandler(data, SensorsService.VIN_PIDS);
                                 vinCode = SensorsService.GetVinCode(data);
@@ -289,7 +315,11 @@ public class OBDClient {
 
                     }
                 });
-                blueteethService.startBluetoothService();
+                MySharedPreferences mySharedPreferences=new MySharedPreferences(APP.getInstance());
+                int value=mySharedPreferences.getInt(KeyEnum.typeKey,OBDConnectType.WIFI.getValue());
+                OBDConnectType type=OBDConnectType.fromInteger(value);
+                obdConnectService.setConnectType(type);
+                obdConnectService.startConnectService();
 
 
                 return null;
@@ -304,7 +334,7 @@ public class OBDClient {
         String SP = new MySharedPreferences(APP.getInstance()).getString(KeyEnum.currentOBDrotocol, "");
 
         if (EmptyUtils.isNotEmpty(SP)) {
-            String data = BlueteethService.getData(SP);
+            String data = OBDConnectService.getData(SP);
             if (this.checkProtocolData(data)) {
                 return SP;
             }
@@ -315,9 +345,9 @@ public class OBDClient {
         //3.必须同时满足1和2才能正常连接
         String data;
         //    NSLog(@"SP = %@",SP);
-        String str1 = BlueteethService.getData("ATZ");//这两个必须有，不然会出现连上了却读不到数据的情况，（实测过的）
-        String str2 = BlueteethService.getData("ATE0");
-        String str3 = BlueteethService.getData("ATS0");
+        String str1 = OBDConnectService.getData("ATZ");//这两个必须有，不然会出现连上了却读不到数据的情况，（实测过的）
+        String str2 = OBDConnectService.getData("ATE0");
+        String str3 = OBDConnectService.getData("ATS0");
 
 
         if (this.checkProtocolData("OK")) {
@@ -331,7 +361,7 @@ public class OBDClient {
         for (int i = 0; i < spArr.length; i++) {
             if (connectStatus == connectTypeConnectingWithSP) {
                 sp_Value = spArr[i];
-                if (this.checkProtocolData(BlueteethService.getData(sp_Value))) {
+                if (this.checkProtocolData(OBDConnectService.getData(sp_Value))) {
                     MySharedPreferences mySharedPreferences = new MySharedPreferences(APP.getInstance());
                     mySharedPreferences.setString(KeyEnum.currentOBDrotocol, sp_Value);
                     return sp_Value;
@@ -344,12 +374,12 @@ public class OBDClient {
     private Boolean checkProtocolData(String data) {
 
         if (data.toUpperCase().contains("OK")) {
-            data = BlueteethService.getData("0100");
+            data = OBDConnectService.getData("0100");
 
             if (data.contains("4100") || data.contains("41 00")) {
                 //当车辆还未初始化完成时，再初始化一次
                 while (data.contains("ERROR")) {
-                    data = BlueteethService.getData("0100");
+                    data = OBDConnectService.getData("0100");
                 }
 
 
@@ -381,11 +411,7 @@ public class OBDClient {
                 OBDClient.this.initData();
                 break;
             case OBDLostDisconnection:
-                //重连
-                connectStatus = OBDConnectStateEnum.connectTypeDisconnectionWithOBD;
-                threadPool.shutDownNow();
-                vinCode = null;
-                OBDClient.this.startOBDClient();
+                stopOBDClient();
                 break;
         }
 
@@ -414,7 +440,7 @@ public class OBDClient {
         carVinStatisticModel.setVinCode(vinCode);
         daoSession.insertOrReplace(carVinStatisticModel);
 
-         singleCarVinStatisticModel = daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
+        singleCarVinStatisticModel = daoSession.queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).unique();
         if (singleCarVinStatisticModel == null) {
             singleCarVinStatisticModel = new SingleCarVinStatisticModel();
             singleCarVinStatisticModel.setOnlyFlag(onlyFlag);
@@ -468,6 +494,7 @@ public class OBDClient {
     //计算和保存
 
     private void calculateTraveData() {
+        Print.d("calculateTraveData","----------");
         if (connectStatus == connectTypeHaveBinded) {
             SensorsService.calculateTraveData();
             if (((int) SensorsService.totalTime()) % 2 != 0) {
@@ -499,7 +526,7 @@ public class OBDClient {
 
         String info = jsonObject.optString(KeyEnum.pidInfoKey);
         String pid = jsonObject.optString(KeyEnum.pidKey);
-        BlueteethService.getData(pid);//没有什么用
+        OBDConnectService.getData(pid);//没有什么用
         EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarCheck_some, info));
     }
 
@@ -518,7 +545,7 @@ public class OBDClient {
 
         //获取故障码-体检
         SensorsService.Car_CheckUp_init();
-        String data = BlueteethService.getData("03");
+        String data = OBDConnectService.getData("03");
         //    NSLog(@"故障码   %@",data);
         SensorsService.DTC_CheckUp(data);
         Resources mResource=APP.getInstance().getResources();
@@ -554,7 +581,7 @@ public class OBDClient {
 
 
 //    //获取汽车工况-体检
-        data = BlueteethService.getData("0141");
+        data = OBDConnectService.getData("0141");
         int[] engineConditions = SensorsService.EngineBehaviour_CheckUp(data);
         titleArray = mResource.getStringArray(R.array.EngineConditions);
         for (int j = 0; j < 6; j++) {
@@ -580,7 +607,7 @@ public class OBDClient {
 //        String examnation_pidStr = SensorsService.CarCheckUp_Pid_List();
 //        String[] examnationPidArray = examnation_pidStr.split(",");
 
-       JSONArray driveDataPidArray = CommonUtils.getJSONArrayFromText("CarCheckDriveDataPids.json");
+        JSONArray driveDataPidArray = CommonUtils.getJSONArrayFromText("CarCheckDriveDataPids.json");
 
 
         for (int i=0;i<driveDataPidArray.length();i++) {
@@ -595,7 +622,7 @@ public class OBDClient {
             JSONObject jsonObject=driveDataPidArray.optJSONObject(i);
 
             String pid=jsonObject.optString(KeyEnum.pidKey);
-            data = BlueteethService.getData(pid);
+            data = OBDConnectService.getData(pid);
 
             int drivingDataStatus = SensorsService.DrivingData_CheckUp(data, pid);
 
@@ -623,7 +650,7 @@ public class OBDClient {
         messageEvent.setData(map);
 
         EventBus.getDefault().post(messageEvent);
-        loadDataType=dataTypedrive;
+
 
     }
 
@@ -700,7 +727,7 @@ public class OBDClient {
                 Print.d("Runnable", "getCarData=========");
                 String[] acceleratorPids = APP.getInstance().getResources().getStringArray(R.array.AcceleratorPids);
                 for (String pid : acceleratorPids) {
-                    String tmpData = BlueteethService.getData(pid);
+                    String tmpData = OBDConnectService.getData(pid);
                     SensorsService.setAccelerator(tmpData, pid);
                 }
 
@@ -712,10 +739,10 @@ public class OBDClient {
 
 
                 for (String pid : mainPIDList) {
-                    String tmpData = BlueteethService.getData(pid);
+                    String tmpData = OBDConnectService.getData(pid);
                     SensorsService.SensorsDataHandler(tmpData, pid);
                 }
-                loadDataType = dataTypedrive;
+
 
                 //添加行驶记录的起始状态
                 travelSummaryModel = new TravelSummaryModel();
@@ -730,30 +757,38 @@ public class OBDClient {
                 daoSession.insert(travelSummaryModel);
 
 
-                threadPool.scheduleWithFixedDelay(new Runnable() {
+
+
+                scheduledFuture=threadPool.scheduleWithFixedRate(new Runnable() {
                     @Override
                     public void run() {
                         OBDClient.this.calculateTraveData();
+
                     }
-                }, 0, 1, SECONDS);
+                }, 1,1, SECONDS);
+
+
+
 
 
                 String[] ALL_DRIVE_PIDs = APP.getInstance().getResources().getStringArray(R.array.ALL_PID_DRIVE);
                 List<String> allDrivePidList = new ArrayList<>(Arrays.asList(ALL_DRIVE_PIDs));
 
+
                 allDrivePidList.removeAll(mainPIDList);
 
 
-                List<String> pids = new ArrayList<>();
 
-                int location = 0, length = 1;
+                int location = 0;
 
+                loadDataType=dataTypedrive;
                 while (true) {
+
                     if (connectStatus == connectTypeHaveBinded) {
                         switch (loadDataType) {
                             case dataTypeTest:
 
-                                String tmpData = BlueteethService.getData("010D");
+                                String tmpData = OBDConnectService.getData("010D");
                                 SensorsService.SensorsDataHandler(tmpData, "010D");
                                 vehicleSpeed=SensorsService.vehicleSpeed();
                                 EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarTest,String.valueOf(vehicleSpeed)));
@@ -763,25 +798,32 @@ public class OBDClient {
                                 loadDataType = dataTypedrive;
                                 break;
                             case dataTypedrive: {
-                                if (pids.size() > 0) {
-                                    location = allDrivePidList.indexOf(pids.get(pids.size() - 1));
+
+                                String minorPid="";
+                                if (allDrivePidList.size() > 0) {
+                                    minorPid=allDrivePidList.get(location);
                                     location++;
                                     if (location == allDrivePidList.size()) {
                                         location = 0;
                                     }
                                 }
 
-                                pids = OBDClient.this.getDrivePidWithOther(allDrivePidList.subList(location, location + length));
+                                List<String> pids = new ArrayList<>(mainPIDList);
+                                pids.add(minorPid);
 
+
+//                                OBDClient.this.getDrivePidWithOther(allDrivePidList.subList(location, location + length));
                                 for (int i = 0; i < pids.size(); i++) {
                                     if (connectStatus == connectTypeHaveBinded) {
                                         String pid = pids.get(i);
-                                        String data = BlueteethService.getData(pid);
+                                        String data = OBDConnectService.getData(pid);
+                                        SensorsService.SensorsDataHandler(data, pid);
+                                        Print.d("SensorsDataHandler",pid+"=="+data);
                                         if (data.length() > 0) {
                                             if (i >= mainPIDList.size()) {
                                                 travelArray.add(OBDClient.this.readTravelDataWith(pid, data));
                                             }
-                                            SensorsService.SensorsDataHandler(data, pid);
+
 
                                             if (pid.equals("010D")) {
                                                 OBDClient.this.postHypervelocity();
@@ -795,7 +837,7 @@ public class OBDClient {
                             break;
                             case dataTypeClearErr: {
 
-                                BlueteethService.getData("04");
+                                OBDConnectService.getData("04");
                                 loadDataType = dataTypeTijian;
                             }
                             break;
@@ -847,13 +889,13 @@ public class OBDClient {
     private boolean isBrakes() {
 
 
-            double speedGap= lastVehicleSpeed-vehicleSpeed;
-            lastVehicleSpeed=vehicleSpeed;
+        double speedGap= lastVehicleSpeed-vehicleSpeed;
+        lastVehicleSpeed=vehicleSpeed;
 
-            if (speedGap > 10) {
-                addDriveCustomRecord(DrivingCustomEnum.Deceleration);
-                return true;
-            }
+        if (speedGap > 10) {
+            addDriveCustomRecord(DrivingCustomEnum.Deceleration);
+            return true;
+        }
 
         return false;
 

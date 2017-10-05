@@ -1,0 +1,29 @@
+[
+  {
+    "title": "超速提醒",
+    "list":
+    [
+      { "title": "开启状态",
+        "isSwitch":true
+      },
+      { "title": "提醒速度",
+        "isSwitch":false
+      }
+
+    ]
+  },
+  {
+    "title": "碰撞提醒",
+    "list":
+    [
+      { "title": "通知联系人",
+        "isSwitch":true
+      },
+      { "title": "联系人号码",
+        "isSwitch":false
+      }
+
+    ]
+  }
+
+]

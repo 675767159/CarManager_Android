@@ -10,6 +10,7 @@ import android.util.DisplayMetrics;
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.PhoneUtils;
+import com.blankj.utilcode.util.ThreadPoolUtils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.engine.Engine;
 import com.qcwp.carmanager.engine.TokenInterceptor;
@@ -17,6 +18,7 @@ import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.greendao.gen.DaoMaster;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.implement.GreenDaoContext;
+import com.qcwp.carmanager.implement.MyOpenHelper;
 import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.service.MyIntentService;
@@ -32,6 +34,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import cn.smssdk.SMSSDK;
@@ -180,7 +183,8 @@ public class APP extends Application {
 
         GreenDaoContext greenDaoContext=new GreenDaoContext(this);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(greenDaoContext,"CarManager.db", null);
+        MyOpenHelper helper = new MyOpenHelper(greenDaoContext,"CarManager.db",null);
+
 
         //获取可写数据库
         SQLiteDatabase db = helper.getWritableDatabase();

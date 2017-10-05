@@ -139,6 +139,7 @@ public class TokenInterceptor implements Interceptor {
 
                 }
 
+                break;
             }
         }
 

@@ -114,5 +114,17 @@ public class MyIntentService extends IntentService implements UploadDataContract
     @Override
     public void uploadMapPointOfDriveDataComplete() {
 
+        uploadDataPresenter.uploadDrivingCustom();
+    }
+
+    @Override
+    public void uploadDrivingCustomComplete() {
+
+        uploadDataPresenter.uploadPhysicalExamination();
+    }
+
+    @Override
+    public void uploadPhysicalExaminationComplete() {
+
     }
 }

@@ -9,7 +9,8 @@ public enum LoadDataTypeEnum {
     dataTypeTijian (1),
     dataTypeTest (2),
     dataTypeClearErr (3),
-    dataTypeReConnection (100);
+    dataTypeReConnection (100),
+    dataTypeDisConnected (-1);
 
     private final int value;
     LoadDataTypeEnum(int value) {

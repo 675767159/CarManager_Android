@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.qcwp.carmanager.ui.CarListActivity"
     android:background="@color/backgroundColor"
     >
     <com.qcwp.carmanager.control.NavBarView
         style="@style/NavBarStyle"
-        app:title="设置"/>
-
+        app:title="提醒设置"/>
     <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/expandablelistview"
-        android:background="@color/whiteColor"
         android:layout_below="@id/NavbarView"
-        android:groupIndicator="@null"
         tools:ignore="UnknownId"
+        android:background="@color/whiteColor"
         />
 
-</RelativeLayout>
+    </RelativeLayout>

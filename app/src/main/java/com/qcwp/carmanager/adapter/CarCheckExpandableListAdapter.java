@@ -11,10 +11,7 @@ import android.widget.TextView;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.enumeration.ExamnationStatusEnum;
 import com.qcwp.carmanager.enumeration.KeyEnum;
-import com.qcwp.carmanager.utils.Print;
 
-import java.security.Key;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,14 +21,14 @@ import java.util.Map;
  * @email:675767159@qq.com
  */
 
-public class CarExamnationExpandableListAdapter extends BaseExpandableListAdapter {
+public class CarCheckExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context mContext;
     private List<Map> mList;
     private final int faultCode=0,other=1;
 
 
-    public CarExamnationExpandableListAdapter(Context context){
+    public CarCheckExpandableListAdapter(Context context){
         mContext=context;
     }
     //  获得父项的数量
@@ -222,7 +219,7 @@ public class CarExamnationExpandableListAdapter extends BaseExpandableListAdapte
     //  子项是否可选中，如果需要设置子项的点击事件，需要返回true
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return groupPosition < 5;
     }
 
 

@@ -36,6 +36,8 @@
 
     <string-array name="NeedTokenAPI">
         <item>doVin_bindVin</item>
+        <item>doCarCheck_addCarCheck</item>
+
         <!--<item>doTravelDataUploadFile_appUpload</item>-->
 
     </string-array>

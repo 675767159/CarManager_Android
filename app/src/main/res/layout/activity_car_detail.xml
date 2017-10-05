@@ -20,6 +20,7 @@
             android:textColor="@color/whiteColor"
             android:background="@null"
             android:id="@+id/carEdit"
+            android:onClick="onClick"
 
             />
     </com.qcwp.carmanager.control.NavBarView>

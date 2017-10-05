@@ -1,0 +1,48 @@
+[
+  {
+    "title": "",
+    "list":
+    [
+      { "title": "提醒设置",
+        "isSwitch":false
+      }
+
+    ]
+  },
+  {
+    "title": "",
+    "list":
+    [
+      { "title": "设置帮助",
+        "isSwitch":false
+      },
+      { "title": "数据上传",
+        "isSwitch":false
+      },
+      { "title": "启动自动连接OBD",
+        "isSwitch":true
+      },
+      { "title": "摇一摇手机体验",
+        "isSwitch":true
+      },
+      { "title": "OBD设备",
+        "isSwitch":false
+      }
+
+    ]
+  },
+  {
+    "title": "",
+    "list":
+    [
+      { "title": "关于软件",
+        "isSwitch":false
+      },
+      { "title": "退出账号",
+        "isSwitch":false
+      }
+
+    ]
+  }
+
+]

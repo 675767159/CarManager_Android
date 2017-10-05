@@ -13,6 +13,8 @@ public interface UploadDataContract {
 
         void uploadDriveDataComplete();
         void uploadMapPointOfDriveDataComplete();
+        void uploadDrivingCustomComplete();
+        void uploadPhysicalExaminationComplete();
     }
 
 
@@ -20,6 +22,8 @@ public interface UploadDataContract {
 
          void uploadDriveData();
          void uploadMapPointOfDriveData();
+         void uploadDrivingCustom();
+         void uploadPhysicalExamination();
 
     }
 }

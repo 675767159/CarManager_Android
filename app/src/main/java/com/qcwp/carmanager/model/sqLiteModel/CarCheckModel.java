@@ -1,5 +1,8 @@
 package com.qcwp.carmanager.model.sqLiteModel;
 
+import com.qcwp.carmanager.enumeration.UploadStatusEnum;
+
+import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -57,12 +60,15 @@ public class CarCheckModel {
     @Property(nameInDb = "carSeries")
     private String carSeries;
 
-    @Generated(hash = 697067539)
-    public CarCheckModel(Long id, int score, int unusualCodeCount,
-            int faultCodeCount, String createDate, String vinCode,
-            String powertrainDTCS, String chassisDTCS, String carBodyDTCS,
-            String networkDTCS, String driveDatas, String engineConditions,
-            String carSeries) {
+    @Convert(converter = CarInfoModel.UploadStatusConverter.class, columnType = Integer.class)
+    @Property(nameInDb = "uploadFlag")
+    private UploadStatusEnum uploadFlag;
+
+    @Generated(hash = 36144552)
+    public CarCheckModel(Long id, int score, int unusualCodeCount, int faultCodeCount,
+            String createDate, String vinCode, String powertrainDTCS, String chassisDTCS,
+            String carBodyDTCS, String networkDTCS, String driveDatas,
+            String engineConditions, String carSeries, UploadStatusEnum uploadFlag) {
         this.id = id;
         this.score = score;
         this.unusualCodeCount = unusualCodeCount;
@@ -76,6 +82,7 @@ public class CarCheckModel {
         this.driveDatas = driveDatas;
         this.engineConditions = engineConditions;
         this.carSeries = carSeries;
+        this.uploadFlag = uploadFlag;
     }
 
     @Generated(hash = 1099894684)
@@ -185,6 +192,15 @@ public class CarCheckModel {
     public void setCarSeries(String carSeries) {
         this.carSeries = carSeries;
     }
+
+    public UploadStatusEnum getUploadFlag() {
+        return this.uploadFlag;
+    }
+
+    public void setUploadFlag(UploadStatusEnum uploadFlag) {
+        this.uploadFlag = uploadFlag;
+    }
+
 
 
 

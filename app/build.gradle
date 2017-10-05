@@ -15,6 +15,7 @@ android {
                 cppFlags ""
             }
         }
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -40,7 +41,7 @@ repositories {
 }
 
 greendao {
-    schemaVersion 2 //数据库模式的当前版本。 这由* OpenHelpers类用于在模式版本之间迁移。 如果更改实体/数据库模式，则必须增加此值。 默认值为1。
+    schemaVersion 3 //数据库模式的当前版本。 这由* OpenHelpers类用于在模式版本之间迁移。 如果更改实体/数据库模式，则必须增加此值。 默认值为1。
     daoPackage 'com.qcwp.carmanager.greendao.gen'//生成的DAO，DaoMaster和DaoSession的包名称。 默认为源实体的包名称。
     targetGenDir 'src/main/java'
     //生成的源码应存储在的位置。 默认为生成目录（build / generated / source / greendao）中生成的源文件夹。
@@ -64,6 +65,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 
     //Android开发人员不得不收集的代码(持续更新中)https://github.com/Blankj/AndroidUtilCode/blob/master/README-CN.md
+    //https://github.com/Blankj/AndroidUtilCode/tree/master/subutil
     compile 'com.blankj:utilcode:1.6.4'
 
     //黄油刀https://github.com/JakeWharton/butterknife

@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.RegexUtils;
 import com.blankj.utilcode.util.TimeUtils;
+import com.qcwp.carmanager.engine.ApiException;
 import com.qcwp.carmanager.engine.MyCallBack;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
@@ -61,9 +62,8 @@ public class MainPresenter extends BasePresenter implements MainContract.Present
             }
 
             @Override
-            public void onSuccess(Call<AllCarModel> call, Response<AllCarModel> response) {
+            public void onSuccess(Call<AllCarModel> call, AllCarModel allCarInfoModel) {
 
-                AllCarModel allCarInfoModel=response.body();
                 Print.d(TAG,"------------");
                 if (allCarInfoModel.getStatus()==1) {
                     List<CarInfoModel> allCarInfoModels = allCarInfoModel.getVins();
@@ -101,8 +101,8 @@ public class MainPresenter extends BasePresenter implements MainContract.Present
             }
 
             @Override
-            public void onFailed(Call<AllCarModel> call, Throwable throwable) {
-                view.showTip(throwable.getLocalizedMessage());
+            public void onFailed(Call<AllCarModel> call,  ApiException throwable) {
+                view.showTip(throwable.getDisplayMessage());
             }
         });
 
@@ -127,6 +127,10 @@ public class MainPresenter extends BasePresenter implements MainContract.Present
 
         CarVinStatisticModel  carVinStatisticModel = mApp.getDaoInstant().queryBuilder(CarVinStatisticModel.class).where(CarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).build().unique();
 
+        if (carVinStatisticModel==null){
+            return new CarVinStatisticModel();
+        }
+
         return carVinStatisticModel;
     }
 
@@ -135,6 +139,9 @@ public class MainPresenter extends BasePresenter implements MainContract.Present
 
         SingleCarVinStatisticModel singleCarVinStatisticModel=mApp.getDaoInstant().queryBuilder(SingleCarVinStatisticModel.class).where(SingleCarVinStatisticModelDao.Properties.VinCode.eq(vinCode)).build().unique();
 
+        if (singleCarVinStatisticModel==null){
+            return new SingleCarVinStatisticModel();
+        }
         return singleCarVinStatisticModel;
     }
 

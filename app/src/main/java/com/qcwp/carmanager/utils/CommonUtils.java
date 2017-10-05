@@ -1,19 +1,34 @@
 package com.qcwp.carmanager.utils;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 
 import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.NetworkUtils;
 import com.qcwp.carmanager.APP;
+import com.qcwp.carmanager.enumeration.DrivingCustomEnum;
+import com.qcwp.carmanager.enumeration.WifiTypeEnum;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.implement.StateRoundRectDrawable;
+import com.qcwp.carmanager.model.sqLiteModel.DrivingCustomModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +42,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 /**
@@ -237,4 +253,113 @@ public class CommonUtils {
         }
         return result;
     }
+
+
+
+    public static boolean currentWifiIsOBDWIFI(WifiManager wifiManager) {
+
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int level=wifiInfo.getRssi();
+        Print.d("SCAN_RESULTS_AVAILABLE_ACTION","level="+level);
+        return wifiInfo != null && wifiInfo.getSSID().contains("OBD") && level > -100;
+    }
+
+
+    public static Boolean createOBDWIFI(WifiManager wifiManager){
+
+
+        Print.d("SCAN_RESULTS_AVAILABLE_ACTION","--------------");
+        wifiManager.startScan();
+        List<ScanResult> resultss = wifiManager.getScanResults();
+        Print.d("SCAN_RESULTS_AVAILABLE_ACTION",resultss.size()+"----");
+        WifiConfiguration wificong = null;
+        for (int i=0;i<10;i++) {
+
+            List<ScanResult> results = wifiManager.getScanResults();
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION",results.size()+"----");
+            for (ScanResult result : results) {
+                Print.d("SCAN_RESULTS_AVAILABLE_ACTION", result.SSID + "," + result.BSSID + ",  " + result.level);
+                if (result.SSID.contains("OBD")) {
+                    wificong = new WifiConfiguration();
+                    wificong.SSID = "\"" + result.SSID + "\"";
+                    wificong.BSSID = result.BSSID;
+                    wificong.status = WifiConfiguration.Status.ENABLED;
+                    wificong.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+                    wificong.wepKeys[0] = "\"" + "\"";
+
+                    break;
+                }
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (wificong!=null){
+                break;
+            }
+        }
+
+        Boolean isSuccess=false;
+        if (wificong != null) {
+            int newNetworkId = wifiManager.addNetwork(wificong);
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "state------" + wifiManager.getWifiState());
+            Boolean a=false;
+            int i=0;
+            while (!a&&i<5) {
+                a=wifiManager.enableNetwork(newNetworkId, true);
+                i++;
+            }
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "a------" + a);
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "state------" + wifiManager.getWifiState());
+            if (a) {
+                wifiManager.saveConfiguration();
+            }
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "state------" + wifiManager.getWifiState());
+
+            i=0;
+            a=false;
+            while (i<5&&!a){
+                a=CommonUtils.currentWifiIsOBDWIFI(wifiManager);
+                Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "aa------" +a);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                i++;
+            }
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "a------" +a);
+
+            if (a) {
+                isSuccess = true;
+            }
+
+
+
+        }
+
+        return isSuccess;
+
+    }
+
+    static public Boolean isGpsOPen(Activity activity) {
+        PackageManager pm =activity.getPackageManager();
+        boolean permission = (PackageManager.PERMISSION_GRANTED ==
+                pm.checkPermission("android.permission.ACCESS_FINE_LOCATION", "com.qcwp.carmanager"));
+        return permission;
+    }
+
+    static public void openGPS(Activity activity,int code) {
+        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                code);
+        Print.d("startBluetoothService", "result==VERSION");
+    }
+
 }

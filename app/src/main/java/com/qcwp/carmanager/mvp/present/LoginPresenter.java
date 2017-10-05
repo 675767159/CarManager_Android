@@ -3,6 +3,7 @@ package com.qcwp.carmanager.mvp.present;
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
 import com.google.gson.Gson;
+import com.qcwp.carmanager.engine.ApiException;
 import com.qcwp.carmanager.engine.MyCallBack;
 import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.model.LoginModel;
@@ -65,8 +66,8 @@ public class LoginPresenter extends BasePresenter implements LoginContract.Prese
 
 
             @Override
-            public void onSuccess(Call<LoginModel> call, Response<LoginModel> response) {
-               final LoginModel  model=response.body();
+            public void onSuccess(Call<LoginModel> call, final LoginModel model) {
+
                 if (model.getStatus()==1) {
                     model.setPassword(password);
                     UserData.setInstance(model);
@@ -88,8 +89,8 @@ public class LoginPresenter extends BasePresenter implements LoginContract.Prese
             }
 
             @Override
-            public void onFailed(Call<LoginModel> call, Throwable throwable) {
-                view.showTip(throwable.getLocalizedMessage());
+            public void onFailed(Call<LoginModel> call, ApiException throwable) {
+                view.showTip(throwable.getDisplayMessage());
             }
         });
 

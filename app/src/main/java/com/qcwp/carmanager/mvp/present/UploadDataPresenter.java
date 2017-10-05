@@ -1,19 +1,28 @@
 package com.qcwp.carmanager.mvp.present;
 
+import android.database.Cursor;
+
 import com.baidu.location.LocationClientOption;
+import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.ThreadPoolUtils;
 import com.blankj.utilcode.util.TimeUtils;
+import com.qcwp.carmanager.enumeration.DrivingCustomEnum;
 import com.qcwp.carmanager.enumeration.UploadStatusEnum;
+import com.qcwp.carmanager.greendao.gen.CarCheckModelDao;
 import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
+import com.qcwp.carmanager.greendao.gen.DrivingCustomModelDao;
 import com.qcwp.carmanager.greendao.gen.LocationModelDao;
 import com.qcwp.carmanager.greendao.gen.TravelDataModelDao;
 import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
 import com.qcwp.carmanager.model.retrofitModel.TokenModel;
+import com.qcwp.carmanager.model.sqLiteModel.CarCheckModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
+import com.qcwp.carmanager.model.sqLiteModel.DrivingCustomModel;
 import com.qcwp.carmanager.model.sqLiteModel.LocationModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
@@ -23,6 +32,7 @@ import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +44,10 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.blankj.utilcode.util.ThreadPoolUtils.CachedThread;
+import static com.blankj.utilcode.util.ThreadPoolUtils.FixedThread;
+import static com.blankj.utilcode.util.ThreadPoolUtils.SingleThread;
 
 /**
  * Created by qyh on 2017/7/10.
@@ -47,9 +61,11 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
     private final DaoSession mDaoSession;
     private int count=0;
     private boolean isUploading=false;
+    private ThreadPoolUtils threadPoolUtils;
     public UploadDataPresenter(UploadDataContract.View view, DaoSession daoSession){
         this.view=view;
         this.mDaoSession=daoSession;
+        threadPoolUtils= new ThreadPoolUtils(CachedThread, 1);
     }
 
 
@@ -61,9 +77,8 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
         count=0;
         isUploading=false;
         while (count<travelSummaryModels.size()) {
-            if (!isUploading&&count<travelSummaryModels.size()) {
+            if (!isUploading) {
                 isUploading = true;
-
                 TravelSummaryModel travelSummaryModel = travelSummaryModels.get(count);
                 final long onlyFlag = travelSummaryModel.getOnlyFlag();
                 String vinCode = travelSummaryModel.getVinCode();
@@ -123,13 +138,12 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
                                     if (allCarModel.getStatus() == 1 || allCarModel.getMsg().equals("该小结没有合法的数据!") || allCarModel.getMsg().equals("该文件已经解析过了,本次不予处理!")) {
 
                                         TravelSummaryModel travelSummaryModel = mDaoSession.queryBuilder(TravelSummaryModel.class).where(TravelSummaryModelDao.Properties.OnlyFlag.eq(onlyFlag)).unique();
+
                                         travelSummaryModel.setUploadFlag(UploadStatusEnum.HadUpload);
                                         mDaoSession.update(travelSummaryModel);
 
                                         List<TravelDataModel> travelDataModels = mDaoSession.queryBuilder(TravelDataModel.class).where(TravelDataModelDao.Properties.OnlyFlag.eq(onlyFlag)).list();
-                                        for (TravelDataModel travelDataModel : travelDataModels) {
-                                            mDaoSession.delete(travelDataModel);
-                                        }
+                                        mDaoSession.getTravelDataModelDao().deleteInTx(travelDataModels);
 
 
                                     }
@@ -158,13 +172,22 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
                         isUploading = false;
                     }
                 });
+
+                while (true){
+                    if (!isUploading){
+                        break;
+                    }
+                }
             }
 
         }
 
-        if (count==travelSummaryModels.size()){
-            view.uploadDriveDataComplete();
-            completeOnceRequest();
+        while (true) {
+            if (count == travelSummaryModels.size()) {
+                view.uploadDriveDataComplete();
+                completeOnceRequest();
+                break;
+            }
         }
 
 
@@ -173,83 +196,94 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
     @Override
     public void uploadMapPointOfDriveData() {
         count=0;
-        isUploading=false;
+        isUploading = false;
         String SQL_DISTINCT_ENAME = "SELECT DISTINCT "+LocationModelDao.Properties.CreateTime.columnName+" FROM "+LocationModelDao.TABLENAME+" WHERE "+LocationModelDao.Properties.UploadFlag.columnName+" = "+UploadStatusEnum.NotUpload.getValue();
         List<String> locationModels= CommonUtils.listEName(mDaoSession,SQL_DISTINCT_ENAME);
 
-
         while (count<locationModels.size()) {
-            if (!isUploading && count < locationModels.size()) {
+            if (!isUploading) {
                 isUploading = true;
-               final   String createDate=locationModels.get(count);
-
+                final   String createDate=locationModels.get(count);
                 final List<LocationModel>locationModelList=mDaoSession.queryBuilder(LocationModel.class).where(LocationModelDao.Properties.CreateTime.eq(createDate)).orderAsc(LocationModelDao.Properties.CreateTime).limit(1000).list();
+                        int i=0;
+                        Locale locale=Locale.getDefault();
+                        String  vinCode=null;
+                        Map<String,Object> map=new HashMap<>();
+                        for (LocationModel locationMode :locationModelList){
+
+                            map.put(String.format(locale,"mapPoints[%d].pointx",i),locationMode.getLongitude());
+                            map.put(String.format(locale,"mapPoints[%d].pointy",i),locationMode.getLatitude());
+                            map.put(String.format(locale,"mapPoints[%d].createDate",i),TimeUtils.string2Millis(locationMode.getCurrentTime()));
+                            vinCode=locationMode.getVinCode();
+                            i++;
+
+                        }
+
+                        map.put("vinCode",vinCode);
+                        map.put("summarizeStartDate",createDate);
+
+                        Print.d("uploadMapPointOfDrive","--"+map.toString());
+                  Print.d("uploadMapPointOfDriveuploadMapPointOfDrive","111111111");
+
+
+                        mEngine.uploadMapPointOfDrive(map).enqueue(new Callback<AllCarModel>() {
+                            @Override
+                            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+                                AllCarModel model=response.body();
+
+                                Print.d("uploadMapPointOfDriveuploadMapPointOfDrive","2222222");
+
+                                Print.d("uploadMapPointOfDrive","--"+model.getMsg());
+                                if (model!=null&&model.getStatus()==1)
+                                {
+                                    Print.d("uploadMapPointOfDrive","--"+model.getStatus());
+                                    mDaoSession.getLocationModelDao().deleteInTx(locationModelList);
 
 
 
+                                    int tempCount=mDaoSession.queryBuilder(LocationModel.class).where(LocationModelDao.Properties.CreateTime.eq(createDate)).orderAsc(LocationModelDao.Properties.CreateTime).limit(1000).list().size();
+                                    if (tempCount==0) {
+                                        count++;
+                                        isUploading = false;
 
-                int i=0;
-                Locale locale=Locale.getDefault();
-                String  vinCode=null;
-                Map<String,Object> map=new HashMap<String, Object>();
-                for (LocationModel locationMode :locationModelList){
+                                    }
 
-                    map.put(String.format(locale,"mapPoints[%d].pointx",i),locationMode.getLongitude());
-                    map.put(String.format(locale,"mapPoints[%d].pointy",i),locationMode.getLatitude());
-                    map.put(String.format(locale,"mapPoints[%d].createDate",i),TimeUtils.string2Millis(locationMode.getCurrentTime()));
-                    vinCode=locationMode.getVinCode();
-                    i++;
+                                }else{
 
-                }
-
-                map.put("vinCode",vinCode);
-                map.put("summarizeStartDate",createDate);
-
-                Print.d("uploadMapPointOfDrive","--"+map.toString());
-
-                mEngine.uploadMapPointOfDrive(map).enqueue(new Callback<AllCarModel>() {
-                    @Override
-                    public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
-                        AllCarModel model=response.body();
-                        Print.d("uploadMapPointOfDrive","--"+response.code());
-                        Print.d("uploadMapPointOfDrive","--"+model.getMsg());
-                        if (model!=null&&model.getStatus()==1)
-                        {
-                            Print.d("uploadMapPointOfDrive","--"+model.getStatus());
-                            for (LocationModel locationModel:locationModelList) {
-                                mDaoSession.delete(locationModel);
+                                    count++;
+                                    isUploading = false;
+                                }
                             }
 
-
-
-                            int tempCount=mDaoSession.queryBuilder(LocationModel.class).where(LocationModelDao.Properties.CreateTime.eq(createDate)).orderAsc(LocationModelDao.Properties.CreateTime).limit(1000).list().size();
-                            if (tempCount==0) {
+                            @Override
+                            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+                                Print.d("uploadMapPointOfDriveuploadMapPointOfDrive","2222222");
                                 count++;
                                 isUploading = false;
-
                             }
+                        });
 
-                        }else{
-
-                            count++;
-                            isUploading = false;
-                        }
+                while (true){
+                    if (!isUploading){
+                        break;
                     }
-
-                    @Override
-                    public void onFailure(Call<AllCarModel> call, Throwable throwable) {
-                        count++;
-                        isUploading = false;
-                    }
-                });
-
-
+                }
+                Print.d("uploadMapPointOfDriveuploadMapPointOfDrive","33333333333");
 
             }
+
+
+
         }
 
-        if (count==locationModels.size()){
-            view.uploadMapPointOfDriveDataComplete();
+
+
+        while (true) {
+            if (count == locationModels.size()) {
+                view.uploadMapPointOfDriveDataComplete();
+                completeOnceRequest();
+                break;
+            }
         }
 
 
@@ -257,6 +291,155 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
 
 
     }
+
+    @Override
+    public void uploadDrivingCustom() {
+        isUploading=false;
+        count=0;
+        List<DrivingCustomModel> drivingCustomModels= this.listDriveCustom();
+
+        while (count<drivingCustomModels.size()) {
+            if (!isUploading) {
+                isUploading = true;
+                DrivingCustomModel drivingCustomModel=drivingCustomModels.get(count);
+                final String startDate=drivingCustomModel.getStartDate();
+                int accelerate=UploadDataPresenter.this.getDrivingCustomCount(startDate,DrivingCustomEnum.Acceleration);
+                int deceleration=UploadDataPresenter.this.getDrivingCustomCount(startDate,DrivingCustomEnum.Deceleration);
+                int overdrive=UploadDataPresenter.this.getDrivingCustomCount(startDate,DrivingCustomEnum.Overdrive);
+
+                mEngine.uploadDriveCustom(drivingCustomModel.getVinCode(),startDate,accelerate,deceleration,overdrive).enqueue(new Callback<AllCarModel>() {
+                    @Override
+                    public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+                        AllCarModel model=response.body();
+
+                        Print.d("uploadDrivingCustom",model.getMsg()+"-----");
+                        if (model!=null&&model.getStatus()==1) {
+                            Print.d("uploadDrivingCustom",model.getStatus()+"-----");
+                            List<DrivingCustomModel>list=mDaoSession.queryBuilder(DrivingCustomModel.class).where(DrivingCustomModelDao.Properties.StartDate.eq(startDate)).list();
+                            mDaoSession.getDrivingCustomModelDao().deleteInTx(list);
+                        }
+
+
+                        count++;
+                        isUploading=false;
+                    }
+
+                    @Override
+                    public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+
+                        count++;
+                        isUploading=false;
+                    }
+                });
+
+                while (true){
+                    if (!isUploading){
+                        break;
+                    }
+                }
+
+
+            }
+        }
+
+
+
+
+
+        while (true) {
+            if (count == drivingCustomModels.size()) {
+                view.uploadDrivingCustomComplete();
+                completeOnceRequest();
+                Print.d("uploadDrivingCustom", "完成");
+                break;
+
+            }
+        }
+
+
+
+
+    }
+
+
+
+
+
+
+    @Override
+    public void uploadPhysicalExamination() {
+
+        count=0;
+        isUploading=false;
+
+        List<CarCheckModel> carCheckModels= mDaoSession.queryBuilder(CarCheckModel.class).where(CarCheckModelDao.Properties.UploadFlag.eq(UploadStatusEnum.NotUpload.getValue())).list();
+
+        while (count<carCheckModels.size()) {
+            if (!isUploading) {
+                isUploading = true;
+                final CarCheckModel carCheckModel=carCheckModels.get(count);
+
+                Map<String,String> faultCodeMap=new HashMap<>();
+                String faultCodeStr=carCheckModel.getCarBodyDTCS()+carCheckModel.getChassisDTCS()+carCheckModel.getNetworkDTCS()+carCheckModel.getPowertrainDTCS();
+                String[] faultCodes=faultCodeStr.split(",");
+                int i=0;
+                for (String faultCode:faultCodes) {
+                        faultCodeMap.put(String.format(Locale.getDefault(), "faultCodes[%d].code", i), faultCode);
+                        i++;
+                }
+
+                String engineConditionStr=carCheckModel.getEngineConditions();
+                String[] engineConditions=engineConditionStr.split(",");
+
+
+
+                Print.d("uploadPhysicalExamination",carCheckModel.getVinCode());
+
+                mEngine.uploadPhysicalExamination(carCheckModel.getVinCode(),carCheckModel.getCreateDate(),carCheckModel.getScore(),engineConditions[0],engineConditions[1],engineConditions[2],engineConditions[3],engineConditions[4],engineConditions[5],faultCodeMap).enqueue(new Callback<AllCarModel>() {
+                    @Override
+                    public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                        AllCarModel carModel=response.body();
+                        Print.d("uploadPhysicalExamination","msg==="+carModel.getMsg());
+                        Print.d("uploadPhysicalExamination","status==="+carModel.getStatus());
+                        if (carModel.getStatus()==1){
+
+                            carCheckModel.setUploadFlag(UploadStatusEnum.HadUpload);
+                            mDaoSession.update(carCheckModel);
+                        }
+                        count++;
+                        isUploading = false;
+                    }
+
+                    @Override
+                    public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+
+                        Print.d("uploadPhysicalExamination","throwable==="+throwable.getLocalizedMessage());
+                        count++;
+                        isUploading = false;
+
+                    }
+                });
+
+                while (true){
+                    if (!isUploading){
+                        break;
+                    }
+                }
+
+            }
+        }
+
+
+        if (count==carCheckModels.size()){
+            view.uploadPhysicalExaminationComplete();
+            completeOnceRequest();
+            Print.d("uploadDrivingCustom","完成");
+        }
+
+    }
+
+
 
     @Override
     int getRequestCount() {
@@ -266,5 +449,53 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
     @Override
     void completeAllRequest() {
 
+    }
+
+
+    private  List<DrivingCustomModel> listDriveCustom() {
+
+        String SQL_DISTINCT_ENAME = "SELECT * FROM "+DrivingCustomModelDao.TABLENAME+" group by "+DrivingCustomModelDao.Properties.StartDate.columnName;
+
+        List<DrivingCustomModel> result = new ArrayList<>();
+        Cursor c = mDaoSession.getDatabase().rawQuery(SQL_DISTINCT_ENAME, null);
+        try{
+            if (c.moveToFirst()) {
+                do {
+
+                    DrivingCustomModel drivingCustomModel=new DrivingCustomModel();
+
+                    drivingCustomModel.setVinCode(c.getString(c.getColumnIndex(DrivingCustomModelDao.Properties.VinCode.columnName)));
+                    drivingCustomModel.setStartDate(c.getString(c.getColumnIndex(DrivingCustomModelDao.Properties.StartDate.columnName)));
+                    drivingCustomModel.setType(DrivingCustomEnum.fromInteger(c.getInt(c.getColumnIndex(DrivingCustomModelDao.Properties.Type.columnName))));
+                    drivingCustomModel.setCreateDate(c.getString(c.getColumnIndex(DrivingCustomModelDao.Properties.CreateDate.columnName)));
+                    drivingCustomModel.setPointx(c.getDouble(c.getColumnIndex(DrivingCustomModelDao.Properties.Pointx.columnName)));
+                    drivingCustomModel.setPointy(c.getDouble(c.getColumnIndex(DrivingCustomModelDao.Properties.Pointy.columnName)));
+                    result.add(drivingCustomModel);
+                } while (c.moveToNext());
+            }
+        } finally {
+            c.close();
+        }
+        return result;
+    }
+
+
+    private  int getDrivingCustomCount(String startDate,DrivingCustomEnum type) {
+
+        String SQL_DISTINCT_ENAME = "select count(*) from "+DrivingCustomModelDao.TABLENAME+" where "+ DrivingCustomModelDao.Properties.StartDate.columnName+" = ' "+startDate+" ' and type= "+ type.getValue();
+
+        int count=0;
+        Cursor c = mDaoSession.getDatabase().rawQuery(SQL_DISTINCT_ENAME, null);
+        try{
+            if (c.moveToFirst()) {
+                do {
+
+                    count=c.getInt(0);
+                } while (c.moveToNext());
+            }
+        } finally {
+            c.close();
+        }
+        return count;
     }
 }

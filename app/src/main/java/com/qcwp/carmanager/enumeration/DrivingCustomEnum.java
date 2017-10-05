@@ -22,5 +22,18 @@ public enum DrivingCustomEnum {
     }
 
 
+    public static DrivingCustomEnum fromInteger(int value){
+        switch (value){
+            case 1:
+                return Deceleration;
+            case 2:
+                return Acceleration;
+            case 3:
+                return Overdrive;
+            default:
+                return Unknown;
+        }
+
+    }
 
 }

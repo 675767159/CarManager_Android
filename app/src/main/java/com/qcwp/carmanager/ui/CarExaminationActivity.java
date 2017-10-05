@@ -14,40 +14,33 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.TimeUtils;
-import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
+import com.qcwp.carmanager.adapter.CarCheckExpandableListAdapter;
 import com.qcwp.carmanager.adapter.CarCheckRecordAdapter;
-import com.qcwp.carmanager.adapter.CarEditSelectAdapter;
-import com.qcwp.carmanager.adapter.CarExamnationExpandableListAdapter;
+import com.qcwp.carmanager.adapter.SetExpandableListAdapter;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.TitleContentView;
 import com.qcwp.carmanager.control.TouchHighlightImageView;
 import com.qcwp.carmanager.enumeration.ExamnationStatusEnum;
 import com.qcwp.carmanager.enumeration.KeyEnum;
-import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
-import com.qcwp.carmanager.greendao.gen.CarBrandModelDao;
+import com.qcwp.carmanager.enumeration.LoadDataTypeEnum;
+import com.qcwp.carmanager.enumeration.UploadStatusEnum;
 import com.qcwp.carmanager.greendao.gen.CarCheckModelDao;
-import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
-import com.qcwp.carmanager.model.sqLiteModel.CarBrandModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarCheckModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
 import com.qcwp.carmanager.model.sqLiteModel.CarVinStatisticModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
 import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.utils.CommonUtils;
-import com.qcwp.carmanager.utils.Print;
 
 import org.json.JSONArray;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class CarExaminationActivity extends BaseActivity {
 
@@ -89,7 +82,10 @@ public class CarExaminationActivity extends BaseActivity {
     private String chassisDTCS;
     private String carBodyDTCS;
     private String networkDTCS;
-    private CarExamnationExpandableListAdapter carExamnationExpandableListAdapter;
+    private CarCheckExpandableListAdapter carExamnationExpandableListAdapter;
+
+
+    private Boolean hadClear=false;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_car_examination;
@@ -108,7 +104,7 @@ public class CarExaminationActivity extends BaseActivity {
 
 
 
-        carExamnationExpandableListAdapter=new CarExamnationExpandableListAdapter(this);
+        carExamnationExpandableListAdapter=new CarCheckExpandableListAdapter(this);
         expandablelistview.setAdapter(carExamnationExpandableListAdapter);
 
 
@@ -155,11 +151,18 @@ public class CarExaminationActivity extends BaseActivity {
         expandablelistview.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                CarCheckModel carCheckModel=carCheckModels.get(childPosition);
-                carCheckTime=carCheckModel.getCreateDate();
-                CarExaminationActivity.this.loadCarCheckRecord(carCheckTime);
-                RadioButton radioButtonAll=(RadioButton)selectModel.findViewById(R.id.radioButton1);
-                radioButtonAll.setChecked(true);
+
+                ExpandableListAdapter adapter=parent.getExpandableListAdapter();
+                if (adapter instanceof CarCheckRecordAdapter) {
+
+                    CarCheckModel carCheckModel = carCheckModels.get(childPosition);
+                    carCheckTime = carCheckModel.getCreateDate();
+                    CarExaminationActivity.this.loadCarCheckRecord(carCheckTime);
+                    RadioButton radioButtonAll = (RadioButton) selectModel.findViewById(R.id.radioButton1);
+                    radioButtonAll.setChecked(true);
+                }else {
+                    CarExaminationActivity.this.startExamination(LoadDataTypeEnum.dataTypeClearErr);
+                }
 
                 return false;
             }
@@ -210,7 +213,7 @@ public class CarExaminationActivity extends BaseActivity {
             JSONArray driveDataPidArray = CommonUtils.getJSONArrayFromText("CarCheckDriveDataPids.json");
             this.handleRecordOthers(driveDataList,this.getString(R.string.driveData),driveDataPidArray);
 
-            carExamnationExpandableListAdapter=new CarExamnationExpandableListAdapter(this);
+            carExamnationExpandableListAdapter=new CarCheckExpandableListAdapter(this);
             expandablelistview.setAdapter(carExamnationExpandableListAdapter);
             carExamnationExpandableListAdapter.updateData(dataList);
             this.expandGroup(7);
@@ -334,16 +337,16 @@ public class CarExaminationActivity extends BaseActivity {
         super.onClick(v);
         switch (v.getId()) {
             case R.id.btn_start:
-                if (obdClient.getConnectStatus()==OBDConnectStateEnum.connectTypeHaveBinded) {
-                    CarExaminationActivity.this.startExamination();
+                if (obdClient.getLoadDataType()==LoadDataTypeEnum.dataTypedrive) {
+                    CarExaminationActivity.this.startExamination(LoadDataTypeEnum.dataTypeTijian);
                 }else {
-                    showToast("请先连接上OBD");
+                    showToast("请先连接上OBD,等待初始化完成！");
                 }
                 break;
         }
     }
 
-    private void startExamination() {
+    private void startExamination(LoadDataTypeEnum type) {
         btnStart.setImageResource(R.mipmap.car_examination_needle);
         btnStart.startAnimation(rotateAnimation);
         btnStart.setEnabled(false);
@@ -359,7 +362,15 @@ public class CarExaminationActivity extends BaseActivity {
 
         this.initDataList();
         carExamnationExpandableListAdapter.invalidData();
-        obdClient.startExamnation();
+        switch (type){
+            case dataTypeTijian:
+                obdClient.startExamnation();
+                break;
+            case dataTypeClearErr:
+                obdClient.clearFaultCode();
+                break;
+        }
+
         examinationProgress.setVisibility(View.VISIBLE);
 
         carCheckScore.setVisibility(View.GONE);
@@ -399,39 +410,50 @@ public class CarExaminationActivity extends BaseActivity {
         String currentTime=TimeUtils.getNowString();
         examinationTime.setContentTextViewText(currentTime.substring(0,16));
 
-        CarCheckModel carCheckModel=new CarCheckModel();
-        carCheckModel.setScore(score);
-        carCheckModel.setCreateDate(currentTime);
-        carCheckModel.setUnusualCodeCount(unusualCodeCount);
-        carCheckModel.setFaultCodeCount(faultCodeCount);
-        carCheckModel.setVinCode(carInfo.getVinCode());
-        carCheckModel.setPowertrainDTCS(powertrainDTCS);
-        carCheckModel.setChassisDTCS(chassisDTCS);
-        carCheckModel.setCarBodyDTCS(carBodyDTCS);
-        carCheckModel.setNetworkDTCS(networkDTCS);
-        carCheckModel.setDriveDatas(driveDatas);
-        carCheckModel.setEngineConditions(engineConditions);
-        carCheckModel.setCarSeries(carInfo.getCarSeries());
-        mDaoSession.insertOrReplace(carCheckModel);
+
+        if (faultCodeCount>0&&!hadClear){
+            showToast("发现故障码，现进行自动清除！");
+            this.startExamination(LoadDataTypeEnum.dataTypeClearErr);
+            hadClear=true;
+        }else {
+
+            if (faultCodeCount>0){
+                showToast("有无法清除的故障码！");
+            }
+            hadClear=false;
+            CarCheckModel carCheckModel = new CarCheckModel();
+            carCheckModel.setScore(score);
+            carCheckModel.setCreateDate(currentTime);
+            carCheckModel.setUnusualCodeCount(unusualCodeCount);
+            carCheckModel.setFaultCodeCount(faultCodeCount);
+            carCheckModel.setVinCode(carInfo.getVinCode());
+            carCheckModel.setPowertrainDTCS(powertrainDTCS);
+            carCheckModel.setChassisDTCS(chassisDTCS);
+            carCheckModel.setCarBodyDTCS(carBodyDTCS);
+            carCheckModel.setNetworkDTCS(networkDTCS);
+            carCheckModel.setDriveDatas(driveDatas);
+            carCheckModel.setEngineConditions(engineConditions);
+            carCheckModel.setCarSeries(carInfo.getCarSeries());
+            carCheckModel.setUploadFlag(UploadStatusEnum.NotUpload);
+            mDaoSession.insertOrReplace(carCheckModel);
 
 
+            CarVinStatisticModel carVinStatisticModel = obdClient.getCarVinStatisticModel();
+            carVinStatisticModel.setFaultCodeCount(carVinStatisticModel.getFaultCodeCount() + faultCodeCount);
+
+            double averageScore = (carVinStatisticModel.getCarCheckCount() * carVinStatisticModel.getCarCheckAvg() + score) * 1f / (carVinStatisticModel.getCarCheckCount() + 1);
+
+            carVinStatisticModel.setCarCheckAvg(averageScore);
+            carVinStatisticModel.setLastCarCheck(score);
+            carVinStatisticModel.setCarCheckCount(carVinStatisticModel.getCarCheckCount() + 1);
+            mDaoSession.update(carVinStatisticModel);
+
+            TravelSummaryModel travelSummaryModel = obdClient.getTravelSummaryModel();
+            travelSummaryModel.setCarCheckUpScore(score);
+            mDaoSession.update(carVinStatisticModel);
 
 
-
-        CarVinStatisticModel carVinStatisticModel=obdClient.getCarVinStatisticModel();
-        carVinStatisticModel.setFaultCodeCount(carVinStatisticModel.getFaultCodeCount()+faultCodeCount);
-
-        double averageScore=(carVinStatisticModel.getCarCheckCount()*carVinStatisticModel.getCarCheckAvg()+score)*1f/(carVinStatisticModel.getCarCheckCount()+1);
-
-        carVinStatisticModel.setCarCheckAvg(averageScore);
-        carVinStatisticModel.setLastCarCheck(score);
-        carVinStatisticModel.setCarCheckCount(carVinStatisticModel.getCarCheckCount()+1);
-        mDaoSession.update(carVinStatisticModel);
-
-        TravelSummaryModel travelSummaryModel=obdClient.getTravelSummaryModel();
-        travelSummaryModel.setCarCheckUpScore(score);
-        mDaoSession.update(carVinStatisticModel);
-
+        }
 
 
 

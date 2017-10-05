@@ -21,6 +21,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
@@ -91,5 +92,14 @@ public  interface Engine {
     @FormUrlEncoded
     @POST("doMapPoint_addPoints")
     Call<AllCarModel> uploadMapPointOfDrive(@FieldMap() Map<String,Object> map);
+
+
+    @FormUrlEncoded
+    @POST("doSummarize_driveCustom")
+    Call<AllCarModel> uploadDriveCustom(@Field("vinCode") String vinCode, @Field("summarizeStartDate") String summarizeStartDate,@Field("jijiasuTotal") int accelerate,@Field("jijiansuTotal") int deceleration,@Field("chaosuTotal") int overSpeed);
+
+    @FormUrlEncoded
+    @POST("doCarCheck_addCarCheck")
+    Call<AllCarModel> uploadPhysicalExamination(@Query("vincode") String vinCode, @Field("theCreateTime") String createDate, @Field("score") int score, @Field("fireSystem") String fireSystem, @Field("fuelSystem") String fuelSystem, @Field("letSystem") String letSystem, @Field("acSystem") String acSystem, @Field("oxygenSystem") String oxygenSystem, @Field("egrSystem") String egrSystem, @FieldMap() Map<String,String> faultCodes);
 
 }

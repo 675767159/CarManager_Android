@@ -441,11 +441,8 @@ public class CarEditActivity extends BaseActivity {
 
                 AllCarModel allCarModel=response.body();
                 if (allCarModel.getStatus()==1){
-                   List<CarBrandModel>carBrandModels=allCarModel.getBrands();
-                    for (CarBrandModel carBrandModel:carBrandModels){
-                        mDaoSession.insertOrReplace(carBrandModel);
-                        Print.d(TAG,carBrandModel.getBrandName());
-                    }
+                    List<CarBrandModel>carBrandModels=allCarModel.getBrands();
+                    mDaoSession.getCarBrandModelDao().insertInTx(carBrandModels);
 
                 }
                 dismissLoadingDialog();
@@ -475,10 +472,9 @@ public class CarEditActivity extends BaseActivity {
                 AllCarModel allCarModel=response.body();
                 if (allCarModel.getStatus()==1){
                     List<CommonBrandModel>commonBrands=allCarModel.getCommonBrands();
-                    for (CommonBrandModel  commonBrandModel:commonBrands){
-                        mDaoSession.insertOrReplace(commonBrandModel);
-                        Print.d(TAG,commonBrandModel.getCommonBrandName());
-                    }
+                    mDaoSession.getCommonBrandModelDao().insertInTx(commonBrands);
+
+
 
                 }
                 dismissLoadingDialog();
@@ -509,10 +505,7 @@ public class CarEditActivity extends BaseActivity {
                 AllCarModel allCarModel=response.body();
                 if (allCarModel.getStatus()==1){
                     List<CarSeriesModel>carSerieses=allCarModel.getCarSerieses();
-                    for (CarSeriesModel  carSeriesModel:carSerieses){
-                        mDaoSession.insertOrReplace(carSeriesModel);
-                        Print.d(TAG,carSeriesModel.getSeriesName());
-                    }
+                    mDaoSession.getCarSeriesModelDao().insertInTx(carSerieses);
 
                 }
                 dismissLoadingDialog();
@@ -542,10 +535,7 @@ public class CarEditActivity extends BaseActivity {
                 AllCarModel allCarModel=response.body();
                 if (allCarModel.getStatus()==1){
                     List<CarTypeModel>carTypes=allCarModel.getCarTypes();
-                    for (CarTypeModel  carTypeModel:carTypes){
-                        mDaoSession.insertOrReplace(carTypeModel);
-                        Print.d(TAG,carTypeModel.getCarTypeName());
-                    }
+                    mDaoSession.getCarTypeModelDao().insertInTx(carTypes);
 
                 }
                 dismissLoadingDialog();

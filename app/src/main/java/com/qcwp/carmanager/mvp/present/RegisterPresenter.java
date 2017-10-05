@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.PhoneUtils;
 import com.blankj.utilcode.util.RegexUtils;
 import com.google.gson.Gson;
+import com.qcwp.carmanager.engine.ApiException;
 import com.qcwp.carmanager.engine.MyCallBack;
 import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.model.LoginModel;
@@ -173,9 +174,8 @@ public class RegisterPresenter extends BasePresenter implements RegisterContract
             }
 
             @Override
-            public void onSuccess(Call<PhoneAuthModel> call, Response<PhoneAuthModel> response) {
+            public void onSuccess(Call<PhoneAuthModel> call, PhoneAuthModel model) {
 
-                PhoneAuthModel model = response.body();
                 if (model.getCanUse() == 1)//手机号未被注册
                 {
                     view.showProgress("正在获取验证码...");
@@ -190,8 +190,8 @@ public class RegisterPresenter extends BasePresenter implements RegisterContract
             }
 
             @Override
-            public void onFailed(Call<PhoneAuthModel> call, Throwable throwable) {
-                view.showTip(throwable.getLocalizedMessage());
+            public void onFailed(Call<PhoneAuthModel> call, ApiException throwable) {
+                view.showTip(throwable.getDisplayMessage());
             }
         });
 
@@ -214,9 +214,8 @@ public class RegisterPresenter extends BasePresenter implements RegisterContract
             }
 
             @Override
-            public void onSuccess(Call<LoginModel> call, Response<LoginModel> response) {
+            public void onSuccess(Call<LoginModel> call, LoginModel model) {
 
-                LoginModel model = response.body();
                 if (model.getStatus() == 1) {
                     model.setPassword(password);
                     UserData.setInstance(model);
@@ -227,8 +226,8 @@ public class RegisterPresenter extends BasePresenter implements RegisterContract
             }
 
             @Override
-            public void onFailed(Call<LoginModel> call, Throwable throwable) {
-                view.showTip(throwable.getLocalizedMessage());
+            public void onFailed(Call<LoginModel> call,  ApiException throwable) {
+                view.showTip(throwable.getDisplayMessage());
             }
         });
 

@@ -3,6 +3,7 @@ package com.qcwp.carmanager.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -14,7 +15,7 @@ import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.engine.Engine;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
-import com.qcwp.carmanager.obd.BlueteethService;
+import com.qcwp.carmanager.obd.OBDConnectService;
 import com.qcwp.carmanager.utils.Print;
 import com.qcwp.carmanager.utils.ToastUtil;
 
@@ -25,6 +26,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+
+import static com.qcwp.carmanager.obd.OBDConnectService.REQUEST_OPEN_BT_CODE;
 
 
 /**
@@ -241,9 +244,21 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Print.d("onActivityResult",requestCode+"------"+resultCode);
         //请求蓝牙打开结果
-        if (requestCode== BlueteethService.REQUEST_OPEN_BT_CODE){
+        if (requestCode== REQUEST_OPEN_BT_CODE){
           EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.BlueRequestResult,String.valueOf(resultCode)));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode== OBDConnectService.REQUEST_WIFILocationRequestResult_Code){
+            EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.WIFILocationRequestResult,String.valueOf(grantResults[0])));
+        }else  if (requestCode== OBDConnectService.REQUEST_BluetoothLocationRequestResult_Code){
+            EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.BluetoothLocationRequestResult,String.valueOf(grantResults[0])));
         }
     }
 }

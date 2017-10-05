@@ -129,18 +129,18 @@ public class CustomDialog extends Dialog {
             // instantiate the dialog with the custom Theme
             final CustomDialog dialog = new CustomDialog(context, R.style.Dialog);
             View layout = inflater.inflate(R.layout.dialog_normal_layout, null);
-//            dialog.addContentView(layout, new ViewGroup.LayoutParams(
-//                    500, ViewGroup.LayoutParams.WRAP_CONTENT));
+            dialog.addContentView(layout, new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
 
 
-            Window win = dialog.getWindow();
-            win.getDecorView().setPadding(0, 0, 0, 0);
-            WindowManager.LayoutParams lp = win.getAttributes();
-            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-            win.setAttributes(lp);
-            this.setContentView(layout);
+//            Window win = dialog.getWindow();
+//            win.getDecorView().setPadding(0, 0, 0, 0);
+//            WindowManager.LayoutParams lp = win.getAttributes();
+//            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+//            lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+//            win.setAttributes(lp);
+//            this.setContentView(layout);
 
 
 
@@ -154,6 +154,7 @@ public class CustomDialog extends Dialog {
                     layout.findViewById(R.id.positiveButton)
                             .setOnClickListener(new View.OnClickListener() {
                                 public void onClick(View v) {
+                                    dialog.dismiss();
                                     positiveButtonClickListener.onClick(dialog,
                                             DialogInterface.BUTTON_POSITIVE);
                                 }
@@ -172,6 +173,7 @@ public class CustomDialog extends Dialog {
                     layout.findViewById(R.id.negativeButton)
                             .setOnClickListener(new View.OnClickListener() {
                                 public void onClick(View v) {
+                                    dialog.dismiss();
                                     negativeButtonClickListener.onClick(dialog,
                                             DialogInterface.BUTTON_NEGATIVE);
                                 }
