@@ -110,4 +110,6 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+    <string name="crashMessage">车牌为(车牌)的车辆突然由时速(碰撞前)KM/H下降至(碰撞后)KM/H,且较长时间无行驶迹象，系统判断可能发生事故,目前该车位于(位置),此短信有系统自动生成</string>
 </resources>

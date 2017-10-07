@@ -2,8 +2,6 @@ package com.qcwp.carmanager.mvp.present;
 
 import android.database.Cursor;
 
-import com.baidu.location.LocationClientOption;
-import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ThreadPoolUtils;
@@ -27,7 +25,6 @@ import com.qcwp.carmanager.model.sqLiteModel.LocationModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
 import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
 import com.qcwp.carmanager.mvp.contact.UploadDataContract;
-import com.qcwp.carmanager.service.MyIntentService;
 import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.Print;
 
@@ -46,8 +43,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.blankj.utilcode.util.ThreadPoolUtils.CachedThread;
-import static com.blankj.utilcode.util.ThreadPoolUtils.FixedThread;
-import static com.blankj.utilcode.util.ThreadPoolUtils.SingleThread;
 
 /**
  * Created by qyh on 2017/7/10.
@@ -76,6 +71,7 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
 
         count=0;
         isUploading=false;
+        view.showProgress("正在上传行程...");
         while (count<travelSummaryModels.size()) {
             if (!isUploading) {
                 isUploading = true;
@@ -185,6 +181,8 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
         while (true) {
             if (count == travelSummaryModels.size()) {
                 view.uploadDriveDataComplete();
+                view.dismissProgress();
+                view.showTip("行程上传完毕!");
                 completeOnceRequest();
                 break;
             }
@@ -200,6 +198,7 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
         String SQL_DISTINCT_ENAME = "SELECT DISTINCT "+LocationModelDao.Properties.CreateTime.columnName+" FROM "+LocationModelDao.TABLENAME+" WHERE "+LocationModelDao.Properties.UploadFlag.columnName+" = "+UploadStatusEnum.NotUpload.getValue();
         List<String> locationModels= CommonUtils.listEName(mDaoSession,SQL_DISTINCT_ENAME);
 
+        view.showProgress("正在上传轨迹...");
         while (count<locationModels.size()) {
             if (!isUploading) {
                 isUploading = true;
@@ -282,6 +281,8 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
             if (count == locationModels.size()) {
                 view.uploadMapPointOfDriveDataComplete();
                 completeOnceRequest();
+                view.dismissProgress();
+                view.showTip("轨迹上传完毕!");
                 break;
             }
         }
@@ -298,6 +299,7 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
         count=0;
         List<DrivingCustomModel> drivingCustomModels= this.listDriveCustom();
 
+        view.showProgress("正在上传驾驶习惯...");
         while (count<drivingCustomModels.size()) {
             if (!isUploading) {
                 isUploading = true;
@@ -350,6 +352,8 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
             if (count == drivingCustomModels.size()) {
                 view.uploadDrivingCustomComplete();
                 completeOnceRequest();
+                view.dismissProgress();
+                view.showTip("驾驶习惯上传完毕!");
                 Print.d("uploadDrivingCustom", "完成");
                 break;
 
@@ -374,6 +378,7 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
 
         List<CarCheckModel> carCheckModels= mDaoSession.queryBuilder(CarCheckModel.class).where(CarCheckModelDao.Properties.UploadFlag.eq(UploadStatusEnum.NotUpload.getValue())).list();
 
+        view.showProgress("正在上传体检...");
         while (count<carCheckModels.size()) {
             if (!isUploading) {
                 isUploading = true;
@@ -433,6 +438,8 @@ public class UploadDataPresenter extends BasePresenter implements UploadDataCont
 
         if (count==carCheckModels.size()){
             view.uploadPhysicalExaminationComplete();
+            view.dismissProgress();
+            view.showTip("体检上传完毕!");
             completeOnceRequest();
             Print.d("uploadDrivingCustom","完成");
         }

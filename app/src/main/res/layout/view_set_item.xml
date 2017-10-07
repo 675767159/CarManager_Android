@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:id="@+id/background"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@android:color/transparent"
     android:padding="@dimen/padding_small"
-    android:id="@+id/background"
     >
 
         <TextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:id="@+id/title"
             android:textColor="@color/blackColor"
             />
 
         <ImageView
+            android:id="@+id/ceil"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:src="@mipmap/ceil"
+            android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
-            android:id="@+id/ceil"
+            android:src="@mipmap/ceil"
             />
 
         <Switch
+            android:id="@+id/aSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:id="@+id/aSwitch"
-            android:visibility="gone"
+            android:layout_centerVertical="true"
             android:background="@color/whiteColor"
+            android:visibility="gone"
             />
 
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/horizon_margin"
+        android:layout_toLeftOf="@+id/ceil"
+        android:textColor="@color/blueColor" />
 
 </RelativeLayout>

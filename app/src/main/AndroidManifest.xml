@@ -32,6 +32,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
+
     <application
         android:name=".APP"
         android:allowBackup="true"
@@ -44,6 +45,9 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="Hlp8UY4YA7Gmksxn18gXlXLsezXoz9Xn" />
+        <meta-data
+            android:name="releaseTime"
+            android:value="${RELEASE_TIME}" />
 
         <activity
             android:name=".ui.MainActivity"
@@ -76,7 +80,6 @@
                 <action android:name="android.bluetooth.device.action.NAME_CHANGED" />
             </intent-filter>
         </receiver>
-
 
         <activity
             android:name=".ui.CarListActivity"
@@ -133,8 +136,13 @@
         <activity
             android:name=".ui.TravelRecordActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".ui.RemindSetActivity"  android:screenOrientation="portrait" />
-        <activity android:name=".ui.AboutActivity"  android:screenOrientation="portrait" ></activity>
+        <activity
+            android:name=".ui.RemindSetActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.AboutActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".ui.SetHelpActivity"></activity>
     </application>
 
 </manifest>

@@ -3,45 +3,13 @@ package com.qcwp.carmanager.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 
-
-import com.blankj.utilcode.util.FileIOUtils;
-import com.blankj.utilcode.util.FileUtils;
-import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.engine.Engine;
-import com.qcwp.carmanager.engine.RequestModel;
-import com.qcwp.carmanager.enumeration.UploadStatusEnum;
-import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
-import com.qcwp.carmanager.greendao.gen.TravelDataModelDao;
-import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
-import com.qcwp.carmanager.model.UserData;
-import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
-import com.qcwp.carmanager.model.retrofitModel.TokenModel;
-import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
-import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
-import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
 import com.qcwp.carmanager.mvp.contact.UploadDataContract;
 import com.qcwp.carmanager.mvp.present.UploadDataPresenter;
 import com.qcwp.carmanager.utils.Print;
-
-import org.greenrobot.eventbus.EventBus;
-
-import java.io.File;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-import static java.lang.Thread.sleep;
 
 
 /**
@@ -126,5 +94,25 @@ public class MyIntentService extends IntentService implements UploadDataContract
     @Override
     public void uploadPhysicalExaminationComplete() {
 
+    }
+
+    @Override
+    public void showProgress(String text) {
+
+    }
+
+    @Override
+    public void dismissProgress() {
+
+    }
+
+    @Override
+    public void showTip(String message) {
+
+    }
+
+    @Override
+    public Boolean isActive() {
+        return true;
     }
 }

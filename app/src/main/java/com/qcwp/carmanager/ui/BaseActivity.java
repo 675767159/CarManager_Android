@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-
 import com.blankj.utilcode.util.BarUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
@@ -18,7 +17,6 @@ import com.qcwp.carmanager.greendao.gen.DaoSession;
 import com.qcwp.carmanager.obd.OBDConnectService;
 import com.qcwp.carmanager.utils.Print;
 import com.qcwp.carmanager.utils.ToastUtil;
-
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -36,12 +34,13 @@ import static com.qcwp.carmanager.obd.OBDConnectService.REQUEST_OPEN_BT_CODE;
 
 public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private SweetAlertDialog mLoadingDialog;
     protected APP mApp;
     protected Engine mEngine;
     protected String TAG;
     protected DaoSession mDaoSession;
     protected Boolean isActive=true;
+    private SweetAlertDialog mLoadingDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -236,7 +235,6 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-
 
         onReceiveMessageEvent(event);
     }

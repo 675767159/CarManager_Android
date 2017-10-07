@@ -65,6 +65,75 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class OBDClient {
 
+    private static OBDClient INSTANCE;
+    private OBDConnectStateEnum connectStatus;//连接状态
+    private LoadDataTypeEnum loadDataType;//车辆处于何种状态
+    private String vinCode;//车辆的vincode码
+    private String spValue;//协议
+    private double vehicleSpeed;//当前速度
+    private String isGetVehicleSpeed;//是否初始化成功
+    private double engineRpm;//转速
+    private double fuelPressure;//气压
+    private double totalTime;//行驶时间
+    private double avgVehicleSpeed;//平均速度
+    private double avgOilConsume;//平均油耗
+    private double currentOilConsume;//当前油耗
+    private double dist;//当前里程
+    private double controlModuleVoltage;//控制模块电压
+    private double intakeTemp;//环境空气温度(-40~214)
+    private double engineCoolant;//发动机冷却液温度(-40~214)
+    private double totalMileage;//总里程
+    private int readyToExamination;//连接状态
+    private double bfImpactVehicleSpeed; //碰撞前
+    private double afImapactVehicleSpeed; //碰撞后
+    private int accelerCount, decelerCount, overSpeedCount, hypervelocityReminder;
+    private long onlyFlag;
+    private CarVinStatisticModel carVinStatisticModel;
+    private SingleCarVinStatisticModel singleCarVinStatisticModel;
+    private TravelSummaryModel travelSummaryModel;
+    private CarInfoModel carInfoModel;
+    private List<Double> engineRpmArray, vehicleSpeedArray;
+    private List<String> travelArray;
+    private int countOfOBDData, originalTimeCount;
+    private double originalDistCount, originalFuelCount, originalCarMileage;
+    private DaoSession daoSession;
+    private String phoneModel;
+    private ThreadPoolUtils threadPool;
+    private ScheduledFuture scheduledFuture;
+    private String overSpeedLimit;
+    private String startTime;
+    private Boolean isNeedInsertOverSpeedRecord = true;
+    private ReadVinCodeCompleteListener readVinCodeCompleteListener;
+    private double lastEngineRpm = 0;
+    private double lastVehicleSpeed = 0;
+
+    /**
+     * * private的构造函数用于避免外界直接使用new来实例化对象
+     */
+    private OBDClient() {
+
+        daoSession = APP.getInstance().getDaoInstant();
+        EventBus.getDefault().register(OBDClient.this);
+
+        MySharedPreferences mySharedPreferences = new MySharedPreferences(APP.getInstance());
+        if (mySharedPreferences.getBoolean(KeyEnum.isOpenedOverspeed, false))
+            overSpeedLimit = new MySharedPreferences(APP.getInstance()).getString(KeyEnum.overspeed, null);
+
+
+    }
+
+    // 提供一个全局的静态方法
+    public static OBDClient getDefaultClien() {
+        if (INSTANCE == null) {
+            synchronized (OBDClient.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new OBDClient();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
     public double getVehicleSpeed() {
         return vehicleSpeed;
     }
@@ -77,13 +146,8 @@ public class OBDClient {
         return fuelPressure;
     }
 
-
     public double getAvgVehicleSpeed() {
         return avgVehicleSpeed;
-    }
-
-    public void setVinCode(String vinCode) {
-        this.vinCode = vinCode;
     }
 
     public double getAvgOilConsume() {
@@ -111,12 +175,9 @@ public class OBDClient {
         this.loadDataType = dataTypeTijian;
     }
 
-
     public void clearFaultCode() {
         this.loadDataType = dataTypeClearErr;
     }
-
-
 
     public void startTest() {
         this.loadDataType = dataTypeTest;
@@ -131,76 +192,32 @@ public class OBDClient {
         return engineCoolant;
     }
 
-    private OBDConnectStateEnum connectStatus;//连接状态
-    private LoadDataTypeEnum loadDataType;//车辆处于何种状态
-    private String vinCode;//车辆的vincode码
-    private String spValue;//协议
-    private double vehicleSpeed;//当前速度
-    private String isGetVehicleSpeed;//是否初始化成功
-
     public LoadDataTypeEnum getLoadDataType() {
         return loadDataType;
     }
-
-    private double engineRpm;//转速
-    private double fuelPressure;//气压
-    private double totalTime;//行驶时间
-    private double avgVehicleSpeed;//平均速度
-    private double avgOilConsume;//平均油耗
-    private double currentOilConsume;//当前油耗
-    private double dist;//当前里程
-    private double controlModuleVoltage;//控制模块电压
-    private double intakeTemp;//环境空气温度(-40~214)
-    private double engineCoolant;//发动机冷却液温度(-40~214)
-    private double totalMileage;//总里程
 
     public double getTotalTime() {
         return totalTime;
     }
 
-
-
-    private int readyToExamination;//连接状态
-    private double bfImpactVehicleSpeed; //碰撞前
-    private double afImapactVehicleSpeed; //碰撞后
-
-
-    private int accelerCount, decelerCount, overspeedCount, hypervelocityReminder;
-    private long onlyFlag;
-
-
-    private CarVinStatisticModel carVinStatisticModel;
-    private SingleCarVinStatisticModel singleCarVinStatisticModel;
-    private  TravelSummaryModel travelSummaryModel;
-
-    private CarInfoModel carInfoModel;
-    private List<Double> engineRpmArray, vehicleSpeedArray;
-    private List<String>  travelArray;
-
-    private int countOfOBDData, originalTimeCount;
-    private double originalDistCount, originalFuelCount, originalCarMileage;
-    private DaoSession daoSession;
-    private String phoneModel;
-    private ThreadPoolUtils threadPool;
-    private  ScheduledFuture scheduledFuture;
-
     public OBDConnectStateEnum getConnectStatus() {
         return connectStatus;
     }
 
-    private String startTime;
-
     public String getStartTime() {
         return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
     public String getVinCode() {
         return vinCode;
     }
 
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setVinCode(String vinCode) {
+        this.vinCode = vinCode;
     }
 
     public CarVinStatisticModel getCarVinStatisticModel() {
@@ -219,33 +236,6 @@ public class OBDClient {
 
         this.onlyFlag = onlyFlag;
     }
-
-
-    /**
-     * * private的构造函数用于避免外界直接使用new来实例化对象
-     */
-    private OBDClient() {
-
-        daoSession = APP.getInstance().getDaoInstant();
-        EventBus.getDefault().register(OBDClient.this);
-
-    }
-
-
-    private static OBDClient INSTANCE;
-
-    // 提供一个全局的静态方法
-    public static OBDClient getDefaultClien() {
-        if (INSTANCE == null) {
-            synchronized (OBDClient.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new OBDClient();
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
 
     private void stopOBDClient(){
         connectStatus=connectTypeDisconnection;
@@ -391,12 +381,6 @@ public class OBDClient {
         return false;
     }
 
-    private ReadVinCodeCompleteListener readVinCodeCompleteListener;
-
-    public interface ReadVinCodeCompleteListener {
-        void connectComplete(Boolean success, String message);
-    }
-
     public void setReadVinCodeCompleteListener(ReadVinCodeCompleteListener readVinCodeCompleteListener) {
         this.readVinCodeCompleteListener = readVinCodeCompleteListener;
     }
@@ -417,13 +401,12 @@ public class OBDClient {
 
     }
 
-
     //初始化
     private void initData() {
 
         accelerCount = 0;
         decelerCount = 0;
-        overspeedCount = 0;
+        overSpeedCount = 0;
         hypervelocityReminder = 0;
 
 
@@ -469,6 +452,8 @@ public class OBDClient {
 
     }
 
+    //计算和保存
+
     private String getCurrentSummryData() {
 
 
@@ -491,7 +476,13 @@ public class OBDClient {
 
     }
 
-    //计算和保存
+    public double getBfImpactVehicleSpeed() {
+        return bfImpactVehicleSpeed;
+    }
+
+    public double getAfImapactVehicleSpeed() {
+        return afImapactVehicleSpeed;
+    }
 
     private void calculateTraveData() {
         Print.d("calculateTraveData","----------");
@@ -706,7 +697,24 @@ public class OBDClient {
     //是否超车
     private void postHypervelocity() {
 
-        // TODO: 2017/6/23
+        if (EmptyUtils.isNotEmpty(overSpeedLimit)) {
+            int speed = Integer.parseInt(overSpeedLimit);
+
+            if (vehicleSpeed > speed) {
+                // 显示
+                EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.OverSpeed, null));
+                if (isNeedInsertOverSpeedRecord) {
+                    isNeedInsertOverSpeedRecord = false;
+                    addDriveCustomRecord(DrivingCustomEnum.Overdrive);
+                }
+
+
+            } else {
+                isNeedInsertOverSpeedRecord = true;
+                EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.NormalSpeed, null));
+            }
+        }
+
     }
 
     private List<String> getDrivePidWithOther(List otherList) {
@@ -862,8 +870,6 @@ public class OBDClient {
 
     }
 
-    private double lastEngineRpm=0;
-
     //是否急加速
     private boolean isHardAcceleration() {
 
@@ -884,7 +890,6 @@ public class OBDClient {
 
     }
 
-    private double lastVehicleSpeed=0;
     //是否急减速
     private boolean isBrakes() {
 
@@ -900,7 +905,6 @@ public class OBDClient {
         return false;
 
     }
-
 
     private void addDriveCustomRecord(DrivingCustomEnum type){
 
@@ -920,6 +924,10 @@ public class OBDClient {
 
                 break;
             case Overdrive:
+                overSpeedCount++;
+                carVinStatisticModel.setOverspeedCount(carVinStatisticModel.getOverspeedCount() + 1);
+                singleCarVinStatisticModel.setOverspeedCount(overSpeedCount);
+
                 break;
         }
 
@@ -936,7 +944,6 @@ public class OBDClient {
         daoSession.insert(drivingCustomModel);
 
     }
-
 
     /**
      * 保存数据
@@ -1028,6 +1035,11 @@ public class OBDClient {
         }
 
 
+    }
+
+
+    public interface ReadVinCodeCompleteListener {
+        void connectComplete(Boolean success, String message);
     }
 
 

@@ -6,25 +6,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.blankj.utilcode.util.EmptyUtils;
-import com.blankj.utilcode.util.FileIOUtils;
-import com.blankj.utilcode.util.KeyboardUtils;
-import com.google.gson.Gson;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.MessageEvent;
-import com.qcwp.carmanager.enumeration.PathEnum;
-import com.qcwp.carmanager.model.LoginModel;
-import com.qcwp.carmanager.model.UserData;
+import com.qcwp.carmanager.enumeration.KeyEnum;
 import com.qcwp.carmanager.mvp.contact.LoginContract;
 import com.qcwp.carmanager.mvp.present.LoginPresenter;
 import com.qcwp.carmanager.utils.CommonUtils;
-import com.qcwp.carmanager.utils.Print;
-
+import com.qcwp.carmanager.utils.MySharedPreferences;
 
 import butterknife.BindView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class LoginActivity extends BaseActivity implements LoginContract.View {
@@ -76,7 +66,15 @@ public class LoginActivity extends BaseActivity implements LoginContract.View {
     @Override
     public void loginSuccess() {
 
-        readyGoThenKill(MainActivity.class);
+        MySharedPreferences mySharedPreferences = new MySharedPreferences(this);
+        Boolean isFirst = mySharedPreferences.getBoolean(KeyEnum.isFirst, true);
+        if (isFirst) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(KeyEnum.typeKey, SetHelpActivity.SetHelpType.FIRST);
+            readyGoThenKill(SetHelpActivity.class, bundle);
+        } else {
+            readyGoThenKill(MainActivity.class);
+        }
     }
 
     @Override

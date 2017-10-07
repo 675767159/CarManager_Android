@@ -64,7 +64,9 @@ public class MessageEvent {
        CarCheck_engineCondition,
        CarCheck_driveData,
        CarCheck_end,
-       CarTest
+       CarTest,
+       OverSpeed,
+       NormalSpeed
 
 
    }

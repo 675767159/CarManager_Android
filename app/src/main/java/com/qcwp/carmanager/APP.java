@@ -9,8 +9,7 @@ import android.util.DisplayMetrics;
 
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
-import com.blankj.utilcode.util.PhoneUtils;
-import com.blankj.utilcode.util.ThreadPoolUtils;
+import com.blankj.utilcode.util.Utils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.engine.Engine;
 import com.qcwp.carmanager.engine.TokenInterceptor;
@@ -22,19 +21,13 @@ import com.qcwp.carmanager.implement.MyOpenHelper;
 import com.qcwp.carmanager.model.LoginModel;
 import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.service.MyIntentService;
-import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.MyActivityManager;
 import com.qcwp.carmanager.utils.Print;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import cn.smssdk.SMSSDK;
@@ -49,12 +42,17 @@ import static com.qcwp.carmanager.enumeration.TimeEnum.DEFAULT_TIMEOUT;
  */
 
 public class APP extends Application {
-    private Engine mEngine;
-    private static APP sInstance;
     // 通过改变isDebug，实现Debug、Release版
     public final static boolean isDebug = BuildConfig.DEBUG;
-    private DaoSession daoSession;
     public static byte[] DESKey={27,19,23,67,90,56,78,55};
+    private static APP sInstance;
+    private Engine mEngine;
+    private DaoSession daoSession;
+
+    public static APP getInstance() {
+        return sInstance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -115,6 +113,9 @@ public class APP extends Application {
         });
 
 
+        Utils.init(this);
+
+
         SMSSDK.initSDK(this,this.getString(R.string.ShareSDK_Key),this.getString(R.string.ShareSDK_Secret));
 
         this.setupDatabase();
@@ -133,11 +134,6 @@ public class APP extends Application {
 
     }
 
-
-
-    public static APP getInstance() {
-        return sInstance;
-    }
     public Engine getEngine() {
         return mEngine;
     }

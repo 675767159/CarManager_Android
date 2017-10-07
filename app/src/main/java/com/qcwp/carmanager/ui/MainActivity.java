@@ -1,5 +1,8 @@
 package com.qcwp.carmanager.ui;
 
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -17,9 +20,9 @@ import com.qcwp.carmanager.mvp.contact.MainContract;
 import com.qcwp.carmanager.mvp.present.MainPresenter;
 import com.qcwp.carmanager.obd.OBDClient;
 import com.qcwp.carmanager.utils.CommonUtils;
+import com.qcwp.carmanager.utils.MySharedPreferences;
 import com.qcwp.carmanager.utils.Print;
 import com.qiantao.coordinatormenu.CoordinatorMenu;
-
 
 import java.util.Locale;
 
@@ -47,8 +50,9 @@ public class MainActivity extends BaseActivity implements MainContract.View{
     private CarInfoModel    carInfoModel;
     private CarVinStatisticModel carVinStatisticModel;
     private SingleCarVinStatisticModel singleCarVinStatisticModel;
-
     private MainContract.Presenter presenter;
+    private AlertDialog overSpeedReminderDialog;
+    private OBDClient obdClient;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_main;
@@ -58,7 +62,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
     protected void initViewsAndEvents(Bundle savedInstanceState) {
         presenter=new MainPresenter(this,mDaoSession);
         userName.setText(UserData.getInstance().getUserName());
-
+        obdClient = OBDClient.getDefaultClien();
         carInfoModel=presenter.getLatestCarInfo();
 
 
@@ -73,8 +77,16 @@ public class MainActivity extends BaseActivity implements MainContract.View{
 
         presenter.getMyAllCarInfo();
 
+
+        AlertDialog.Builder overSpeedReminder =
+                new AlertDialog.Builder(this);
+        overSpeedReminder.setTitle("警告");
+        overSpeedReminder.setMessage("您已超出您所设置的最大速度！");
+        overSpeedReminderDialog = overSpeedReminder.create();
         Print.d(TAG,"UserId="+UserData.getInstance().getUserId());
         Print.d(TAG,"UserName="+UserData.getInstance().getUserName());
+
+
     }
 
 
@@ -142,6 +154,33 @@ public class MainActivity extends BaseActivity implements MainContract.View{
 
                 updateUI();
                 break;
+            case OverSpeed:
+                Print.d(TAG, "showPopupWindow");
+                if (!overSpeedReminderDialog.isShowing())
+                    overSpeedReminderDialog.show();
+                break;
+            case NormalSpeed:
+                Print.d(TAG, "hidePopupWindow");
+                if (overSpeedReminderDialog.isShowing())
+                    overSpeedReminderDialog.dismiss();
+                break;
+
+            case CarCrash: {
+
+                MySharedPreferences mySharedPreferences = new MySharedPreferences(this);
+                if (mySharedPreferences.getBoolean(KeyEnum.isOpenedCrashRemind, false)) {
+                    String contacPhone = mySharedPreferences.getString(KeyEnum.contactPhone, "");
+                    Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + contacPhone));
+                    String crashMessage = getString(R.string.crashMessage);
+                    crashMessage = crashMessage.replace("(车牌)", carInfoModel.getCarNumber());
+                    crashMessage = crashMessage.replace("(碰撞前)", String.format(Locale.getDefault(), "%.1f", obdClient.getBfImpactVehicleSpeed()));
+                    crashMessage = crashMessage.replace("(碰撞后)", String.format(Locale.getDefault(), "%.1f", obdClient.getAfImapactVehicleSpeed()));
+                    intent.putExtra("sms_body", crashMessage);
+                    startActivity(intent);
+                }
+
+            }
+                break;
 
         }
 
@@ -178,7 +217,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
             singleTravel.setValue3(String.format(locale,"%.1f升",singleCarVinStatisticModel.getFuelCount()));
 
         }
-        if ((OBDClient.getDefaultClien().getConnectStatus()== OBDConnectStateEnum.connectTypeHaveBinded)&&carInfoModel.getVinCode().equals(OBDClient.getDefaultClien().getVinCode())){
+        if ((obdClient.getConnectStatus() == OBDConnectStateEnum.connectTypeHaveBinded) && carInfoModel.getVinCode().equals(obdClient.getVinCode())) {
             singleTravel.setTitle1("本次行驶里程");
             singleTravel.setTitle2("本次行驶时间");
             singleTravel.setTitle3("本次行驶用油");

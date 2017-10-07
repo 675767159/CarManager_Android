@@ -356,4 +356,13 @@ public class CommonUtils {
         Print.d("startBluetoothService", "result==VERSION");
     }
 
+    public static int getViewIdByString(Context context, String stringOfID) {
+        int ID = context.getResources().getIdentifier(stringOfID, "id", context.getPackageName());
+        return ID;
+    }
+
+    public static int getImageByString(Context context, String stringOfID) {
+        int ID = context.getResources().getIdentifier(stringOfID, "mipmap", context.getPackageName());
+        return ID;
+    }
 }

@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao' // apply plugin
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("Asia/Chongqing"))
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -19,8 +23,12 @@ android {
     }
     buildTypes {
         release {
+            manifestPlaceholders = [RELEASE_TIME: releaseTime()]
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            manifestPlaceholders = [RELEASE_TIME: releaseTime()]
         }
     }
     externalNativeBuild {
@@ -104,5 +112,8 @@ dependencies {
     //图片
     compile 'com.github.bumptech.glide:glide:4.1.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.1.1'
+
+    //滚动
+    compile 'com.youth.banner:banner:1.4.10'  //最新版本
 }
 

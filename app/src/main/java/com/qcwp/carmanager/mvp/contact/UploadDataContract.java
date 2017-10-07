@@ -9,7 +9,7 @@ package com.qcwp.carmanager.mvp.contact;
  */
 
 public interface UploadDataContract {
-    interface View{
+    interface View extends BaseView {
 
         void uploadDriveDataComplete();
         void uploadMapPointOfDriveDataComplete();

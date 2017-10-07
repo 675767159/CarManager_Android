@@ -32,6 +32,11 @@ public class KeyEnum {
             pidInfoKey="pidInfo",
             latitudeKey="latitude",
             longitudeKey="longitude",
+            isFirst = "isFirst",
+            isOpenedOverspeed = "isOpenedOverspeed",
+            isOpenedCrashRemind = "isOpenedCrashRemind",
+            overspeed = "overspeed",
+            contactPhone = "contactPhone",
             professionalTestType="professionalTestType";
 
 }
