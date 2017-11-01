@@ -66,7 +66,8 @@ public class MessageEvent {
        CarCheck_end,
        CarTest,
        OverSpeed,
-       NormalSpeed
+       NormalSpeed,
+       UploadComplete
 
 
    }

@@ -256,7 +256,7 @@ public class OBDConnectService {
 
 			if (isSuccess){
 				MySharedPreferences mySharedPreferences=new MySharedPreferences(APP.getInstance());
-				mySharedPreferences.setInt(KeyEnum.typeKey,connectType.getValue());
+				mySharedPreferences.setInt(KeyEnum.connectTypeKey,connectType.getValue());
 
 			}
 		}
@@ -319,20 +319,25 @@ public class OBDConnectService {
 
 
 		Print.d("startBluetoothService","result==ddd");
-		String address = null;
+
+		Boolean isSuccess=false;
 		Set<BluetoothDevice> sets = mBluetoothAdapter.getBondedDevices();
 		for (BluetoothDevice bluetoothDevice : sets) {
 			String name = bluetoothDevice.getName();
 			Print.d("startBluetoothService","name=="+name);
 			if (name.contains("OBD")) {
-				address = bluetoothDevice.getAddress();
+				String address  = bluetoothDevice.getAddress();
+				isSuccess=connectBlueToothOBD(address);
+				if (isSuccess){
+					returnConnetResult(isSuccess);
+					break;
+				}
+
 			}
 		}
 
-		if (address != null) {
-			Boolean isSuccess=connectBlueToothOBD(address);
-			returnConnetResult(isSuccess);
-		} else {
+
+		if (!isSuccess){
 			Print.d("startBluetoothService","name=="+"000000");
 			BlueToothReceiver.gotOBD = false;
 			mBluetoothAdapter.startDiscovery();
@@ -361,30 +366,23 @@ public class OBDConnectService {
 	private Boolean connectBlueToothOBD(String address){
 
 		BluetoothDevice mmDevice = mBluetoothAdapter.getRemoteDevice(address);
-		Print.d("startBluetoothService","address=="+address);
-
-		boolean isConnectSuccess = true;
+		BluetoothSocket mmSocket =null;
 		try {
+			BluetoothSocket tmp = null;
+			boolean isConnectSuccess = false;
 
-
-
-			for (int i = 0; i <=3; i++) {
-				Print.d("startBluetoothService","getRemoteDevice"+i);
+			for (int i = 0; i <=100; i++) {
 				try {
-
-					Method m = mmDevice.getClass().getMethod("createRfcommSocket", int.class);
-
-					bluetoothSocket =CommonUtils.setPin(mmDevice.getClass(),mmDevice,"1234");
-					if (bluetoothSocket==null) {
-						Print.d("startBluetoothService","null");
-						bluetoothSocket=(BluetoothSocket) m.invoke(mmDevice, 1);
+					if(i == 0) {
+						Method m = mmDevice.getClass().getMethod("createRfcommSocket", int.class);
+						tmp = (BluetoothSocket)m.invoke(mmDevice, 1);
+						tmp.connect();
+						isConnectSuccess = true;
+						break;
 					}
-					bluetoothSocket.connect();
-					message="连接成功";
-					break;
 
 				} catch(Exception eee) {
-
+					//TODO 蓝牙连接失败返回的代码有：
 					//【Connection refused】 （不包含中括号）再用第二种方法连接是可以连接上的
 					//【Device or resource busy】当另一个软件退出的时候，才可以连接上，可以多试几次第二种方法，可以提示用户退出其它线程
 					//【Permission denied】这是主要问题，有时可以多次进行连接而连上，有时不行（还有个大问题就是当连不上时，有一直弹出输入框），解决办法：如果已经配对过重启蓝牙，取消配对再连即可连上
@@ -392,12 +390,7 @@ public class OBDConnectService {
 					//No route to host 当车易连接上时，我们再连接会出现这情况
 					//还有一种情况，obd已经连接上，但蓝牙却没有检测到，解决方法，重插下obd
 					//当蓝牙已经给其它
-					isConnectSuccess=false;
-					if (bluetoothSocket!=null){
-						bluetoothSocket.close();
-						bluetoothSocket=null;
-					}
-					message = "连接超时，请确认是否连接上设备！";
+					message = eee.getMessage().toString();
 					Print.d("连接情况","错误信息："+message);
 					System.out.println(eee.getMessage());
 					Thread.sleep(300);
@@ -405,29 +398,40 @@ public class OBDConnectService {
 				}
 			}
 
+			if(isConnectSuccess == false) {
+//				if (conectOBDListener!=null){
+//					conectOBDListener.completeConect(false,message);
+//				}
+				return false;
+			}
+
+			mmSocket = tmp;
 
 		} catch (Exception e) {
 			try {
-				if(null != bluetoothSocket) bluetoothSocket.close();
+				if(null != mmSocket) mmSocket.close();
 			} catch (Exception e2) {
 			}
-			message=e.getLocalizedMessage();
+//			if (conectOBDListener!=null){
+//				conectOBDListener.completeConect(false,e.getLocalizedMessage());
+//			}
 			return false;
 		}
 
 
 
 		try {
-			mmInStream = bluetoothSocket.getInputStream();
-			mmOutStream = bluetoothSocket.getOutputStream();
+			mmInStream = mmSocket.getInputStream();
+			mmOutStream = mmSocket.getOutputStream();
 
 		} catch(Exception e) {
-			isConnectSuccess=false;
 			e.printStackTrace();
 		}
 
-
-		return isConnectSuccess;
+//		if (conectOBDListener!=null){
+//			conectOBDListener.completeConect(true,"连接成功!");
+//		}
+		return true;
 
 
 	}

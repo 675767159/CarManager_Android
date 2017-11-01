@@ -169,6 +169,11 @@ public class CarExaminationActivity extends BaseActivity {
         });
 
 
+        if (obdClient.getLoadDataType()==LoadDataTypeEnum.dataTypedrive) {
+            CarExaminationActivity.this.startExamination(LoadDataTypeEnum.dataTypeTijian);
+        }else {
+            showToast("请先连接上OBD,等待初始化完成！");
+        }
 
     }
 
@@ -350,6 +355,8 @@ public class CarExaminationActivity extends BaseActivity {
         btnStart.setImageResource(R.mipmap.car_examination_needle);
         btnStart.startAnimation(rotateAnimation);
         btnStart.setEnabled(false);
+
+
         examnationItem.setVisibility(View.VISIBLE);
         progress=0;
 
@@ -378,6 +385,11 @@ public class CarExaminationActivity extends BaseActivity {
         faultCode.setVisibility(View.GONE);
         examinationTime.setVisibility(View.GONE);
         carState.setContentTextViewText("正在体检...");
+        selectModel.getChildAt(1).setEnabled(false);
+        RadioButton radioButton= (RadioButton)selectModel.getChildAt(0);
+        radioButton.setChecked(true);
+        carExamnationExpandableListAdapter=new CarCheckExpandableListAdapter(this);
+        expandablelistview.setAdapter(carExamnationExpandableListAdapter);
 
 
 
@@ -388,6 +400,7 @@ public class CarExaminationActivity extends BaseActivity {
         btnStart.setImageResource(R.mipmap.car_examination_restart);
         btnStart.clearAnimation();
         btnStart.setEnabled(true);
+        selectModel.getChildAt(1).setEnabled(true);
         examnationItem.setVisibility(View.GONE);
         examinationProgress.setVisibility(View.GONE);
         Integer score=(Integer)map.get("carCheckUpScore");
@@ -408,6 +421,7 @@ public class CarExaminationActivity extends BaseActivity {
 
         examinationTime.setVisibility(View.VISIBLE);
         String currentTime=TimeUtils.getNowString();
+        carCheckTime=currentTime;
         examinationTime.setContentTextViewText(currentTime.substring(0,16));
 
 
@@ -616,4 +630,10 @@ public class CarExaminationActivity extends BaseActivity {
         expandablelistview.setStackFromBottom(false);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        obdClient.stopExamnation();
+    }
 }

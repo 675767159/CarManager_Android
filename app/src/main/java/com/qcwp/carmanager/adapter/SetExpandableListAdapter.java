@@ -1,6 +1,7 @@
 package com.qcwp.carmanager.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +30,11 @@ public class SetExpandableListAdapter extends BaseExpandableListAdapter {
     private Map<String, Boolean> switchMap;
     private Map<String, String> contentMap;
     private OnCheckedChangeListener onCheckedChangeListener;
+    private Drawable switchDefaultDrawable;
     public SetExpandableListAdapter(Context context, JSONArray mList){
         this.mList=mList;
         this.mContext=context;
+        switchDefaultDrawable=new Switch(context).getTrackDrawable();
     }
 
     //  获得父项的数量
@@ -142,12 +145,22 @@ public class SetExpandableListAdapter extends BaseExpandableListAdapter {
 
         Boolean isSwitch=getChild(groupPosition,childPosition).optBoolean("isSwitch");
 
+
+
         if (isSwitch){
             cellViewHolder.aSwitch.setVisibility(View.VISIBLE);
             if (switchMap != null && switchMap.containsKey(title)) {
                 cellViewHolder.aSwitch.setChecked(switchMap.get(title));
             } else {
                 cellViewHolder.aSwitch.setChecked(false);
+            }
+
+
+            if (title.equals("OBD类型")){
+                cellViewHolder.aSwitch.setTrackResource(R.mipmap.switch_bg_connect_type);
+            }else {
+
+                cellViewHolder.aSwitch.setTrackDrawable(switchDefaultDrawable);
             }
 
 
@@ -160,6 +173,8 @@ public class SetExpandableListAdapter extends BaseExpandableListAdapter {
         } else {
             cellViewHolder.content.setText("");
         }
+
+
 
 
         return convertView;

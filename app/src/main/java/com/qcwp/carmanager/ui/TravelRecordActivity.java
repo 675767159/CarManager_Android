@@ -1,11 +1,13 @@
 package com.qcwp.carmanager.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.blankj.utilcode.util.EmptyUtils;
+import com.google.gson.Gson;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.adapter.TravelRecordAdapter;
 import com.qcwp.carmanager.broadcast.MessageEvent;
@@ -44,6 +46,12 @@ public class TravelRecordActivity extends BaseActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         if (OBDClient.getDefaultClien().getConnectStatus() != OBDConnectStateEnum.connectTypeHaveBinded) {
+
+                            TravelSummaryModel travelSummaryModel = list.get(position);
+                            String travelSummaryModelStr = new Gson().toJson(travelSummaryModel);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("travelSummaryModel", travelSummaryModelStr);
+                            readyGo(DriveTrackActivity.class,bundle);
 
 
                         } else {

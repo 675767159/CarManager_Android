@@ -11,25 +11,31 @@ import com.qcwp.carmanager.adapter.SetExpandableListAdapter;
 import com.qcwp.carmanager.broadcast.MessageEvent;
 import com.qcwp.carmanager.control.CustomDialog;
 import com.qcwp.carmanager.enumeration.KeyEnum;
+import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
+import com.qcwp.carmanager.enumeration.OBDConnectType;
 import com.qcwp.carmanager.enumeration.PathEnum;
 import com.qcwp.carmanager.implement.GroupClickListener;
 import com.qcwp.carmanager.model.UserData;
-import com.qcwp.carmanager.mvp.contact.UploadDataContract;
 import com.qcwp.carmanager.mvp.present.UploadDataPresenter;
+import com.qcwp.carmanager.obd.OBDClient;
+import com.qcwp.carmanager.service.MyIntentService;
 import com.qcwp.carmanager.utils.CommonUtils;
 import com.qcwp.carmanager.utils.MyActivityManager;
+import com.qcwp.carmanager.utils.MySharedPreferences;
 import com.qcwp.carmanager.utils.Print;
 
 import org.json.JSONArray;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 
-public class SetActivity extends BaseActivity implements UploadDataContract.View {
+public class SetActivity extends BaseActivity{
 
 
     @BindView(R.id.expandablelistview)
     ExpandableListView expandablelistview;
-    private UploadDataPresenter uploadDataPresenter;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_set;
@@ -39,6 +45,7 @@ public class SetActivity extends BaseActivity implements UploadDataContract.View
     protected void initViewsAndEvents(Bundle savedInstanceState) {
 
 
+        final   MySharedPreferences mySharedPreferences=new MySharedPreferences(this);
 
         JSONArray setItemArray = CommonUtils.getJSONArrayFromText("SetItem.json");
 
@@ -57,13 +64,44 @@ public class SetActivity extends BaseActivity implements UploadDataContract.View
             }
         });
 
-        uploadDataPresenter = new UploadDataPresenter(this, mDaoSession);
+        OBDConnectType connectType=OBDConnectType.fromInteger(mySharedPreferences.getInt(KeyEnum.connectTypeKey,OBDConnectType.WIFI.getValue()));
+
+        Boolean connectTypeVaue=connectType!=OBDConnectType.WIFI;
+
+         Map<String, Boolean> swictMap = new HashMap<>();
+         swictMap.put("OBD类型", connectTypeVaue);
+         setExpandableListAdapter.setSwicthData(swictMap);
+
+        setExpandableListAdapter.setOnCheckedChangeListener(new SetExpandableListAdapter.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(String title, boolean isChecked) {
+
+                switch (title) {
+                    case "OBD类型":
+                        OBDConnectType connectType=isChecked?OBDConnectType.BlueTooth:OBDConnectType.WIFI;
+                        mySharedPreferences.setInt(KeyEnum.connectTypeKey, connectType.getValue());
+                        break;
+
+                }
+                Print.d(TAG, title + "=" + isChecked);
+            }
+        });
+
+
+
+
 
     }
 
     @Override
     protected void onReceiveMessageEvent(MessageEvent messageEvent) {
 
+        switch (messageEvent.getType()){
+            case UploadComplete:
+                dismissLoadingDialog();
+                showToast("数据上传完毕!");
+                break;
+        }
     }
 
     @Override
@@ -92,9 +130,22 @@ public class SetActivity extends BaseActivity implements UploadDataContract.View
                     readyGo(SetHelpActivity.class, bundle);
                 } else if (childPosition == 1) {
 
-                    uploadDataPresenter.uploadDriveData();
-                    showLoadingDialog("正在上传数据...");
-                    dismissLoadingDialog();
+                    if (OBDClient.getDefaultClien().getConnectStatus()!= OBDConnectStateEnum.connectTypeHaveBinded) {
+                        showLoadingDialog("正在上传数据");
+                        UploadDataPresenter uploadDataPresenter = new UploadDataPresenter();
+                        uploadDataPresenter.setUploadDataListener(new UploadDataPresenter.UploadDataListener() {
+
+                            @Override
+                            public void onComplete(String message) {
+                                dismissLoadingDialog();
+                                showToast(message);
+                            }
+                        });
+                        uploadDataPresenter.startUploadData();
+                    }else {
+
+                        showToast("车辆行驶中，不可上传数据!");
+                    }
 
                 }
                 break;
@@ -133,53 +184,5 @@ public class SetActivity extends BaseActivity implements UploadDataContract.View
 
     }
 
-    @Override
-    public void uploadDriveDataComplete() {
 
-        uploadDataPresenter.uploadMapPointOfDriveData();
-        Print.d("uploadDriveData", "uploadDriveDataComplete");
-    }
-
-    @Override
-    public void uploadMapPointOfDriveDataComplete() {
-
-        uploadDataPresenter.uploadDrivingCustom();
-    }
-
-    @Override
-    public void uploadDrivingCustomComplete() {
-
-        uploadDataPresenter.uploadPhysicalExamination();
-    }
-
-    @Override
-    public void uploadPhysicalExaminationComplete() {
-
-        uploadComplete();
-    }
-
-    private void uploadComplete() {
-
-    }
-
-    @Override
-    public void showProgress(String text) {
-        showLoadingDialog(text);
-    }
-
-    @Override
-    public void dismissProgress() {
-        dismissLoadingDialog();
-    }
-
-    @Override
-    public void showTip(String message) {
-
-        showToast(message);
-    }
-
-    @Override
-    public Boolean isActive() {
-        return isActive;
-    }
 }

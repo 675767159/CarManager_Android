@@ -175,6 +175,10 @@ public class OBDClient {
         this.loadDataType = dataTypeTijian;
     }
 
+    public void stopExamnation(){
+        this.loadDataType = dataTypedrive;
+    }
+
     public void clearFaultCode() {
         this.loadDataType = dataTypeClearErr;
     }
@@ -306,7 +310,7 @@ public class OBDClient {
                     }
                 });
                 MySharedPreferences mySharedPreferences=new MySharedPreferences(APP.getInstance());
-                int value=mySharedPreferences.getInt(KeyEnum.typeKey,OBDConnectType.WIFI.getValue());
+                int value=mySharedPreferences.getInt(KeyEnum.connectTypeKey,OBDConnectType.WIFI.getValue());
                 OBDConnectType type=OBDConnectType.fromInteger(value);
                 obdConnectService.setConnectType(type);
                 obdConnectService.startConnectService();
@@ -803,7 +807,7 @@ public class OBDClient {
                                 break;
                             case dataTypeTijian:
                                 OBDClient.this.healthExamination();
-                                loadDataType = dataTypedrive;
+                                OBDClient.this.stopExamnation();
                                 break;
                             case dataTypedrive: {
 
@@ -826,7 +830,6 @@ public class OBDClient {
                                         String pid = pids.get(i);
                                         String data = OBDConnectService.getData(pid);
                                         SensorsService.SensorsDataHandler(data, pid);
-                                        Print.d("SensorsDataHandler",pid+"=="+data);
                                         if (data.length() > 0) {
                                             if (i >= mainPIDList.size()) {
                                                 travelArray.add(OBDClient.this.readTravelDataWith(pid, data));

@@ -54,6 +54,8 @@ public class TrackRecordActivity extends BaseActivity {
                             intent.putExtra("travelSummaryModel", travelSummaryModelStr);
                             TrackRecordActivity.this.setResult(1, intent);
                             finish();
+
+
                         } else {
 
                             showToast("行驶过程中无法查看记录！");

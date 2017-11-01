@@ -15,7 +15,7 @@ import org.greenrobot.greendao.annotation.Generated;
 @Entity(nameInDb = "DrivingCustom")
 public class DrivingCustomModel {
 
-    @Property(nameInDb = "startDate")private String  startDate;
+    @Property(nameInDb = "StartDate")private String  startDate;
     @Property(nameInDb = "vinCode")private String vinCode;
     @Property(nameInDb = "createDate")private String createDate;
     @Property(nameInDb = "pointx")private double pointx;

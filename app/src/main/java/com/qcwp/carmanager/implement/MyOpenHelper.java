@@ -36,6 +36,6 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
     @Override
     public void onUpgrade(Database db, int oldVersion, int newVersion) {
         //操作数据库的更新 有几个表升级都可以传入到下面
-        MigrationHelper.getInstance().migrate(db,CarCheckModelDao.class);
+//        MigrationHelper.getInstance().migrate(db,CarCheckModelDao.class);
     }
 }

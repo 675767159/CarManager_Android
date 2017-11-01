@@ -218,7 +218,7 @@ public class CarEditActivity extends BaseActivity {
                 builder.setTitle("请选择常用品牌");
                 break;
             case Carseries:
-                list= mApp.getDaoInstant().queryBuilder(CarSeriesModel.class).where(CarSeriesModelDao.Properties.Cid.eq(carCommonBrandId)).orderDesc(CarSeriesModelDao.Properties.Id).list();
+                list= mApp.getDaoInstant().queryBuilder(CarSeriesModel.class).where(CarSeriesModelDao.Properties.CbId.eq(carCommonBrandId)).orderDesc(CarSeriesModelDao.Properties.Id).list();
                 builder.setTitle("请选择车系");
                 break;
         }
@@ -360,11 +360,10 @@ public class CarEditActivity extends BaseActivity {
                     Print.d(TAG,requestModel.status+"-----"+requestModel.msg);
                     if (requestModel.isSuccess) {
                         carInfoModel.setNeedUpload(UploadStatusEnum.HadUpload);
-                        CarEditActivity.this.updateSuccess();
-                    }else {
-                        showToast(requestModel.msg);
+
                     }
 
+                    CarEditActivity.this.updateSuccess();
 
 
                 }
@@ -373,7 +372,7 @@ public class CarEditActivity extends BaseActivity {
                 public void onFailure(Call<RequestModel> call, Throwable throwable) {
 
                     dismissLoadingDialog();
-                    showToast(throwable.getLocalizedMessage());
+                    CarEditActivity.this.updateSuccess();
 
                 }
             });

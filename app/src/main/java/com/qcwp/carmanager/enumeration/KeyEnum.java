@@ -37,6 +37,7 @@ public class KeyEnum {
             isOpenedCrashRemind = "isOpenedCrashRemind",
             overspeed = "overspeed",
             contactPhone = "contactPhone",
-            professionalTestType="professionalTestType";
+            professionalTestType="professionalTestType",
+            connectTypeKey="connectTypeKey";
 
 }

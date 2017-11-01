@@ -266,7 +266,10 @@ public class CommonUtils {
         wifiManager.startScan();
         List<ScanResult> resultss = wifiManager.getScanResults();
         Print.d("SCAN_RESULTS_AVAILABLE_ACTION",resultss.size()+"----");
+
+
         WifiConfiguration wificong = null;
+
         for (int i=0;i<10;i++) {
 
             List<ScanResult> results = wifiManager.getScanResults();
@@ -274,13 +277,33 @@ public class CommonUtils {
             for (ScanResult result : results) {
                 Print.d("SCAN_RESULTS_AVAILABLE_ACTION", result.SSID + "," + result.BSSID + ",  " + result.level);
                 if (result.SSID.contains("OBD")) {
+
                     wificong = new WifiConfiguration();
+                    wificong.allowedAuthAlgorithms.clear();
+                    wificong.allowedGroupCiphers.clear();
+                    wificong.allowedKeyManagement.clear();
+                    wificong.allowedPairwiseCiphers.clear();
+                    wificong.allowedProtocols.clear();
+
                     wificong.SSID = "\"" + result.SSID + "\"";
                     wificong.BSSID = result.BSSID;
                     wificong.status = WifiConfiguration.Status.ENABLED;
                     wificong.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                    wificong.wepKeys[0] = "\"" + "\"";
-
+//                    wificong.wepKeys[0] = "\"" + "\"";
+//                    wificong.wepTxKeyIndex = 0;
+//                    wificong = new WifiConfiguration();
+//                    wificong.SSID = "\"" +  result.SSID  + "\"";
+//                    wificong.status = WifiConfiguration.Status.ENABLED;
+//
+//                    wificong.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+//                    wificong.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//                    wificong.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//                    wificong.allowedPairwiseCiphers
+//                            .set(WifiConfiguration.PairwiseCipher.TKIP);
+//                    wificong.allowedPairwiseCiphers
+//                            .set(WifiConfiguration.PairwiseCipher.CCMP);
+//                    wificong.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//                    wificong.wepKeys[0] = "\"" + "\"";
                     break;
                 }
             }
@@ -295,21 +318,29 @@ public class CommonUtils {
             }
         }
 
+
+
+
         Boolean isSuccess=false;
         if (wificong != null) {
+
             int newNetworkId = wifiManager.addNetwork(wificong);
-            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "state------" + wifiManager.getWifiState());
+
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "newNetworkId------" + newNetworkId);
             Boolean a=false;
             int i=0;
-            while (!a&&i<5) {
-                a=wifiManager.enableNetwork(newNetworkId, true);
+            while (!a&&i<3) {
+                a=wifiManager.enableNetwork(newNetworkId,true);
                 i++;
             }
+            Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "激活:"+a);
+
+
             Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "a------" + a);
             Print.d("SCAN_RESULTS_AVAILABLE_ACTION", "state------" + wifiManager.getWifiState());
-            if (a) {
-                wifiManager.saveConfiguration();
-            }
+//            if (a) {
+//                wifiManager.saveConfiguration();
+//            }
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {

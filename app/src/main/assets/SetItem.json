@@ -5,6 +5,9 @@
     [
       { "title": "提醒设置",
         "isSwitch":false
+      },
+      { "title": "OBD类型",
+        "isSwitch":true
       }
 
     ]

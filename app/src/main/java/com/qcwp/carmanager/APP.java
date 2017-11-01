@@ -9,6 +9,7 @@ import android.util.DisplayMetrics;
 
 import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.FileIOUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
 import com.google.gson.Gson;
 import com.qcwp.carmanager.engine.Engine;
@@ -114,6 +115,8 @@ public class APP extends Application {
 
 
         Utils.init(this);
+        LogUtils.Builder mConfig =new  LogUtils.Builder();
+        mConfig.setLog2FileSwitch(true);
 
 
         SMSSDK.initSDK(this,this.getString(R.string.ShareSDK_Key),this.getString(R.string.ShareSDK_Secret));
@@ -123,6 +126,7 @@ public class APP extends Application {
         String userInfoStr= FileIOUtils.readFile2String(this.getMyFileFolder(PathEnum.UserInfo));
         if (EmptyUtils.isNotEmpty(userInfoStr)) {
             LoginModel userInfo = new Gson().fromJson(userInfoStr, LoginModel.class);
+            LogUtils.file("userInfo",userInfo.toString());
             if (EmptyUtils.isNotEmpty(userInfo)) {
                 UserData.setInstance(userInfo);
             }

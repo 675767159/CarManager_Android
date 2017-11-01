@@ -4,6 +4,7 @@ package com.qcwp.carmanager.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocationListener;
@@ -30,6 +31,7 @@ import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.R;
 import com.qcwp.carmanager.broadcast.LocationEvent;
 import com.qcwp.carmanager.broadcast.MessageEvent;
+import com.qcwp.carmanager.control.TouchHighlightImageView;
 import com.qcwp.carmanager.enumeration.OBDConnectStateEnum;
 import com.qcwp.carmanager.greendao.gen.LocationModelDao;
 import com.qcwp.carmanager.implement.MyLocationListener;
@@ -69,10 +71,14 @@ public class DriveTrackActivity extends BaseActivity implements LocationContract
     @BindView(R.id.avgOilConsume)
     TextView avgOilConsume;
 
+    @BindView(R.id.record)
+    TouchHighlightImageView btnRecord;
+
     private OBDClient obdClient;
     private Locale locale;
     private LocationClient mLocationClient;
     private BaiduMap mBaiduMap;
+    private Boolean firstAppear=true;
     @Override
     protected int getContentViewLayoutID() {
         //在使用SDK各组件之前初始化context信息，传入ApplicationContext
@@ -88,9 +94,20 @@ public class DriveTrackActivity extends BaseActivity implements LocationContract
         locale = Locale.getDefault();
         mBaiduMap=mapView.getMap();
 
-        if (obdClient.getConnectStatus()!=OBDConnectStateEnum.connectTypeHaveBinded){
 
+        if (obdClient.getConnectStatus()!=OBDConnectStateEnum.connectTypeHaveBinded) {
             startGetCurrentLocation();
+        }
+
+
+        Intent intent=getIntent();
+        if (intent.getStringExtra("travelSummaryModel")!=null){
+            String travelSummaryModelStr=intent.getStringExtra("travelSummaryModel");
+            TravelSummaryModel travelSummaryModel=new Gson().fromJson(travelSummaryModelStr, TravelSummaryModel.class);
+            initDisplay(travelSummaryModel);
+            initLocationData(travelSummaryModel.getStartDate());
+            btnRecord.setEnabled(false);
+
         }
 
 
@@ -169,6 +186,9 @@ public class DriveTrackActivity extends BaseActivity implements LocationContract
     private void updateMapTrack(List<LatLng> mapPoints,LatLng latLng){
         mBaiduMap.clear();
 
+        if (mapPoints.size()<2){
+            return;
+        }
         LatLng startLocation=mapPoints.get(0);
         //构建Marker图标
         BitmapDescriptor bitmap = BitmapDescriptorFactory
@@ -195,7 +215,10 @@ public class DriveTrackActivity extends BaseActivity implements LocationContract
         mBaiduMap.addOverlay(option);
 
 
-        initPosition(latLng);
+        if (firstAppear) {
+            initPosition(latLng);
+            firstAppear=false;
+        }
 
 
 
@@ -223,6 +246,7 @@ public class DriveTrackActivity extends BaseActivity implements LocationContract
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mapView.onPause();
+        firstAppear=true;
     }
 
 

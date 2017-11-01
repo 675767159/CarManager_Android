@@ -3,6 +3,7 @@ package com.qcwp.carmanager.ui;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -27,6 +28,8 @@ import com.qiantao.coordinatormenu.CoordinatorMenu;
 import java.util.Locale;
 
 import butterknife.BindView;
+
+import static com.qcwp.carmanager.obd.OBDConnectService.REQUEST_WIFILocationRequestResult_Code;
 
 
 public class MainActivity extends BaseActivity implements MainContract.View{
@@ -86,6 +89,10 @@ public class MainActivity extends BaseActivity implements MainContract.View{
         Print.d(TAG,"UserId="+UserData.getInstance().getUserId());
         Print.d(TAG,"UserName="+UserData.getInstance().getUserName());
 
+
+        if (Build.VERSION.SDK_INT >= 6.0 && !CommonUtils.isGpsOPen(this)) {
+            CommonUtils.openGPS(this,REQUEST_WIFILocationRequestResult_Code);
+        }
 
     }
 

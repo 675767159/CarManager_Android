@@ -79,7 +79,7 @@ public class LocationClient implements LocationContract {
     private void initLocation(){
 
         LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Battery_Saving);
+        option.setLocationMode(LocationClientOption.LocationMode.Device_Sensors);
         //可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
 
         option.setCoorType("bd09ll");
@@ -92,7 +92,7 @@ public class LocationClient implements LocationContract {
 //        option.setIsNeedAddress(true);
 //        //可选，设置是否需要地址信息，默认不需要
 
-        option.setOpenGps(false);
+        option.setOpenGps(true);
         //可选，默认false,设置是否使用gps
 
 //        option.setLocationNotify(false);

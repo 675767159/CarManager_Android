@@ -32,7 +32,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
-
     <application
         android:name=".APP"
         android:allowBackup="true"
@@ -142,7 +141,8 @@
         <activity
             android:name=".ui.AboutActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".ui.SetHelpActivity"></activity>
+        <activity android:name=".ui.SetHelpActivity" />
+        <activity android:name=".ui.RankActivity"></activity>
     </application>
 
 </manifest>
