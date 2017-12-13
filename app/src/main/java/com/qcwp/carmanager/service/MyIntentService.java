@@ -4,15 +4,9 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
-import com.qcwp.carmanager.APP;
-import com.qcwp.carmanager.broadcast.MessageEvent;
-import com.qcwp.carmanager.engine.Engine;
-import com.qcwp.carmanager.greendao.gen.DaoSession;
-import com.qcwp.carmanager.mvp.contact.UploadDataContract;
+import com.qcwp.carmanager.mvp.present.UpdateDataPresenter;
 import com.qcwp.carmanager.mvp.present.UploadDataPresenter;
 import com.qcwp.carmanager.utils.Print;
-
-import org.greenrobot.eventbus.EventBus;
 
 
 /**
@@ -63,6 +57,7 @@ public class MyIntentService extends IntentService{
             if (ACTION_UploadDriveData.equals(action)) {
 
                 new UploadDataPresenter().startUploadData();
+                new UpdateDataPresenter().startUpdateData();
             }
         }
     }

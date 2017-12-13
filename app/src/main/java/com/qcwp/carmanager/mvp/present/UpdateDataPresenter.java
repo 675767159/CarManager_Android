@@ -1,45 +1,22 @@
 package com.qcwp.carmanager.mvp.present;
 
-import android.database.Cursor;
-
-import com.blankj.utilcode.util.FileIOUtils;
-import com.blankj.utilcode.util.NetworkUtils;
-import com.blankj.utilcode.util.TimeUtils;
 import com.qcwp.carmanager.APP;
 import com.qcwp.carmanager.engine.Engine;
-import com.qcwp.carmanager.enumeration.DrivingCustomEnum;
-import com.qcwp.carmanager.enumeration.UploadStatusEnum;
-import com.qcwp.carmanager.greendao.gen.CarCheckModelDao;
-import com.qcwp.carmanager.greendao.gen.CarInfoModelDao;
+import com.qcwp.carmanager.greendao.gen.CarBrandModelDao;
+import com.qcwp.carmanager.greendao.gen.CarSeriesModelDao;
+import com.qcwp.carmanager.greendao.gen.CarTypeModelDao;
+import com.qcwp.carmanager.greendao.gen.CommonBrandModelDao;
 import com.qcwp.carmanager.greendao.gen.DaoSession;
-import com.qcwp.carmanager.greendao.gen.DrivingCustomModelDao;
-import com.qcwp.carmanager.greendao.gen.LocationModelDao;
-import com.qcwp.carmanager.greendao.gen.TravelDataModelDao;
-import com.qcwp.carmanager.greendao.gen.TravelSummaryModelDao;
-import com.qcwp.carmanager.model.UserData;
 import com.qcwp.carmanager.model.retrofitModel.AllCarModel;
-import com.qcwp.carmanager.model.retrofitModel.TokenModel;
-import com.qcwp.carmanager.model.sqLiteModel.CarCheckModel;
-import com.qcwp.carmanager.model.sqLiteModel.CarInfoModel;
-import com.qcwp.carmanager.model.sqLiteModel.DrivingCustomModel;
-import com.qcwp.carmanager.model.sqLiteModel.LocationModel;
-import com.qcwp.carmanager.model.sqLiteModel.TravelDataModel;
-import com.qcwp.carmanager.model.sqLiteModel.TravelSummaryModel;
-import com.qcwp.carmanager.utils.CommonUtils;
-import com.qcwp.carmanager.utils.MyActivityManager;
-import com.qcwp.carmanager.utils.Print;
+import com.qcwp.carmanager.model.sqLiteModel.CarBrandModel;
+import com.qcwp.carmanager.model.sqLiteModel.CarSeriesModel;
+import com.qcwp.carmanager.model.sqLiteModel.CarTypeModel;
+import com.qcwp.carmanager.model.sqLiteModel.CommonBrandModel;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
@@ -66,7 +43,10 @@ public class UpdateDataPresenter {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
+                getAllCarBrand();
+                getAllCommonCarBrand();
+                getAllCarSeries();
+                getAllCarType();
 
             }
         }).start();
@@ -76,8 +56,118 @@ public class UpdateDataPresenter {
     }
 
 
-    private void updateCarBrand(){
+    private void getAllCarBrand() {
+        long ID = 0;
+        CarBrandModel carBrandModel = mDaoSession.queryBuilder(CarBrandModel.class).orderDesc(CarBrandModelDao.Properties.Id).limit(1).unique();
+        if (carBrandModel != null) {
+            ID = carBrandModel.getId();
+        }
 
+        mEngine.getAllCarBrand(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel = response.body();
+                if (allCarModel.getStatus() == 1) {
+                    List<CarBrandModel> carBrandModels = allCarModel.getBrands();
+                    mDaoSession.getCarBrandModelDao().insertInTx(carBrandModels);
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+
+            }
+        });
+    }
+
+
+    private void getAllCommonCarBrand() {
+
+        long ID = 0;
+        CommonBrandModel commonBrandModel = mDaoSession.queryBuilder(CommonBrandModel.class).orderDesc(CommonBrandModelDao.Properties.Id).limit(1).unique();
+        if (commonBrandModel != null) {
+            ID = commonBrandModel.getId();
+        }
+
+        mEngine.getAllCommonCarBrand(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel = response.body();
+                if (allCarModel.getStatus() == 1) {
+                    List<CommonBrandModel> commonBrands = allCarModel.getCommonBrands();
+                    mDaoSession.getCommonBrandModelDao().insertInTx(commonBrands);
+
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+
+            }
+        });
+    }
+
+    private void getAllCarSeries() {
+
+        long ID = 0;
+        CarSeriesModel carSeriesModel = mDaoSession.queryBuilder(CarSeriesModel.class).orderDesc(CarSeriesModelDao.Properties.Id).limit(1).unique();
+        if (carSeriesModel != null) {
+            ID = carSeriesModel.getId();
+        }
+
+
+        mEngine.getAllCarSeries(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel = response.body();
+                if (allCarModel.getStatus() == 1) {
+                    List<CarSeriesModel> carSerieses = allCarModel.getCarSerieses();
+                    mDaoSession.getCarSeriesModelDao().insertInTx(carSerieses);
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+
+            }
+        });
+    }
+
+    private void getAllCarType() {
+
+        long ID = 0;
+        CarTypeModel carTypeModel = mDaoSession.queryBuilder(CarTypeModel.class).orderDesc(CarTypeModelDao.Properties.Id).limit(1).unique();
+        if (carTypeModel != null) {
+            ID = carTypeModel.getId();
+        }
+
+        mEngine.getAllCarType(ID).enqueue(new Callback<AllCarModel>() {
+            @Override
+            public void onResponse(Call<AllCarModel> call, Response<AllCarModel> response) {
+
+                AllCarModel allCarModel = response.body();
+                if (allCarModel.getStatus() == 1) {
+                    List<CarTypeModel> carTypes = allCarModel.getCarTypes();
+                    mDaoSession.getCarTypeModelDao().insertInTx(carTypes);
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<AllCarModel> call, Throwable throwable) {
+
+            }
+        });
     }
 
 
