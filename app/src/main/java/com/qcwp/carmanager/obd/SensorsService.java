@@ -99,6 +99,8 @@ public class SensorsService {
 
     public static native double instantFuel();// 行车100公里瞬时油耗，前端显示使用
 
+    public static native double instantOriginFuel();// 怠速时瞬时油耗，前端显示使用
+
     public static native double dist();// 里程 （计算）
 
     public static native double dist(double dist);

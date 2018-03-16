@@ -2,6 +2,7 @@
 string SensorsService:: pids = "0105,010B,010C,010D,010F,0110,0142,0146,015A";
 double SensorsService:: engineLoadValue=0.0;
 double SensorsService::lTFuelTrim=0.0;
+double SensorsService::lTFuelTrim2=0.0;
 double SensorsService::fuelPressure=0.0;
 double SensorsService::map=0.0;
 double SensorsService::maxVehicleSpeed=0.0;
@@ -9,10 +10,12 @@ double SensorsService::intakeTemp=0.0;
 double SensorsService::engineCoolant=0.0;
 double SensorsService::airFlowRate=0.0;
 double SensorsService::acceleratorPedalPosition=0.0;
+string SensorsService::acceleratorPedalPositionPid;
 double SensorsService::maxAcceleratorPedalPosition=0.0;
 double SensorsService::vehicleSpeed=0.0;
 double SensorsService::avgVehicleSpeed =0.0;
 double SensorsService::sTFuelTrim=0.0;
+double SensorsService::sTFuelTrim2=0.0;
 double SensorsService:: engineRpm=0.0;
 double SensorsService::maxEngineRpm=0.0;
 //  double vehicleSpeed=0.0;
@@ -84,6 +87,15 @@ vector<string> SensorsService::chassisDTCList;	//底盘系统故障码
 vector<string> SensorsService::bodyDTCList;	//车身系统故障码
 
 vector<string> SensorsService::networkDTCList;	//网络通讯系统故障码
+double SensorsService::oxygenSensor1;	//氧传感器-1
+double SensorsService::oxygenSensor2;	//氧传感器-2
+double SensorsService::oxygenSensor3;	//氧传感器-3
+double SensorsService::oxygenSensor4;	//氧传感器-4
+double SensorsService::oxygenSensor5;	//氧传感器-5
+double SensorsService::oxygenSensor6;	//氧传感器-6
+double SensorsService::oxygenSensor7;	//氧传感器-7
+double SensorsService::oxygenSensor8;	//氧传感器-8
+
 
 int SensorsService::DtcCount;	//故障码个数
 
@@ -91,12 +103,12 @@ int SensorsService::DrivingDataUnusualCount;		//行车数据异常个数
 int SensorsService::DrivingDataNormalCount;		//行车数据正常个数
 int SensorsService::DrivingDataVoidCount;		//行车数据无值个数
 string SensorsService::CarCheckUp_Pid_List="0104,0105,0106,0107,0108,0109,010A,010B,010C,010D,"
-"010E,010F,0110,0111,011F,0121,0122,0131,0133,0142,0145,0146,0147,0148,0149,014A,014B,014C,014D,014E";
+        "010E,010F,0110,0111,011F,0121,0122,0131,0133,0142,0145,0146,0147,0148,0149,014A,014B,014C,014D,014E";
 string SensorsService::CarCheckUp_PidDescription_list="发动机负载,冷却剂温度,燃油修正(第1排)短时,"
-"燃油修正(第1排)长时,燃油修正(第2排)短时,燃油修正(第2排)长时,燃油压力,进气歧管压力,发动机转速,"
-"车速,点火提前角,进气温度,空气流量速率,节气门开度,发动机运行时间,故障指示灯灯亮后行驶距离,燃油压力(相对歧管真空),"
-"故障码清除后行驶公里数,气压,电压,相对节气门位置,环境温度,绝对节气门门位置B,绝对节气门门位置C,绝对节气门门位置D,"
-"加速踏板位置E,加速踏板位置F,节气门控制指令,MIL时发动机运转时间,故障码清除后时间";
+        "燃油修正(第1排)长时,燃油修正(第2排)短时,燃油修正(第2排)长时,燃油压力,进气歧管压力,发动机转速,"
+        "车速,点火提前角,进气温度,空气流量速率,节气门开度,发动机运行时间,故障指示灯灯亮后行驶距离,燃油压力(相对歧管真空),"
+        "故障码清除后行驶公里数,气压,电压,相对节气门位置,环境温度,绝对节气门门位置B,绝对节气门门位置C,绝对节气门门位置D,"
+        "加速踏板位置E,加速踏板位置F,节气门控制指令,MIL时发动机运转时间,故障码清除后时间";
 vector<double> SensorsService::CarCheckUp_Value_list(MAXNUM,0); //行车数据具体值
 vector<double> SensorsService::CarCheckUp_MaxValue_list(MAXNUM,0); //行车数据最大值
 vector<double> SensorsService::CarCheckUp_MinValue_list(MAXNUM,0);//行车数据最小值
@@ -105,6 +117,10 @@ string SensorsService::CarCheckUp_Units_list="%,°C,%,%,%,%,kPa,kPa,rpm,km/h,°,
 int  SensorsService::ambientAirTemperature=0;//环境空气温度
 double  SensorsService::controlModuleVoltage=0;//控制模块电压
 
+
+double SensorsService::instantOriginFuel=0 ;// 原始瞬时油耗，单位：升/小时
+double SensorsService::totalOriginFuel=0;// 原始瞬时油耗，单位：升/小时
+double SensorsService::totalDriveFuel=0;// 原始瞬时油耗，单位：升/小时
 /**
  * 分割string成vector<string>
  * @param vinData
@@ -135,11 +151,13 @@ static vector<string> split_for_string(string str,const string separator)
 
 void SensorsService::initData()   //初始化
 {
-    
-    
+
+
     pids = "0105,010B,010C,010D,010F,0110,0142,0146,015A";
-     engineLoadValue=0.0;
-    lTFuelTrim=0.0;
+    acceleratorPedalPositionPid="015A";
+    engineLoadValue=0.0;
+    lTFuelTrim=-200;
+    lTFuelTrim2=-200;
     fuelPressure=0.0;
     map=0.0;
     maxVehicleSpeed=0.0;
@@ -150,8 +168,9 @@ void SensorsService::initData()   //初始化
     maxAcceleratorPedalPosition=0.0;
     vehicleSpeed=0.0;
     avgVehicleSpeed =0.0;
-    sTFuelTrim=0.0;
-     engineRpm=0.0;
+    sTFuelTrim=-200;
+    sTFuelTrim2=-200;
+    engineRpm=0.0;
     maxEngineRpm=0.0;
     //  double vehicleSpeed=0.0;
     timingAdvance=0.0;
@@ -176,37 +195,40 @@ void SensorsService::initData()   //初始化
     totalUsaLiter2 = 0.0;
     totalEnglandKpl = 0.0;
     totalEnglandLiter = 0.0;
-    
+
     idlingFuel1 = 0.0;
     idlingFuel2 = 0.0;
     usaKPL = 0;
     usaKPLAvg = 0.0;
-    
+
     usaLiter = 0.0;
     // 行车100公里平均油耗，前端显示使用
     showUsaLiter = 0.0;
     usaLiterAvg = 0.0;
     usaLiter2=0.0;
-    
+    instantOriginFuel=0;
+    totalOriginFuel=0;
+    totalDriveFuel=0;
+
     // 第一个公式用
     f_value1 = 0.48;
     f_value2_pre = 3600;
     f_value2 = 3600;
-    
+
     // 第二个公式用
-     s_value1 = 0.48;
+    s_value1 = 0.48;
     s_value2 = 3000;
-    
+
     pl = 1.8;
-    
+
     usaLiterAvg2 = 0.0;
     usaKPL2=0.0;
-    
+
     stopTime=0;
     travelTime=0;
     beginMileage = 0.0;  //开始里程
     totalTime=0.0; //总行驶时间
-    
+
     testTotalTime = 0.0;
     vehicleSpeedTotal = 0;
     acceleratorPedalPositionTotal =0;
@@ -216,28 +238,28 @@ void SensorsService::initData()   //初始化
     engineReferenceTorque=0;	//发动机参考转矩
     ambientAirTemperature=0;//环境空气温度
     controlModuleVoltage=0;//控制模块电压
-    
+
     powertrainDTCList.clear();	//动力系统故障码
     chassisDTCList.clear();	//底盘系统故障码
     bodyDTCList.clear();	//车身系统故障码
     networkDTCList.clear();	//网络通讯系统故障码
 
-    
-     DrivingDataUnusualCount=0;		//行车数据异常个数
-     DrivingDataNormalCount=0;		//行车数据正常个数
-     DrivingDataVoidCount=0;		//行车数据无值个数
-     CarCheckUp_Pid_List="0104,0105,0106,0107,0108,0109,010A,010B,010C,010D,"
-    "010E,010F,0110,0111,011F,0121,0122,0131,0133,0142,0145,0146,0147,0148,0149,014A,014B,014C,014D,014E";
-     CarCheckUp_PidDescription_list="发动机负载,冷却剂温度,燃油修正(第1排)短时,"
-    "燃油修正(第1排)长时,燃油修正(第2排)短时,燃油修正(第2排)长时,燃油压力,进气歧管压力,发动机转速,"
-    "车速,点火提前角,进气温度,空气流量速率,节气门开度,发动机运行时间,故障指示灯灯亮后行驶距离,燃油压力(相对歧管真空),"
-    "故障码清除后行驶公里数,气压,电压,相对节气门位置,环境温度,绝对节气门门位置B,绝对节气门门位置C,绝对节气门门位置D,"
-    "加速踏板位置E,加速踏板位置F,节气门控制指令,MIL时发动机运转时间,故障码清除后时间";
-    
-   
-     CarCheckUp_Units_list="%,°C,%,%,%,%,kPa,kPa,rpm,km/h,°,°C,g/s,%,sec,km,kPa,km,kPa,V,%,°C,%,%,%,%,%,%,minutes,minutes";
-    
-    
+
+    DrivingDataUnusualCount=0;		//行车数据异常个数
+    DrivingDataNormalCount=0;		//行车数据正常个数
+    DrivingDataVoidCount=0;		//行车数据无值个数
+    CarCheckUp_Pid_List="0104,0105,0106,0107,0108,0109,010A,010B,010C,010D,"
+            "010E,010F,0110,0111,011F,0121,0122,0131,0133,0142,0145,0146,0147,0148,0149,014A,014B,014C,014D,014E";
+    CarCheckUp_PidDescription_list="发动机负载,冷却剂温度,燃油修正(第1排)短时,"
+            "燃油修正(第1排)长时,燃油修正(第2排)短时,燃油修正(第2排)长时,燃油压力,进气歧管压力,发动机转速,"
+            "车速,点火提前角,进气温度,空气流量速率,节气门开度,发动机运行时间,故障指示灯灯亮后行驶距离,燃油压力(相对歧管真空),"
+            "故障码清除后行驶公里数,气压,电压,相对节气门位置,环境温度,绝对节气门门位置B,绝对节气门门位置C,绝对节气门门位置D,"
+            "加速踏板位置E,加速踏板位置F,节气门控制指令,MIL时发动机运转时间,故障码清除后时间";
+
+
+    CarCheckUp_Units_list="%,°C,%,%,%,%,kPa,kPa,rpm,km/h,°,°C,g/s,%,sec,km,kPa,km,kPa,V,%,°C,%,%,%,%,%,%,minutes,minutes";
+
+
 
     //lkm = "0.0"; //计算
     usaKPL = 0;
@@ -256,38 +278,38 @@ void SensorsService::initData()   //初始化
     dist = 0.0; //计算
     beginMileage = 0.0;  //开始里程
     //	totalMileage = 0.0;//总里程
-    
+
     totalTime = 0; //总行驶时间
     idlingFuel = 0;// 100公里怠速油耗
     customIdlingFuel = 0;  // 自定义怠速油耗
     literAvg = 5; // 60时速5-100次油耗平均值
-    
+
     // 第一个公式用
     f_value1 = 0.48;
     f_value2_pre = 3600;
     f_value2 = 3600;
-    
+
     // 第二个公式用
     s_value1 = 0.48;
     s_value2 = 3000;
-    
+
     // 0时速怠速系数
     idlingRatio1 = 20;
-    
+
     // 1-10时速怠速系数
     idlingRatio2 = 2 * idlingRatio1;
-    
+
     pl = 1.8;
-    
+
     totalUsaKpl = 0.0;
     totalUsaLiter = 0.0;
     totalUsaLiter2 = 0.0;
     totalEnglandKpl = 0.0;
     totalEnglandLiter = 0.0;
-    
+
     idlingFuel1 = 0.0;
     idlingFuel2 = 0.0;
-    
+
     vector<string>arr = split_for_string(CarCheckUp_Pid_List,",");
     for(int i=0;i<arr.size();i++)
     {
@@ -326,7 +348,16 @@ void SensorsService::initData()   //初始化
     setCarCheckUpValue(Car_CheckUp_location["014E"],65535,0);
     setCarCheckUpValue(Car_CheckUp_location["0154"],65535,0);
     setCarCheckUpValue(Car_CheckUp_location["0159"],655350,0);
-    
+
+    oxygenSensor1=-200;
+    oxygenSensor2=-200;
+    oxygenSensor3=-200;
+    oxygenSensor4=-200;
+    oxygenSensor5=-200;
+    oxygenSensor6=-200;
+    oxygenSensor7=-200;
+    oxygenSensor8=-200;
+
 }
 
 
@@ -341,37 +372,37 @@ void SensorsService::calculateFuel(){
      formater.setMinimumFractionDigits(1);*/
     //char tmpChar[15];
     //double usakpl,usakplavg,usaliter,showusaliter,usaliteravg,usaliter2,usaliteravg2,usakpl2;
-    
-    
+
+
     //if(travelTime <= 0) travelTime = 1;
     //if(stopTime <= 0) stopTime = 1;
-    
+
     double tmpMAF = 0.0;
     if(airFlowRate > 0)
         tmpMAF = airFlowRate;
-    
+
     f_value2 = f_value2_pre;
-    
+
     // 如果不能读取空气流量
     if(tmpMAF <= 0&&intakeTemp!=0) {
         tmpMAF = (((engineRpm * map / intakeTemp)/120)*(0.85/100*100)*(pl)*(28.97)/(8.314)) / 10;
         f_value2 = s_value2;
     }
-    
+
     if ((tmpMAF <= 0 || intakeTemp==0)
         && map <= 0) {
         showUsaLiter = -1;
         return;
     }
     double mpg;
-    
+
     if(f_value2 * tmpMAF / 100==0){
         mpg = 0.0;
     }
     else{
         mpg = (14.7 * 6.17 * 4.54 * vehicleSpeed * 0.621371) / (f_value2 * tmpMAF / 100);
     }
-    
+
     //行车,踩油门,有车速
     if(vehicleSpeed > 0 || engineRpm > 0) {
         //美-公里每升(瞬时)
@@ -405,7 +436,7 @@ void SensorsService::calculateFuel(){
             //usaLiter=usaKplChar;
         }
         //sprintf(tmpChar,"%.1f",usakpl);
-        
+
         //usaKPL = tmpChar;
         //double tmpUsaLiter;
         //sscanf(usaLiter.c_str(),"%.1f",tmpUsaLiter);
@@ -432,7 +463,7 @@ void SensorsService::calculateFuel(){
         totalUsaLiter += usaLiter;
         //sprintf(tmpChar,"%.1f",usaliter);
         //usaLiter = tmpChar;
-        
+
         //美-升每百公里(平均值)
         //SensorsService.usaLiterAvg = formater.format(totalUsaLiter / travelTimeCount);
         //	sprintf_s(usaKplChar,"%.1f",(totalUsaLiter / travelTimeCount));
@@ -457,15 +488,15 @@ void SensorsService::calculateFuel(){
         {
             mpg2 = (14.7 * 6.17 * 4.54 * vehicleSpeed* 0.621371) / (s_value2 * tmpMAF / 100);
         }
-        
+
         usaKPL2 = mpg2 * 1.609344 / 3.78;
-        
+
         //	double tmpusaLiter2 ;
         if(usaKPL2==0)
             usaLiter2 = 0.0;
         else
             usaLiter2 = 100 / usaKPL2;
-        
+
         //sprintf(usaKplChar,"%.1f",tmpusaLiter2);
         //usaLiter2=usaKplChar;
         //sscanf(usaKplChar,"%.1f",tmpusaLiter2);
@@ -484,16 +515,16 @@ void SensorsService::calculateFuel(){
         if(vehicleSpeed > 70 ) {
             usaLiter2 = usaLiter2* 0.2+usaLiter2;
         }
-        
+
         //12.31 新加油耗最高39.99
         if(usaLiter2>40)
         {
             usaLiter2=39.99;
         }
-        
+
         totalUsaLiter2+=usaLiter2;
-        
-        
+
+
         //美-升每百公里(平均值)
         //SensorsService.usaLiterAvg2 = formater.format(totalUsaLiter2 / travelTimeCount);
         //sprintf(usaKplChar,"%.1f",(totalUsaLiter2 / travelTimeCount));
@@ -506,30 +537,30 @@ void SensorsService::calculateFuel(){
         {
             usaLiterAvg2=(totalUsaLiter2 / travelTime);
         }
-        
-        
+
+
         if(usaLiterAvg > 0) showUsaLiter = usaLiterAvg+idlingFuel+customIdlingFuel;
         else if(usaLiterAvg2 > 0) showUsaLiter = usaLiterAvg2+idlingFuel+customIdlingFuel;
         else showUsaLiter=idlingFuel+customIdlingFuel;
         //sprintf(tmpChar,"%.1f",showusaliter);
         //showUsaLiter = tmpChar;
-        
+
         if(usaLiter > 0) instantFuel = usaLiter ;
         else if (usaLiter2 > 0) instantFuel = usaLiter2;
-        
-        
+
+
         /*
          sprintf_s(tmpChar,"%.1f",usakplavg);
          usaKPLAvg = tmpChar;
          sprintf_s(tmpChar,"%.1f",usaliter);
          usaLiter = tmpChar;
          // 行车100公里平均油耗，前端显示使用
-         
+
          sprintf_s(tmpChar,"%.1f",usaliteravg);
          usaLiterAvg = tmpChar;
          sprintf_s(tmpChar,"%.1f",usaliter2);
          usaLiter2=tmpChar;
-         
+
          */
         // ~ 将油耗添加至lkm
         //if(null != SensorsService.usaLiter && !"".equals(SensorsService.usaLiter)) {
@@ -545,14 +576,14 @@ void SensorsService::calculateFuel(){
          {
          lkm = usaliter2;
          }
-         
+
          //英-公里每升(瞬时)
          double englandKpl = mpg * 1.609344 / 4.54;
          //englandKPL = formater.format(englandKpl);
          totalEnglandKpl += englandKpl;
          //英-公里每升(平均值)
          //SensorsService.englandKPLAvg = formater.format(totalEnglandKpl / travelTimeCount);
-         
+
          //英-升每百公里(瞬时)
          double englandLiter = 100 / englandKpl;
          //SensorsService.englandLiter = formater.format(englandLiter);
@@ -561,6 +592,241 @@ void SensorsService::calculateFuel(){
          //SensorsService.englandLiterAvg = formater.format(totalEnglandLiter / travelTimeCount);
          */
     }
+}
+void SensorsService::calculateFuelNew(){
+
+
+
+//   1. 控制器读取 OBDII PID 0x10 的值 A1，并根据公式 A1*256/100 计算出空气流 量 m，此时，车辆 CANBUS 上数据的格式是一个字节 ；或控制器读取 OBDII PID 0x10 的值 B1 根据公式 ((B1*256)+B1)/100 计算出空气流量 m，此时，车辆 CANBUS 上数据的格式是两个字 节，如果 B1 的值为 FF，则 B1 值无效 ；
+//    double m=airFlowRate;
+    if (engineRpm==0) {
+        usaLiter=0;
+        instantFuel=0;
+        instantOriginFuel=0;
+        if(travelTime<=0||dist<=0)
+        {
+            usaLiterAvg=totalOriginFuel ;
+        }
+        else
+        {
+            usaLiterAvg=(totalOriginFuel /dist)*100.0;
+        }
+
+        showUsaLiter = usaLiterAvg;
+
+
+        return;
+    }
+
+    double m = 0.0;
+    if(airFlowRate > 0)
+        m = airFlowRate;
+
+
+    // 如果不能读取空气流量
+    if(m <= 0&&intakeTemp!=0) {
+        m = (((engineRpm * map / intakeTemp)/120)*(0.85/100*100)*(pl)*(28.97)/(8.314)) / 10;
+
+    }
+
+//    (2) 控制器读取 OBD II PID 0x11 的值 A2，根据公式 A2*100/255 获取节气门位置 传感器数值 t，若 90％ >t>10％，设理想空燃比 r ＝ 14.7，若 t>90％，则设理想空燃比 r ＝ 13.23/t，若 t<10％，则设理想空燃比 r ＝ 15/(1+t)，计算出空气流量 m 与理想空燃比 r 的 比值，得到标准喷油速率 n 的值 ；
+    double t=acceleratorPedalPosition/100.0;
+    double r=0;
+
+
+    if (t>0.1&&t<0.9) {
+        r=14.7;
+    }else if (t>0.9){
+        r=13.23/t;
+    }else if (t<0.1){
+        r=15.0/(1+t);
+    }
+    double n=m/r;
+
+//    (3) 控制器读取 OBDII PID 0x7/9 的值 A3 和 A4，根据公式 (A3-128)*100/128 和 公式 (A4-128)*100/128 得到发动机缸组一和缸组二的燃油修正比 k1 和 k2，然后将 k1 和 k2 进行平均，得到平均长期燃油修正比 k，根据公式 n*(k+1)，得出第一次修正燃油喷出速 率 p1；
+
+    double k1=lTFuelTrim;
+    double k2=lTFuelTrim2;
+    double k=0;
+    int i=0;
+
+    if (k1!=-200) {
+        k+=k1;
+        i++;
+    }
+
+    if (k2!=-200) {
+        k+=k2;
+        i++;
+    }
+
+    if (i!=0) {
+        k=k/i/100.0;
+    }
+
+    double p1=0;
+    if (k==-1){
+        p1=n;
+    }else{
+        p1=n*(k+1);
+    }
+
+//     (4) 控制器读取 OBD II PID 6/8 的值 A5 和 A6，根据公式 (A5-128)*100/128 和公 式 (A6-128)*100/128，计算出发动机缸组一和缸组二的短期燃油修正值 h1 和 h2，然后将 h1 和 h2 进行平均，得出平均短期燃油修正比 h，根据公式 p1*(h+1)，得出第二次修正燃油喷出 速率 p2 ；
+
+    double h1=sTFuelTrim;
+    double h2=sTFuelTrim2;
+    double h=0;
+    int j=0;
+
+
+    if (h1!=-200) {
+        h+=h1;
+        j++;
+    }
+
+    if (h2!=-200) {
+        h+=h2;
+        j++;
+    }
+
+    if (j!=0) {
+        h=h/j/100.0;
+    }
+
+
+
+
+
+    double p2=0;
+    if (h==-1){
+        p2=p1;
+    }else{
+        p2=p1*(h+1);
+    }
+
+
+//     (5) 控制器读取 OBD II PID5 的值 A7，根据公式 A7-40 计算出水温 C，如果水温 C 小于 90℃，根据公式 [(90-C)/363+1]*p2 计算出第三次修正燃油喷出速率 p3，如果水温 C>90℃，则按 p3 ＝ p2 计算出第三次修正燃油喷出速率 ；
+
+    double C=engineCoolant;
+    double p3;
+    if (C<90) {
+        p3=((90-C)/363.0+1)*p2;
+    }else{
+        p3=p2;
+    }
+
+//     (6) 控制器读取 OBDII PID10-13 的值，读出发动机 1-4 氧传感器的值 D1-D4，做平 均得出平均数值 D，按公式 (D/1023+1)p3，计算出第 4 次燃油喷出速率 p4 ；
+
+    double D=0;
+    int l=0;
+    if (oxygenSensor1!=-200&&oxygenSensor1!=-300) {
+        D+=oxygenSensor1;
+        l++;
+    }
+    if (oxygenSensor2!=-200&&oxygenSensor2!=-300) {
+        D+=oxygenSensor2;
+        l++;
+    }
+
+    if (oxygenSensor3!=-200&&oxygenSensor3!=-300) {
+        D+=oxygenSensor3;
+        l++;
+    }
+    if (oxygenSensor4!=-200&&oxygenSensor4!=-300) {
+        D+=oxygenSensor4;
+        l++;
+    }
+    if (oxygenSensor5!=-200&&oxygenSensor5!=-300) {
+        D+=oxygenSensor5;
+        l++;
+    }
+    if (oxygenSensor6!=-200&&oxygenSensor6!=-300) {
+        D+=oxygenSensor6;
+        l++;
+    }
+    if (oxygenSensor7!=-200&&oxygenSensor7!=-300) {
+        D+=oxygenSensor7;
+        l++;
+    }
+    if (oxygenSensor8!=-200&&oxygenSensor8!=-300) {
+        D+=oxygenSensor8;
+        l++;
+    }
+
+    if (l!=0) {
+        D=D/l/100.0;
+    }
+
+
+
+
+
+
+    double p4=(D/1023.0+1)*p3;//单位 g
+
+
+    //1s用的油耗，单位 L
+
+    double p5=p4/720.0;//;单位 L
+
+
+    instantOriginFuel=p5*3600; //p4/720(g/L)/(1/3600(h))    单位:升/小时
+    totalOriginFuel+=p5;
+
+    if (vehicleSpeed>0) {
+        totalDriveFuel+=p5;
+        usaLiter=100*instantOriginFuel/vehicleSpeed;
+
+
+    }else{
+
+        usaLiter=0;
+    }
+
+
+
+//    (7) 用第 4 次燃油喷出速率 p4 以时间 t 计算积分，根据公式 fuel ＝∫ f(p4)d(t) p4 得出行程油耗 fuel。
+
+
+
+
+
+
+
+
+    if(travelTime<=0||dist<=0)
+    {
+        usaLiterAvg=totalOriginFuel ;
+    }
+    else
+    {
+        usaLiterAvg=(totalOriginFuel /dist)*100.0;
+    }
+
+    //12.31 新加油耗最高39.99
+    if(usaLiter>39)
+    {
+        usaLiter=39;
+    }
+
+    if(usaLiterAvg>39)
+    {
+        usaLiterAvg=39;
+    }
+
+//    printf("p5====%f",p5);
+//    printf("totalDriveFuel====%f",totalDriveFuel);
+//    printf("totalDriveFuel====%f",totalOriginFuel);
+
+
+    showUsaLiter = usaLiterAvg;
+    instantFuel = usaLiter ;
+
+
+
+
+
+
 }
 
 
@@ -590,7 +856,12 @@ vector<string> SensorsService::dataHandler(string data, bool isSpecialVinValue)
     //trim 实现
     //tmpData.erase(0,tmpData.find_first_not_of("\r\t\n "));
     //tmpData.erase(tmpData.find_last_not_of("\r\t\n ")+1);
-    
+
+    vector<string> arr ;
+    if (tmpData.length()<=0) {
+        return arr;
+    }
+
     if(isSpecialVinValue==false)
     {
         pidStr=tmpData.substr(0,4);
@@ -603,8 +874,8 @@ vector<string> SensorsService::dataHandler(string data, bool isSpecialVinValue)
             tmpData=tmpData.erase(len,4);
         }
     }
-    
-    vector<string> arr ;
+
+
     int stopNum= tmpData.length()/2;
     for(int i=0;i<stopNum;i++)
     {
@@ -628,18 +899,18 @@ string SensorsService::GetVinCode(string vinData)
     string retValue = "";
     //	char tmpStr[5];
     bool isSpecialVinValue = false;
-    
+
     vector<string> arr = split_for_string(vinData,"@");
     for(vector<string *>::size_type  i=0;i<arr.size();i++)
     {
-      
+
         if (arr[i].find("BUS INIT:")!= string::npos) {
             std::vector<string>::iterator it = arr.begin()+i;
             arr.erase(it);
-            
+
         }
         if(arr[i].length()<8) continue;
-        
+
         string tmpStr = arr[i];
         string::size_type pos;
         if( !tmpStr.empty()&&(pos=tmpStr.find(":"))!=string::npos)
@@ -651,14 +922,14 @@ string SensorsService::GetVinCode(string vinData)
     for(vector<string *>::size_type  k =0;k<arr.size();k++)
     {
         if(arr[k].length()<8) continue;
-        
+
         vector<string> tmpData = dataHandler(arr[k],isSpecialVinValue);
-        
+
         for(vector<string *>::size_type  j=0;j<tmpData.size();j++){
             if(tmpData[j].find("00")!=string::npos) continue;
             int intValue;
             sscanf(tmpData[j].c_str(),"%x",&intValue);
-            
+
             if ((intValue >= 48 && intValue <= 57) || (intValue >= 65 && intValue <= 90) || (intValue >= 97 && intValue <= 122))
             {
                 //sprintf(retValue.c_str(),"%s%d",retValue,intValue);
@@ -668,9 +939,9 @@ string SensorsService::GetVinCode(string vinData)
             }
         }
     }
-    
+
     if(retValue.length()>17){
-        retValue = retValue.substr(retValue.length()-17,retValue.length());
+        retValue=retValue.substr(1,17);
     }
     printf("%s\n",retValue.c_str());
     return retValue;
@@ -685,19 +956,40 @@ string SensorsService::GetVinCode(string vinData)
 
 void SensorsService::SensorsDataHandler(string sensorsData,string pid )
 {
-    
 
-    
-    if( sensorsData.empty()||sensorsData.length() == 0||sensorsData.find("NO DATA")!= string::npos||sensorsData.find("CAN ERROR")!= string::npos||sensorsData.find("STOPPED")!= string::npos||sensorsData.find("ERROR")!= string::npos){
-
+    if(sensorsData=="FAULT"){
+        vehicleSpeed = -1;
+//        EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.CarCrash, null));
         return;
     }
+
+
+
+//    if (arr.size()<=0) {
+//        NSDictionary*userInfo=[NSDictionary dictionaryWithObject:[NSString stringWithUTF8String:pid.c_str()] forKey:@"pid"];
+//        [[NSNotificationCenter defaultCenter]postNotificationName:NotifyNewInvalidPid object:nil userInfo:userInfo];
+//
+//        if(pid=="010D"||pid=="010C") {
+//            [[NSNotificationCenter defaultCenter]postNotificationName:NotifyOBDConnectError object:nil];
+//        }
+//        return;
+//    }
+    vector<string> arr= dataHandler(sensorsData,false);
+    if( sensorsData.empty()||sensorsData.length() == 0||sensorsData.find("NO DATA")!= string::npos||sensorsData.find("CAN ERROR")!= string::npos||sensorsData.find("STOPPED")!= string::npos||sensorsData.find("ERROR")!= string::npos||arr.size()<=0){
+
+        if(pid!="010D"&&pid!="010C"&&pid!=acceleratorPedalPositionPid) {
+//            NSDictionary*userInfo=[NSDictionary dictionaryWithObject:[NSString stringWithUTF8String:pid.c_str()] forKey:@"pid"];
+//            [[NSNotificationCenter defaultCenter]postNotificationName:NotifyNewInvalidPid object:nil userInfo:userInfo];
+        }
+        return;
+    }
+
     int data1=0;
     int data2=0;
     //char tmpStr[5];
     //sprintf(tmpStr, "%.0f", engineLoadValue);     //double 转 char
-    
-    if(sensorsData.find("4104")!= string::npos&&pid.find("0104")!=string::npos){
+
+    if(sensorsData.find("4104")!= string::npos&&pid=="0104"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -706,9 +998,9 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
         }
         //	sprintf(tmpStr, "%d", (data1 * 100 / 255));
         //	engineLoadValue=tmpStr;
-        
+
     }
-    else if(sensorsData.find("4105")!= string::npos&&pid.find("0105")!=string::npos){
+    else if(sensorsData.find("4105")!= string::npos&&pid=="0105"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -718,27 +1010,27 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
         //	sprintf(tmpstr, "%d", (data1 - 40));
         //	engineCoolant=tmpstr;
     }
-    else if(sensorsData.find("4106")!= string::npos&&pid.find("0106")!=string::npos){
+    else if(sensorsData.find("4106")!= string::npos&&pid=="0106"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
             sscanf(arr[0].c_str(),"%x",&data1);
-            sTFuelTrim=((data1 - 128) * 100 / 128);
+            sTFuelTrim=((data1 - 128) * 100.0 / 128);
         }
         //sprintf(tmpStr, "%d", ((data1 - 128) * 100 / 128));
         //sTFuelTrim=tmpStr;
     }
-    else if(sensorsData.find("4107")!= string::npos&&pid.find("0107")!=string::npos){
+    else if(sensorsData.find("4107")!= string::npos&&pid=="0107"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
             sscanf(arr[0].c_str(),"%x",&data1);
-            lTFuelTrim=((data1 - 128) * 100 / 128);
+            lTFuelTrim=((data1 - 128) * 100.0 / 128);
         }
         //sprintf(tmpStr, "%d", ((data1 - 128) * 100 / 128));
         //lTFuelTrim=tmpStr;
     }
-    else if(sensorsData.find("410A")!= string::npos&&pid.find("010A")!=string::npos){
+    else if(sensorsData.find("410A")!= string::npos&&pid=="010A"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -748,7 +1040,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
         //sprintf(tmpStr, "%d", (data1 * 3));
         //fuelPressure=tmpStr;
     }
-    else if(sensorsData.find("410B")!= string::npos&&pid.find("010B")!=string::npos){
+    else if(sensorsData.find("410B")!= string::npos&&pid=="010B"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -758,7 +1050,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
         //sprintf(tmpStr, "%d", (data1));
         //map=tmpStr;
     }
-    else if(sensorsData.find("410C")!= string::npos&&pid.find("010C")!=string::npos){
+    else if(sensorsData.find("410C")!= string::npos&&pid=="010C"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>1)
         {
@@ -771,7 +1063,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
                 maxEngineRpm=engineRpm;
         }
     }
-    else if(sensorsData.find("410D")!= string::npos&&pid.find("010D")!=string::npos){
+    else if(sensorsData.find("410D")!= string::npos&&pid=="010D"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -786,9 +1078,9 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             if(vehicleSpeed>maxVehicleSpeed)
                 maxVehicleSpeed = vehicleSpeed;
         }
-       
+
     }
-    else if(sensorsData.find("410E")!= string::npos&&pid.find("010E")!=string::npos){
+    else if(sensorsData.find("410E")!= string::npos&&pid=="010E"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -796,7 +1088,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             timingAdvance = (data1 / 2 - 64) ;
         }
     }
-    else if(sensorsData.find("410F")!= string::npos&&pid.find("010F")!=string::npos){
+    else if(sensorsData.find("410F")!= string::npos&&pid=="010F"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -804,7 +1096,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             intakeTemp = (data1 - 40) ;
         }
     }
-    else if(sensorsData.find("4110")!= string::npos&&pid.find("0110")!=string::npos){
+    else if(sensorsData.find("4110")!= string::npos&&pid=="0110"){
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()>1)
         {
@@ -813,10 +1105,10 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             airFlowRate = (((data1 * 256) + data2) / 100) ;
         }
     }
-    else if((sensorsData.find("4111")!=string::npos&&pid.find("0111")!=string::npos)||(sensorsData.find("415A")!=string::npos&&pid.find("015A")!=string::npos)||
-            (sensorsData.find("4145")!=string::npos&&pid.find("0145")!=string::npos)||(sensorsData.find("4147")!=string::npos&&pid.find("0147")!=string::npos)||
-            (sensorsData.find("4148")!=string::npos&&pid.find("0148")!=string::npos)||(sensorsData.find("4149")!=string::npos&&pid.find("0149")!=string::npos)||
-            (sensorsData.find("414A")!=string::npos&&pid.find("014A")!=string::npos)||(sensorsData.find("414B")!=string::npos&&pid.find("014B")!=string::npos)){
+    else if((sensorsData.find("4111")!=string::npos&&pid=="0111")||(sensorsData.find("415A")!=string::npos&&pid=="015A")||
+            (sensorsData.find("4145")!=string::npos&&pid=="0145")||(sensorsData.find("4147")!=string::npos&&pid=="0147")||
+            (sensorsData.find("4148")!=string::npos&&pid=="0148")||(sensorsData.find("4149")!=string::npos&&pid=="0149")||
+            (sensorsData.find("414A")!=string::npos&&pid=="014A")||(sensorsData.find("414B")!=string::npos&&pid=="014B")){
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -835,7 +1127,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
                 maxAcceleratorPedalPosition = acceleratorPedalPosition;
         }
     }
-    else if(sensorsData.find("4142")!=string::npos&&pid.find("0142")!=string::npos){
+    else if(sensorsData.find("4142")!=string::npos&&pid=="0142"){
         //((A*256)+B)/1000
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()>1)
@@ -845,7 +1137,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             controlModuleVoltage=((data1*256)+data2)*1.0/1000;
         }
     }
-    else if(sensorsData.find("4146")!=string::npos&&pid.find("0146")!=string::npos){
+    else if(sensorsData.find("4146")!=string::npos&&pid=="0146"){
         //A-40
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()>0)
@@ -854,7 +1146,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             ambientAirTemperature=data1-40;
         }
     }
-    else if(sensorsData.find("4161")!=string::npos&&pid.find("0161")!=string::npos){
+    else if(sensorsData.find("4161")!=string::npos&&pid=="0161"){
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -862,7 +1154,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             driverTorque=data1-125;
         }
     }
-    else if(sensorsData.find("4162")!=string::npos&&pid.find("0162")!=string::npos){
+    else if(sensorsData.find("4162")!=string::npos&&pid=="0162"){
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()>0)
         {
@@ -870,7 +1162,7 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             actualTorque=data1-125;
         }
     }
-    else if(sensorsData.find("4163")!=string::npos&&pid.find("0163")!=string::npos){
+    else if(sensorsData.find("4163")!=string::npos&&pid=="0163"){
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()>1)
         {
@@ -879,19 +1171,81 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
             engineReferenceTorque=data1*256+data2;
         }
     }
-    else if(pid.find("0902")!=string::npos){
+    else if(pid=="0902"){
         vinCodeSourceData = sensorsData;
         printf("sensorsData====%s",sensorsData.c_str());
-       vinCode = GetVinCode(vinCodeSourceData);
-       
+        vinCode = GetVinCode(vinCodeSourceData);
+
     }
-    //新模拟器sensorsData4 "0: 4900004A5333\r1: 54443034563046\r2: 34323031363832\r\r>"
-    else if(sensorsData.find("4904")!= string::npos&&pid.find("0904")!=string::npos){
+        //新模拟器sensorsData4 "0: 4900004A5333\r1: 54443034563046\r2: 34323031363832\r\r>"
+    else if(sensorsData.find("4904")!= string::npos&&pid=="0904"){
         calibrationIdSourceData = sensorsData;
         calibrationId = sensorsData;
+    }else if (pid=="0114"||pid=="0115"||pid=="0116"||pid=="0117"||pid=="0118"||pid=="0119"||pid=="011A"||pid=="011B"){
+
+        vector<string> arr = dataHandler(sensorsData,false);
+        if(arr.size()>1)
+        {
+            sscanf(arr[1].c_str(),"%x",&data2);
+            double tempOxygenSensor=0;
+            if (data2!=255) {
+                tempOxygenSensor=100.0/128.0*data2-100;
+            }else{
+                tempOxygenSensor=-300;
+//                NSDictionary*userInfo=[NSDictionary dictionaryWithObject:[NSString stringWithUTF8String:pid.c_str()] forKey:@"pid"];
+//                [[NSNotificationCenter defaultCenter]postNotificationName:NotifyNewInvalidPid object:nil userInfo:userInfo];
+            }
+
+            if (pid=="0114") {
+                oxygenSensor1=tempOxygenSensor;
+            }else if (pid=="0115"){
+                oxygenSensor2=tempOxygenSensor;
+            }else if (pid=="0116"){
+                oxygenSensor3=tempOxygenSensor;
+            }else if (pid=="0117"){
+                oxygenSensor4=tempOxygenSensor;
+            }else if (pid=="0118"){
+                oxygenSensor5=tempOxygenSensor;
+            }else if (pid=="0119"){
+                oxygenSensor6=tempOxygenSensor;
+            }else if (pid=="011A"){
+                oxygenSensor7=tempOxygenSensor;
+            }else if (pid=="011B"){
+                oxygenSensor8=tempOxygenSensor;
+            }
+
+
+        }else{
+
+//            NSDictionary*userInfo=[NSDictionary dictionaryWithObject:[NSString stringWithUTF8String:pid.c_str()] forKey:@"pid"];
+//            [[NSNotificationCenter defaultCenter]postNotificationName:NotifyNewInvalidPid object:nil userInfo:userInfo];
+            return;
+        }
+
+
     }
-    
-    
+
+    else if(pid=="0109"){
+
+        vector<string> arr= dataHandler(sensorsData,false);
+        if(arr.size()>0)
+        {
+            sscanf(arr[0].c_str(),"%x",&data1);
+            lTFuelTrim2=((data1 - 128) * 100 / 128);
+        }
+
+    }else if(pid=="0108"){
+        vector<string> arr= dataHandler(sensorsData,false);
+        if(arr.size()>0)
+        {
+            sscanf(arr[0].c_str(),"%x",&data1);
+            sTFuelTrim2=((data1 - 128) * 100 / 128);
+        }
+        //sprintf(tmpStr, "%d", ((data1 - 128) * 100 / 128));
+        //sTFuelTrim=tmpStr;
+    }
+
+
 }
 
 
@@ -911,14 +1265,14 @@ void SensorsService::SensorsDataHandler(string sensorsData,string pid )
  * SensorsService.dist
  * */
 void SensorsService::testing(double intervalTime) {
-    
+
     testTotalTime += intervalTime;
-    
+
     vehicleSpeedTotal += vehicleSpeed;
-    
+
     // 平均时速
     avgVehicleSpeed = vehicleSpeedTotal / testTotalTime;
-    
+
     // 行驶路程
     double tmpDist = vehicleSpeed * intervalTime / 3600;
     dist += tmpDist;
@@ -933,7 +1287,7 @@ void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
         pids ="0105,010B,010C,010D,010F,0110,0142,0146,015A";
         return;
     }
-    //tmpData = BluetoothService.getData("0145");
+        //tmpData = BluetoothService.getData("0145");
     else if( pid.find("0145")!=string::npos ){
         SensorsDataHandler(tmpData,pid);
         //if(tmpData.contains("4145") && Double.parseDouble(SensorsService.acceleratorPedalPosition) > 0) {
@@ -950,11 +1304,11 @@ void SensorsService::findRightAccelerator(string tmpData ,string pid ) {
             return;
         }
     }
-    /*tmpData = BluetoothService.getData("0147");
-     if(tmpData.contains("4147")) {
-     MAIN_ACTIVITY_PIDS = new String[] { "0105", "010B", "010C", "010D", "010F", "0110", "0147" };
-     return;
-     }*/
+        /*tmpData = BluetoothService.getData("0147");
+         if(tmpData.contains("4147")) {
+         MAIN_ACTIVITY_PIDS = new String[] { "0105", "010B", "010C", "010D", "010F", "0110", "0147" };
+         return;
+         }*/
     else if( pid.find ("0148")!=string::npos){
         //tmpData = BluetoothService.getData("0148");
         SensorsDataHandler(tmpData,pid);
@@ -1095,9 +1449,9 @@ string SensorsService::analysisDTC(string data)
         retValue = "U3" + data.substr(1);
         networkDTCList.push_back(retValue);
     }
-    
+
     return retValue;
-    
+
 }
 
 
@@ -1179,42 +1533,42 @@ void SensorsService::calculateIdlingFuel(double stopTimeCount) {
      * 每公里怠速油耗 = 总怠速油耗 / 行驶里程(dist)
      * 百公里怠速油耗 = 每公里怠速油耗 * 100
      */
-    
+
     // 如果 avgLiter 小于等于1或大于等于15时，将avgLiter设置为5
     if (literAvg <= 1 || literAvg >= 15) {
         literAvg = 5;
     }
-    
+
     double km100StopLiter = 0;
     double tmpDist = 0;
-    
+
     if(stopTimeCount > 0) {
         // 每秒油耗 = X / 3600秒
         double sLiter = literAvg / 3600;
-        
+
         // 总怠速油耗 = 每秒油耗 * 停车时间
         double totalStopAvg = sLiter * stopTimeCount;
-        
+
         // 每公里怠速油耗 = 总怠速油耗 / 行驶里程
         tmpDist = dist;
         if (tmpDist <= 0) tmpDist = 0.1;
-        
+
         double kmStopLiter = totalStopAvg / tmpDist;
-        
+
         // 百公里怠速油耗 = 每公里怠速油耗 * 100
         km100StopLiter = kmStopLiter * 100;
     }
-    
+
     if(km100StopLiter < 0) km100StopLiter = 0;
     if(km100StopLiter >= 99.9) km100StopLiter = 99.9;
-    
+
     // 怠速油耗人为调高一倍 *************
     idlingFuel = (km100StopLiter / idlingRatio1) * 2;
     if(vehicleSpeed <= 0)
         instantFuel = literAvg ;
     if(vehicleSpeed <= 0 && engineRpm <= 0)
         instantFuel = 0.0;
-    
+
     /**
      * 自定义怠速油耗
      * 1、如果时速>0 && <10
@@ -1225,7 +1579,7 @@ void SensorsService::calculateIdlingFuel(double stopTimeCount) {
         /*double tmpRatio = 0.45D;
          double tmpCustomIdlingFuel = tmpRatio / 100;
          customIdlingFuel += tmpCustomIdlingFuel;*/
-        
+
         customIdlingFuel = km100StopLiter / idlingRatio2;
     }
 }
@@ -1237,7 +1591,7 @@ void SensorsService::calculateIdlingFuel(double stopTimeCount) {
 double SensorsService::calculateTravelTotalDistance() {
     double tmpDist = vehicleSpeed * 1.0 / 3600;
     dist += tmpDist;
-    
+
     return dist;
 }
 
@@ -1302,14 +1656,14 @@ void SensorsService::calculateTraveData()
         // 计算此次行车总里程
         calculateTravelTotalDistance();
         // 计算油耗
-        calculateFuel();
+        calculateFuelNew();
         // 计算时速平均值
         calculateVehicleSpeedAvg();
         // 计算油门平均值
         calculateAcceleratorPedalPositionAvg();
         // 计算转速平均值
         calculateEngineRpmAvg();
-        
+
         calculateTraveDataCount++;
         if(isCalculate&&vehicleSpeed>=55&&vehicleSpeed<=65)
         {
@@ -1343,7 +1697,7 @@ void SensorsService::Car_CheckUp_init()
     networkDTCList.clear();
     DrivingDataUnusualCount=0;
     DrivingDataNormalCount=0;
-    
+
 }
 
 /**
@@ -1358,9 +1712,9 @@ int SensorsService::DTC_CheckUp(string data )
     chassisDTCList.clear();
     bodyDTCList.clear();
     networkDTCList.clear();
-    
+
     if(data.empty()) return -1;
-    
+
     DtcCount=dtcs(data).size();
     return DtcCount;
 }
@@ -1477,7 +1831,7 @@ void SensorsService::setCarCheckUpValue(int i,double Value,double MaxValue,doubl
 void SensorsService::setCarCheckUpValue(int i,double MaxValue,double MinValue)
 {
     if(i<MAXNUM)	{
-        
+
         CarCheckUp_MaxValue_list[i]=MaxValue;
         CarCheckUp_MinValue_list[i]=MinValue;
     }
@@ -1492,7 +1846,7 @@ void SensorsService::setCarCheckUpValue(int i,double Value)
     if(i<MAXNUM)
     {
         CarCheckUp_Value_list[i]=Value;
-        
+
     }
     else
     {
@@ -1508,7 +1862,7 @@ void SensorsService::setCarCheckUpValue(int i,double Value)
 int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
 {
     if( sensorsData.empty()||sensorsData.length() == 0||sensorsData.find("NO DATA")!= string::npos||sensorsData.find("CAN ERROR")!= string::npos||
-       sensorsData.find("STOPPED")!= string::npos||sensorsData.find("BUS INIT:")!= string::npos)
+        sensorsData.find("STOPPED")!= string::npos||sensorsData.find("BUS INIT:")!= string::npos)
     {
         //自发动机启动的时间、故障码清楚后行驶公里数、相对节气门位置、绝对节气门位置B、绝对节气门位置C
         //加速踏板位置D、加速踏板位置E、加速踏板位置F、节气门执行器控制指令、故障码清楚后时间
@@ -1521,13 +1875,13 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
         //}
         DrivingDataVoidCount++;
         return -1;
-        
+
     }
     int data1=0;
     int data2=0;
     double tmpNum=0;
     if(sensorsData.find("410")!= string::npos&&pid.find("010")!=string::npos){
-        
+
         /******************** 0104-- 010F 开始********************/
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()==0)
@@ -1544,7 +1898,7 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             setCarCheckUpValue(i,tmpNum);
             return isNormal(tmpNum,CarCheckUp_MaxValue_list[i],CarCheckUp_MinValue_list[i]);
         }
-        
+
         else if(sensorsData.find("4105")!= string::npos&&pid.find("0105")!=string::npos){		//发动机冷却液温度
             tmpNum=(data1 - 40);
             //setCarCheckUpValue(Car_CheckUp_location["0105"],tmpNum,185,-39);
@@ -1576,7 +1930,7 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             int i= Car_CheckUp_location["0108"];
             setCarCheckUpValue(i,tmpNum);
             return isNormal(tmpNum,CarCheckUp_MaxValue_list[i],CarCheckUp_MinValue_list[i]);
-            
+
         }
         else if(sensorsData.find("4109")!=string::npos&&pid.find("0109")!=string::npos){			//长时燃料补偿值（气缸组2）
             tmpNum=((data1 - 128) * 100 / 128);
@@ -1644,16 +1998,16 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             DrivingDataVoidCount++;
             return -1;
         }
-        
-        
-        
-        
-        
+
+
+
+
+
         /******************** 0104-- 010F 结束********************/
-        
+
     }
     else if(sensorsData.find("411")!= string::npos&&pid.find("011")!=string::npos){
-        
+
         vector<string> arr= dataHandler(sensorsData,false);
         if(arr.size()==0)
         {
@@ -1661,7 +2015,7 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             return -1;
         }
         sscanf(arr[0].c_str(),"%x",&data1);
-        
+
         /******************** 0110-- 011F 开始********************/
         if(sensorsData.find("4110")!= string::npos&&pid.find("0110")!=string::npos){      //空气流量速率
             if(arr.size()<=1)
@@ -1704,14 +2058,14 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             return -1;
         }
         /******************** 0110-- 011F 结束********************/
-        
+
     }
     else if(sensorsData.find("412")!= string::npos&&pid.find("012")!=string::npos){
-        
-        
-        
+
+
+
         /******************** 0121-- 0122 开始********************/
-        
+
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()<=1)
         {
@@ -1720,7 +2074,7 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
         }
         sscanf(arr[0].c_str(),"%x",&data1);
         sscanf(arr[1].c_str(),"%x",&data2);
-        
+
         if(sensorsData.find("4121")!=string::npos&&pid.find("0121")!=string::npos){      //在故障指示灯激活状态下行驶的里程
             tmpNum=(data1*256)+data2;
             //setCarCheckUpValue(Car_CheckUp_location["0121"],tmpNum,0,0);
@@ -1743,10 +2097,10 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             return -1;
         }
         /******************** 0121-- 0122 结束********************/
-        
+
     }
     else if(sensorsData.find("413")!= string::npos&&pid.find("013")!=string::npos){
-        
+
         /******************** 0131-- 013F 开始********************/
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()<=0)
@@ -1788,12 +2142,12 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             DrivingDataVoidCount++;
             return -1;
         }
-        
+
         /******************** 0131-- 013F 结束********************/
-        
+
     }
     else if(sensorsData.find("414")!= string::npos&&pid.find("014")!=string::npos){
-        
+
         /******************** 0142-- 014E 开始********************/
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()<=0)
@@ -1920,10 +2274,10 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             return -1;
         }
         /******************** 0142-- 014E 结束********************/
-        
+
     }
     else if(sensorsData.find("415")!= string::npos&&pid.find("015")!=string::npos){
-        
+
         /******************** 0151-- 0159 开始********************/
         vector<string> arr = dataHandler(sensorsData,false);
         if(arr.size()<=1)
@@ -1954,14 +2308,14 @@ int  SensorsService::DrivingData_CheckUp(string sensorsData,string pid)
             return -1;
         }
         /******************** 0151-- 0159 结束********************/
-        
+
     }
     else
     {
         DrivingDataVoidCount++;
         return -1;
     }
-    
+
 }
 
 
@@ -2036,7 +2390,7 @@ int SensorsService::vehicleImpact()
 {
     /*int data1=0;
      int data2=0;
-     
+
      if(beforeVehicleSpeed>=60&&beforeVehicleSpeed-vehicleSpeed>=50)
      {
      beforeVehicleSpeed=vehicleSpeed;
@@ -2053,7 +2407,7 @@ int SensorsService::vehicleImpact()
     {
         beginCalculate=true;
     }
-    
+
     beforeVehicleSpeed[arrayHead]=vehicleSpeed;
     if(beginCalculate)
     {
@@ -2063,7 +2417,7 @@ int SensorsService::vehicleImpact()
             return 1;
         }
         //10秒内有急刹车现象
-        
+
     }
     return 0;
 }
@@ -2104,7 +2458,7 @@ double SensorsService::analysisAcceleratorPedal(string sensorsData ,string pid )
         if(arr.size()>0)
         {
             sscanf(arr[0].c_str(),"%x",&data1);
-            return (data1 * 100*1.0 / 255);				
+            return (data1 * 100*1.0 / 255);
         }
     }
     else if(sensorsData.find("410C")!= string::npos&&pid.find("010C")!=string::npos){
@@ -2113,11 +2467,9 @@ double SensorsService::analysisAcceleratorPedal(string sensorsData ,string pid )
         {
             sscanf(arr[0].c_str(),"%x",&data1);
             sscanf(arr[1].c_str(),"%x",&data2);
-            return (((data1 * 256) + data2) / 4.0);			
+            return (((data1 * 256) + data2) / 4.0);
         }
     }
     return 0;
-    
+
 }
-
-

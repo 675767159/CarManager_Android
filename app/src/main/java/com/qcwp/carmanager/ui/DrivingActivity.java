@@ -104,7 +104,21 @@ public class DrivingActivity extends BaseActivity {
 
 
                 averageSpeed.setContentTextViewText(String.format(locale, "%.0f KM/H", obdClient.getAvgVehicleSpeed()));
-                instantOilConsume.setContentTextViewText(String.format(locale, "%.2f L/100KM", obdClient.getCurrentOilConsume()));
+
+
+                if (OBDClient.getDefaultClien().getVehicleSpeed()>0) {
+                    instantOilConsume.setContentTextViewText(String.format(locale, "%.2f L/100KM", obdClient.getCurrentOilConsume()));
+
+                }else{
+                    instantOilConsume.setContentTextViewText(String.format(locale, "瞬时油耗：%.2f L/h", obdClient.getCurrentOilConsume()));
+
+                }
+
+
+
+
+
+
                 averageOilConsume.setContentTextViewText(String.format(locale, "%.2f L/100KM", obdClient.getAvgOilConsume()));
                 currentMileage.setContentTextViewText(String.format(locale, "%.1f KM", obdClient.getDist()));
                 totalMileage.setContentTextViewText(String.format(locale, "%.1f KM", obdClient.getTotalMileage()));

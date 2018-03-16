@@ -14,7 +14,9 @@ public:
 	static string  pids ;
 	static double engineLoadValue;	//计算发动机负荷值
 	static double lTFuelTrim;		//长时燃料补偿值（气缸组1）
+	static double lTFuelTrim2;//长时燃料补偿值（气缸组2）
 	static double sTFuelTrim;	//短时燃料补偿值（气缸组1）
+	static double sTFuelTrim2;	//短时燃料补偿值（气缸组2）
 	static double fuelPressure;		//燃料压力
 	static double map;  //进气歧管绝对压力
 	static double maxVehicleSpeed;	//最大车速
@@ -22,6 +24,7 @@ public:
 	static double engineCoolant;	//发动机冷却液温度
 	static double airFlowRate;		//空气流量传感器的空气流量
 	static double acceleratorPedalPosition;		//节气门位置
+	static string acceleratorPedalPositionPid;//节气门位置指令
 	static double maxAcceleratorPedalPosition;	//最大节气门位置
 	static double acceleratorPedalPositionTotal ;//总的节气门位置
 	static double avgAcceleratorPedalPosition;   //节气门位置平均值
@@ -49,7 +52,9 @@ public:
 	static double instantFuel ;// 行车100公里瞬时油耗，前端显示使用
 	static double customIdlingFuel; // 自定义怠速油耗
 
-
+	static double instantOriginFuel ;// 原始瞬时油耗，单位：升/小时
+	static double totalOriginFuel ;// 总油耗，单位：升
+	static double totalDriveFuel ;// 行驶油耗，单位：升
 
 
 	static double idlingFuel1 ;
@@ -141,28 +146,13 @@ public:
 	static vector<double> beforeVehicleSpeed; //10个时速数据
 	static double bfImpactVehicleSpeed; //碰撞前
 	static double afImapactVehicleSpeed; //碰撞后时速
-
-	//汽车引入新油耗系数
-	static double val1;
-	static double val2;
-	static double val3;
-	static double val4;
-	static double val5;
-	static double val6;
-	static double val7;
-	static double val8;
-	static double val9;
-	static double val10;
-	
-	static double maxLiter;//油耗上限值
-	static double overSpeed;//超速预警时速
-	static int isOverSpeedVal;//是否超过预警时速，1为超过,0不超速
-	
 public:
 	static void initData();	//初始化
 
 	//static void calculateFuel(int travelTimeCount, int stopTimeCount); //油耗计算
 	static void calculateFuel(); //油耗计算
+
+	static void calculateFuelNew(); //新油耗计算
 
 	static void SensorsDataHandler(string sensorsData,string pid);
 
@@ -205,20 +195,23 @@ public:
 	static void setCarCheckUpValue(int i,double MaxValue,double MinValue);
 	static void setCarCheckUpValue(int i,double Value);
 
-	
+
 	static double analysisAcceleratorPedal(string tmpData ,string pid );//油门踏板解析
 
 
 	static int vehicleImpact();// 汽车碰撞判断
 	static void vehicleImpactInit(); //初始化汽车碰撞数据
-	
-	static void initCoefficient(double val1,double val2,double val3,double val4,double val5,double val6,double val7,double val8,double val9,double val10);
-	//设置最高瞬时油耗，默认39.99
-	static void setMaxLiter(double val);
-	//设置超速预警速度，0为不预警（默认）
-	static void setOverSpeed(double overSpeed);
-	//是否超速,true超速
-	static int isOverSpeed();
+
+	static double oxygenSensor1;	//氧传感器-1
+	static double oxygenSensor2;	//氧传感器-2
+	static double oxygenSensor3;	//氧传感器-3
+	static double oxygenSensor4;	//氧传感器-4
+	static double oxygenSensor5;	//氧传感器-5
+	static double oxygenSensor6;	//氧传感器-6
+	static double oxygenSensor7;	//氧传感器-7
+	static double oxygenSensor8;	//氧传感器-8
+
+
 
 };
 

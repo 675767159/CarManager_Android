@@ -343,6 +343,13 @@ JNIEXPORT jdouble JNICALL Java_com_qcwp_carmanager_obd_SensorsService_instantFue
     return SensorsService::instantFuel;
 }
 
+
+JNIEXPORT jdouble JNICALL Java_com_qcwp_carmanager_obd_SensorsService_instantOriginFuel
+        (JNIEnv *env, jclass obj){
+    //double tmp=GetDoubleOfInteger(SensorsService::instantFuel,"%.1f");
+    return SensorsService::instantOriginFuel;
+}
+
 /*
 * Class:     com_auto_service_SensorsService
 * Method:    dist

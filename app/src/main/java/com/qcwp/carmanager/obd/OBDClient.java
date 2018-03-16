@@ -77,7 +77,8 @@ public class OBDClient {
     private double totalTime;//行驶时间
     private double avgVehicleSpeed;//平均速度
     private double avgOilConsume;//平均油耗
-    private double currentOilConsume;//当前油耗
+    private double currentOilConsume;//当前油耗(L/100km)
+    private double currentOriginalOilConsume;//当前油耗(L/H)
     private double dist;//当前里程
     private double controlModuleVoltage;//控制模块电压
     private double intakeTemp;//环境空气温度(-40~214)
@@ -155,7 +156,11 @@ public class OBDClient {
     }
 
     public double getCurrentOilConsume() {
-        return currentOilConsume;
+        if (vehicleSpeed > 0) {
+            return currentOilConsume;
+        }else {
+            return currentOriginalOilConsume;
+        }
     }
 
     public double getDist() {
@@ -664,6 +669,7 @@ public class OBDClient {
         avgVehicleSpeed = SensorsService.vehicleSpeedAve();
         avgOilConsume = SensorsService.showUsaLiter();
         currentOilConsume = SensorsService.instantFuel();
+        currentOriginalOilConsume = SensorsService.instantOriginFuel();
         dist = SensorsService.dist();
         controlModuleVoltage = SensorsService.controlModuleVoltage();
         intakeTemp = SensorsService.intakeTemp();
@@ -701,6 +707,9 @@ public class OBDClient {
     //是否超车
     private void postHypervelocity() {
 
+        if (vehicleSpeed == -1){
+            EventBus.getDefault().post(new MessageEvent(MessageEvent.MessageEventType.OBDLostDisconnection, null));
+        }
         if (EmptyUtils.isNotEmpty(overSpeedLimit)) {
             int speed = Integer.parseInt(overSpeedLimit);
 
