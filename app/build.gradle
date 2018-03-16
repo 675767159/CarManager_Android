@@ -6,7 +6,7 @@ def releaseTime() {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.qcwp.carmanager"
         minSdkVersion 17
@@ -89,7 +89,7 @@ dependencies {
     //²à»¬²Ëµ¥https://github.com/bestTao/CoordinatorMenu
     compile 'com.github.bestTao:CoordinatorMenu:v1.0.2'
 
-    compile "com.google.auto.value:auto-value:1.4.1"
+//    compile "com.google.auto.value:auto-value:1.4.1"
     //Êý¾Ý¿â
     compile 'org.greenrobot:greendao:3.2.2' // add library
 
